@@ -11,7 +11,7 @@ export interface Article {
   tags: string[]
 }
 
-export const articlesDatabase: Article[] = [
+const articlesData: Article[] = [
   {
     id: "1",
     title: "The Science Behind Intermittent Fasting",
@@ -50,4 +50,6 @@ export const articlesDatabase: Article[] = [
   },
 ]
 
-export default articlesDatabase
+export const articlesDatabase = articlesData
+export default articlesData
+export type { Article }
