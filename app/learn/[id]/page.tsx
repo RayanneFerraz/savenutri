@@ -4,30 +4,35 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Clock, User, Share2, Bookmark, Star, BookOpen, ChevronRight } from "lucide-react"
+import {
+  ArrowLeft,
+  Clock,
+  User,
+  Share2,
+  Bookmark,
+  Star,
+  BookOpen,
+  Lightbulb,
+  CheckCircle,
+  ChevronRight,
+  AlertTriangle,
+} from "lucide-react"
 import { toast } from "sonner"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { useLanguage } from "@/context/languageContext"
-import articlesData, { type Article } from "@/lib/articles-data"
-import { useContentTranslation } from "@/hooks/useContentTranslation"
+import { useLanguage } from "@/context/languageContext" // Certifique-se que este é o seu hook de linguagem
+import articlesData, { type Article, type ContentSection } from "@/lib/articles-data" // Usando a fonte de dados original
 
 export default function ArticleDetailPage({ params }: { params: { id: string } }) {
-  const { t, language } = useLanguage()
+  const { t } = useLanguage() // Usando seu hook de linguagem
   const article: Article | undefined = articlesData[params.id]
   const router = useRouter()
   const [isBookmarked, setIsBookmarked] = useState(false)
-  const { translateContent } = useContentTranslation()
 
   if (!article) {
     notFound()
   }
-
-  // Get translated content
-  const translatedTitle = translateContent(article.title)
-  const translatedDescription = translateContent(article.description)
-  const translatedContent = translateContent(article.content)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -38,7 +43,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
         try {
           bookmarks = JSON.parse(storedBookmarks)
         } catch (error) {
-          console.error("Error parsing bookmarks:", error)
+          console.error("Erro ao fazer parse de bookmarks:", error)
           bookmarks = []
         }
       }
@@ -56,7 +61,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
         try {
           bookmarks = JSON.parse(storedBookmarks)
         } catch (error) {
-          console.error("Error parsing bookmarks:", error)
+          console.error("Erro ao fazer parse de bookmarks:", error)
           bookmarks = []
         }
       }
@@ -79,13 +84,81 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
   const shareArticle = () => {
     if (navigator.share) {
       navigator.share({
-        title: translatedTitle,
-        text: translatedDescription,
+        title: article.title,
+        text: article.description,
         url: window.location.href,
       })
     } else {
       navigator.clipboard.writeText(window.location.href)
       toast.success(t("linkCopiedToClipboard"))
+    }
+  }
+
+  const renderContentSection = (section: ContentSection, index: number) => {
+    switch (section.type) {
+      case "intro":
+        return (
+          <section key={index} className="mb-8 p-6 bg-blue-50 rounded-lg shadow">
+            <h2 className="text-2xl font-semibold text-blue-700 mb-3">{t(section.titleKey)}</h2>
+            <p className="text-gray-700 leading-relaxed">{section.content}</p>
+          </section>
+        )
+      case "section":
+        return (
+          <section key={index} className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">
+              {t(section.titleKey)}
+            </h2>
+            {section.content && <p className="text-gray-700 leading-relaxed mb-4">{section.content}</p>}
+            {section.subsections &&
+              section.subsections.map((subsection, subIndex) => (
+                <div key={subIndex} className="mb-4 ml-4 p-4 border-l-4 border-blue-500 bg-gray-50 rounded">
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">{t(subsection.titleKey)}</h3>
+                  <p className="text-gray-600 leading-relaxed">{subsection.content}</p>
+                </div>
+              ))}
+          </section>
+        )
+      case "benefits":
+        return (
+          <section key={index} className="mb-8 p-6 bg-green-50 rounded-lg shadow">
+            <h2 className="text-xl font-semibold text-green-700 mb-3 flex items-center">
+              <CheckCircle className="w-6 h-6 mr-2" />
+              {t(section.titleKey)}
+            </h2>
+            <ul className="list-disc list-inside space-y-1 text-gray-700">
+              {section.items?.map((itemKey, itemIndex) => (
+                <li key={itemIndex}>{t(itemKey)}</li>
+              ))}
+            </ul>
+          </section>
+        )
+      case "tips":
+        return (
+          <section key={index} className="mb-8 p-6 bg-yellow-50 rounded-lg shadow">
+            <h2 className="text-xl font-semibold text-yellow-700 mb-3 flex items-center">
+              <Lightbulb className="w-6 h-6 mr-2" />
+              {t(section.titleKey)}
+            </h2>
+            <ul className="list-disc list-inside space-y-1 text-gray-700">
+              {section.items?.map((tipKey, tipIndex) => (
+                <li key={tipIndex}>{t(tipKey)}</li>
+              ))}
+            </ul>
+          </section>
+        )
+      case "warning":
+        return (
+          <section key={index} className="mb-8 p-6 bg-red-50 rounded-lg shadow">
+            <h2 className="text-xl font-semibold text-red-700 mb-3 flex items-center">
+              <AlertTriangle className="w-6 h-6 mr-2" />
+              {t(section.titleKey)}
+            </h2>
+            <p className="text-gray-700 leading-relaxed">{section.content}</p>
+          </section>
+        )
+      default:
+        return null
     }
   }
 
@@ -100,7 +173,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
             </Button>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-[#F2AEE7] text-[#F24E29]">{article.category}</Badge>
+                <Badge className="bg-[#F2AEE7] text-[#F24E29]">{t(article.category)}</Badge>
                 <div className="flex items-center gap-1 text-sm text-gray-500">
                   <Clock className="w-4 h-4" />
                   {article.readTime}
@@ -110,8 +183,8 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
                   {article.rating} ({article.reviews} {t("reviewsSuffix")})
                 </div>
               </div>
-              <h1 className="text-3xl font-bold text-[#F24E29]">{translatedTitle}</h1>
-              <p className="text-gray-600">{translatedDescription}</p>
+              <h1 className="text-3xl font-bold text-[#F24E29] mb-2">{article.title}</h1>
+              <p className="text-gray-600">{article.description}</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="icon" onClick={toggleBookmark}>
@@ -126,10 +199,10 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <Link href="/learn" className="hover:text-[#F24E29] transition-colors">
-              {t("learn")}
+              {t("learn")} {/* ESTA É A LINHA CORRIGIDA */}
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-[#F24E29]">{translatedTitle}</span>
+            <span className="text-[#F24E29]">{article.title}</span>
           </div>
 
           {/* Article Meta */}
@@ -163,11 +236,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
 
           {/* Article Content */}
           <Card>
-            <CardContent className="p-8">
-              <div className="prose prose-lg max-w-none">
-                <div className="text-gray-700 leading-relaxed whitespace-pre-line">{translatedContent}</div>
-              </div>
-            </CardContent>
+            <CardContent className="p-6 space-y-8">{article.content.map(renderContentSection)}</CardContent>
           </Card>
 
           {/* Article Footer */}
@@ -205,25 +274,24 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
                   .map((relatedArticle) => (
                     <Card
                       key={relatedArticle.id}
-                      className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-                      onClick={() => router.push(`/learn/${relatedArticle.id}`)}
+                      className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
                     >
-                      <div className="aspect-video bg-gradient-to-br from-[#F2AEE7] to-[#F2C12E] flex items-center justify-center">
-                        <BookOpen className="w-12 h-12 text-white" />
-                      </div>
+                      <img
+                        src={relatedArticle.image || "/placeholder.svg?width=400&height=200&query=related+article"}
+                        alt={relatedArticle.title}
+                        className="w-full h-40 object-cover"
+                      />
+                      <CardHeader className="p-4">
+                        <CardTitle className="text-md font-semibold h-12 overflow-hidden">
+                          {relatedArticle.title}
+                        </CardTitle>
+                      </CardHeader>
                       <CardContent className="p-4">
-                        <h3 className="font-semibold text-[#F24E29] mb-2 line-clamp-2">
-                          {translateContent(relatedArticle.title)}
-                        </h3>
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                          {translateContent(relatedArticle.description)}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <Badge variant="outline" className="text-xs">
-                            {relatedArticle.category}
-                          </Badge>
-                          <span className="text-xs text-gray-500">{relatedArticle.readTime}</span>
-                        </div>
+                        <Link href={`/learn/${relatedArticle.id}`}>
+                          <Button variant="outline" className="w-full">
+                            {t("readMore")}
+                          </Button>
+                        </Link>
                       </CardContent>
                     </Card>
                   ))}

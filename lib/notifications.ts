@@ -19,7 +19,7 @@ interface ScheduledNotification {
 
 class NotificationManager {
   private static instance: NotificationManager
-  private vapidPublicKey = "BGVxsToCXmpx4iPM9ecvi0MavKZq0MTDBuRyWdwDB4Jrqn5EkG-GLjbnJd4I6iwd3i8us70ZOZvX1p0v-ZKATdU"
+  private vapidPublicKey = "BEl62iUYgUivxIkv69yViEuiBIa40HcCWLrUjHLjdMorGDlLVW6SCDhHxiHSNOHIS03v7VdHoTxKryaHXr6tmlA" // Exemplo - em produção usar chaves reais
 
   static getInstance(): NotificationManager {
     if (!NotificationManager.instance) {
@@ -30,7 +30,7 @@ class NotificationManager {
 
   async requestPermission(): Promise<boolean> {
     if (!("Notification" in window) || !("serviceWorker" in navigator)) {
-      console.log("Notifications not supported")
+      console.log("Notificações não suportadas")
       return false
     }
 
@@ -47,6 +47,7 @@ class NotificationManager {
         applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey),
       })
 
+      // Salvar token no localStorage (em produção, enviar para servidor)
       const token: NotificationToken = {
         endpoint: subscription.endpoint,
         keys: {
@@ -57,11 +58,11 @@ class NotificationManager {
       }
 
       localStorage.setItem("pushToken", JSON.stringify(token))
-      console.log("Push subscription created:", token)
+      console.log("Push subscription criada:", token)
 
       return subscription
     } catch (error) {
-      console.error("Error creating push subscription:", error)
+      console.error("Erro ao criar push subscription:", error)
       return null
     }
   }
@@ -77,6 +78,7 @@ class NotificationManager {
     return outputArray
   }
 
+  // Notificação local imediata
   showLocalNotification(title: string, body: string, options?: NotificationOptions) {
     if (Notification.permission === "granted") {
       new Notification(title, {
@@ -89,6 +91,7 @@ class NotificationManager {
     }
   }
 
+  // Agendar notificação local
   scheduleLocalNotification(notification: Omit<ScheduledNotification, "id">) {
     const id = Date.now().toString()
     const scheduledNotification: ScheduledNotification = { ...notification, id }
@@ -97,6 +100,7 @@ class NotificationManager {
     scheduled.push(scheduledNotification)
     localStorage.setItem("scheduledNotifications", JSON.stringify(scheduled))
 
+    // Configurar timeout
     const delay = notification.scheduledFor - Date.now()
     if (delay > 0) {
       setTimeout(() => {
@@ -122,22 +126,23 @@ class NotificationManager {
     localStorage.setItem("scheduledNotifications", JSON.stringify(filtered))
   }
 
+  // Notificações específicas do jejum
   scheduleTimerNotification(duration: number, type: "start" | "end") {
     const now = Date.now()
     const scheduledFor = now + duration
 
     if (type === "start") {
       this.scheduleLocalNotification({
-        title: "Fasting Started! 🚀",
-        body: "Your fasting period has begun. Good luck!",
-        scheduledFor: now + 1000,
+        title: "Jejum Iniciado! 🚀",
+        body: "Seu período de jejum começou. Boa sorte!",
+        scheduledFor: now + 1000, // 1 segundo depois
         type: "timer",
         data: { timerType: "start" },
       })
     } else {
       this.scheduleLocalNotification({
-        title: "Fasting Complete! 🎉",
-        body: "Congratulations! You've successfully completed your fast.",
+        title: "Jejum Concluído! 🎉",
+        body: "Parabéns! Você completou seu jejum com sucesso.",
         scheduledFor,
         type: "timer",
         data: { timerType: "end" },
@@ -150,18 +155,20 @@ class NotificationManager {
     const scheduledTime = new Date()
     scheduledTime.setHours(hour, minute, 0, 0)
 
+    // Se já passou da hora hoje, agendar para amanhã
     if (scheduledTime.getTime() <= now.getTime()) {
       scheduledTime.setDate(scheduledTime.getDate() + 1)
     }
 
     this.scheduleLocalNotification({
-      title: "Time to Fast! ⏰",
-      body: "How about starting your fast now?",
+      title: "Hora do Jejum! ⏰",
+      body: "Que tal começar seu jejum agora?",
       scheduledFor: scheduledTime.getTime(),
       type: "reminder",
     })
   }
 
+  // Enviar push notification via API
   async sendPushNotification(title: string, body: string, data?: any) {
     try {
       const response = await fetch("/api/notifications/send", {
@@ -177,12 +184,13 @@ class NotificationManager {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to send notification")
+        throw new Error("Falha ao enviar notificação")
       }
 
       return await response.json()
     } catch (error) {
-      console.error("Error sending push notification:", error)
+      console.error("Erro ao enviar push notification:", error)
+      // Fallback para notificação local
       this.showLocalNotification(title, body, { data })
     }
   }

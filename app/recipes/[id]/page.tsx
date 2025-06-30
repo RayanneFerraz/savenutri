@@ -29,7 +29,6 @@ import { toast } from "@/hooks/use-toast"
 import { getRecipeById } from "@/lib/recipes-data"
 import { useLanguage } from "@/context/languageContext"
 import type { TranslationKey } from "@/lib/translations"
-import { useContentTranslation } from "@/hooks/useContentTranslation"
 
 export default function RecipeDetailPage() {
   const params = useParams()
@@ -41,7 +40,6 @@ export default function RecipeDetailPage() {
 
   const recipe = getRecipeById(Number(params.id))
   const { t } = useLanguage()
-  const { translateContent } = useContentTranslation()
 
   if (!recipe) {
     return (
@@ -57,17 +55,6 @@ export default function RecipeDetailPage() {
       </div>
     )
   }
-
-  // Aplicar tradução na receita
-  const translatedRecipe = recipe
-    ? {
-        ...recipe,
-        title: translateContent(recipe.title),
-        description: translateContent(recipe.description),
-        category: translateContent(recipe.category),
-        difficulty: translateContent(recipe.difficulty),
-      }
-    : null
 
   const toggleStepComplete = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
@@ -211,8 +198,8 @@ export default function RecipeDetailPage() {
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-[#F24E29]">{translatedRecipe?.title}</h1>
-              <p className="text-gray-600 mt-1">{translatedRecipe?.description}</p>
+              <h1 className="text-3xl font-bold text-[#F24E29]">{recipe.title}</h1>
+              <p className="text-gray-600 mt-1">{recipe.description}</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="icon" onClick={toggleFavorite}>
@@ -271,7 +258,7 @@ export default function RecipeDetailPage() {
                     <div className="flex items-center gap-2">
                       <Target className="w-4 h-4 text-[#F24E29]" />
                       <div>
-                        <div className="font-medium">{translatedRecipe?.difficulty}</div>
+                        <div className="font-medium">{recipe.difficulty}</div>
                         <div className="text-gray-500">{t("difficulty")}</div>
                       </div>
                     </div>

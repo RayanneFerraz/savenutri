@@ -8,9 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Shield, Lock, User } from "lucide-react"
+import { Shield, Eye, EyeOff, Lock, User, AlertCircle } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import { useLanguage } from "@/context/languageContext"
 
 interface AdminUser {
   id: number
@@ -22,7 +21,7 @@ interface AdminUser {
   lastLogin?: string
 }
 
-// Initial admin users data (in production would be in database)
+// Dados iniciais dos usuários admin (em produção seria em banco de dados)
 const getAdminUsers = (): AdminUser[] => {
   const stored = localStorage.getItem("adminUsers")
   if (stored) {
@@ -45,7 +44,6 @@ const getAdminUsers = (): AdminUser[] => {
 }
 
 export default function AdminLoginPage() {
-  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -61,23 +59,23 @@ export default function AdminLoginPage() {
     setError("")
 
     try {
-      // Simulate authentication delay
+      // Simular delay de autenticação
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       const adminUsers = getAdminUsers()
       const user = adminUsers.find((u) => u.username === formData.username && u.password === formData.password)
 
       if (!user) {
-        setError(t("adminLoginError"))
+        setError("Usuário ou senha incorretos")
         setIsLoading(false)
         return
       }
 
-      // Update last login
+      // Atualizar último login
       const updatedUsers = adminUsers.map((u) => (u.id === user.id ? { ...u, lastLogin: new Date().toISOString() } : u))
       localStorage.setItem("adminUsers", JSON.stringify(updatedUsers))
 
-      // Save admin session
+      // Salvar sessão admin
       localStorage.setItem(
         "adminSession",
         JSON.stringify({
@@ -90,13 +88,13 @@ export default function AdminLoginPage() {
       )
 
       toast({
-        title: t("loginSuccessful"),
-        description: t("welcomeAdmin", { name: user.name }),
+        title: "Login realizado!",
+        description: `Bem-vindo, ${user.name}!`,
       })
 
       router.push("/admin")
     } catch (error) {
-      setError(t("internalError"))
+      setError("Erro interno. Tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -109,19 +107,19 @@ export default function AdminLoginPage() {
           <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-white" />
           </div>
-          <CardTitle className="text-2xl">{t("adminAccess")}</CardTitle>
-          <p className="text-white/90 text-sm">{t("enterWithCredentials")}</p>
+          <CardTitle className="text-2xl">Acesso Administrativo</CardTitle>
+          <p className="text-white/90 text-sm">Entre com suas credenciais de administrador</p>
         </CardHeader>
         <CardContent className="p-6">
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">{t("username")}</Label>
+              <Label htmlFor="username">Usuário</Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="username"
                   type="text"
-                  placeholder={t("enterUsername")}
+                  placeholder="Digite seu usuário"
                   className="pl-10"
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
@@ -131,43 +129,47 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">{t("password")}</Label>
+              <Label htmlFor="password">Senha</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder={t("enterPassword")}
+                  placeholder="Digite sua senha"
                   className="pl-10 pr-10"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
                 />
-                <Button
+                <button
                   type="button"
-                  variant="ghost"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? "Hide" : "Show"}
-                </Button>
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
 
-            {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+            {error && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                <AlertCircle className="w-4 h-4" />
+                {error}
+              </div>
+            )}
 
             <Button
               type="submit"
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-[#F24E29] to-[#F27D16] hover:from-[#F24E29]/90 hover:to-[#F27D16]/90 text-white"
             >
-              {isLoading ? t("loading") : t("login")}
+              {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-xs text-gray-500">
-            <p>{t("restrictedArea")}</p>
-            <p>{t("contactSupport")}</p>
+            <p>Área restrita para administradores</p>
+            <p>Entre em contato com o suporte se precisar de acesso</p>
           </div>
         </CardContent>
       </Card>

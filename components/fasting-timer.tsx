@@ -5,21 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Play, Pause, Square, Clock } from "lucide-react"
-import { useLanguage } from "@/context/languageContext"
 
 export default function FastingTimer() {
   const [isActive, setIsActive] = useState(false)
   const [timeLeft, setTimeLeft] = useState(16 * 60 * 60) // 16 horas em segundos
   const [totalTime, setTotalTime] = useState(16 * 60 * 60)
-  const [fastingStage, setFastingStage] = useState("")
+  const [fastingStage, setFastingStage] = useState("Início do Jejum")
   const [startTime, setStartTime] = useState<Date | null>(null)
-
-  const { t } = useLanguage()
-
-  // Initialize fasting stage with translated value
-  useEffect(() => {
-    setFastingStage(t("preparation"))
-  }, [t])
 
   // Carregar estado do timer do localStorage
   useEffect(() => {
@@ -40,13 +32,9 @@ export default function FastingTimer() {
           const newTimeLeft = Math.max(0, timerState.totalTime - elapsedSeconds)
           setTimeLeft(newTimeLeft)
           setTotalTime(timerState.totalTime)
-          updateFastingStage(timerState.totalTime - newTimeLeft)
         } else {
           setTimeLeft(timerState.timeLeft || 16 * 60 * 60)
           setTotalTime(timerState.totalTime || 16 * 60 * 60)
-          if (timerState.timeLeft < timerState.totalTime && timerState.timeLeft > 0) {
-            updateFastingStage(timerState.totalTime - timerState.timeLeft)
-          }
         }
       } catch (error) {
         console.log("Erro ao carregar estado do timer:", error)
@@ -78,7 +66,7 @@ export default function FastingTimer() {
         console.log("Erro ao carregar perfil:", error)
       }
     }
-  }, [t])
+  }, [])
 
   // Salvar estado do timer no localStorage sempre que mudar
   useEffect(() => {
@@ -106,12 +94,8 @@ export default function FastingTimer() {
             const elapsedSeconds = Math.floor((now - startTimeMs) / 1000)
             const newTimeLeft = Math.max(0, timerState.totalTime - elapsedSeconds)
             setTimeLeft(newTimeLeft)
-            updateFastingStage(timerState.totalTime - newTimeLeft)
           } else {
             setTimeLeft(timerState.timeLeft)
-            if (timerState.timeLeft < timerState.totalTime && timerState.timeLeft > 0) {
-              updateFastingStage(timerState.totalTime - timerState.timeLeft)
-            }
           }
           setTotalTime(timerState.totalTime)
         } catch (error) {
@@ -122,7 +106,7 @@ export default function FastingTimer() {
 
     window.addEventListener("storage", handleStorageChange)
     return () => window.removeEventListener("storage", handleStorageChange)
-  }, [t])
+  }, [])
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
@@ -137,26 +121,25 @@ export default function FastingTimer() {
       }, 1000)
     } else if (timeLeft === 0) {
       setIsActive(false)
-      setFastingStage(t("fastCompleted"))
     }
 
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isActive, timeLeft, totalTime, t])
+  }, [isActive, timeLeft, totalTime])
 
   const updateFastingStage = (elapsedTime: number) => {
     const hours = elapsedTime / 3600
     if (hours < 4) {
-      setFastingStage(t("digestionAndAbsorption"))
+      setFastingStage("Digestão e Absorção")
     } else if (hours < 8) {
-      setFastingStage(t("metabolicTransition"))
+      setFastingStage("Transição Metabólica")
     } else if (hours < 12) {
-      setFastingStage(t("fatBurning"))
+      setFastingStage("Queima de Gordura")
     } else if (hours < 16) {
-      setFastingStage(t("initialKetosis"))
+      setFastingStage("Cetose Inicial")
     } else {
-      setFastingStage(t("completeFast"))
+      setFastingStage("Jejum Completo")
     }
   }
 
@@ -179,7 +162,7 @@ export default function FastingTimer() {
   const resetTimer = () => {
     setIsActive(false)
     setTimeLeft(totalTime)
-    setFastingStage(t("preparation"))
+    setFastingStage("Início do Jejum")
     setStartTime(null)
   }
 
@@ -188,7 +171,7 @@ export default function FastingTimer() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-2">
           <Clock className="w-6 h-6" />
-          {t("fasting")} {Math.floor(totalTime / 3600)}:
+          Jejum {Math.floor(totalTime / 3600)}:
           {Math.floor((totalTime % 3600) / 60)
             .toString()
             .padStart(2, "0")}
@@ -200,9 +183,7 @@ export default function FastingTimer() {
           <div className="text-6xl font-mono font-bold text-white mb-2">{formatTime(timeLeft)}</div>
           <p className="text-white/80 text-lg">{fastingStage}</p>
           {startTime && isActive && (
-            <p className="text-white/70 text-sm mt-1">
-              {t("startedAt")} {startTime.toLocaleTimeString()}
-            </p>
+            <p className="text-white/70 text-sm mt-1">Iniciado às {startTime.toLocaleTimeString()}</p>
           )}
         </div>
 
@@ -210,12 +191,8 @@ export default function FastingTimer() {
         <div className="space-y-2">
           <Progress value={progress} className="h-3 bg-white/20 [&>*]:bg-[#F24E29]" />
           <div className="flex justify-between text-sm text-white/80">
-            <span>
-              {t("progressLabel")}: {Math.round(progress)}%
-            </span>
-            <span>
-              {t("goal")}: {Math.floor(totalTime / 3600)}h
-            </span>
+            <span>Progresso: {Math.round(progress)}%</span>
+            <span>Meta: {Math.floor(totalTime / 3600)}h</span>
           </div>
         </div>
 
@@ -226,28 +203,32 @@ export default function FastingTimer() {
             className="bg-[#F24E29] hover:bg-[#F24E29]/90 text-white px-8 py-3 rounded-full"
           >
             {isActive ? <Pause className="w-5 h-5 mr-2" /> : <Play className="w-5 h-5 mr-2" />}
-            {isActive ? t("pause") : t("startFasting")}
+            {isActive ? "Pausar" : "Iniciar"}
           </Button>
           <Button
             onClick={resetTimer}
             variant="outline"
-            className="border-white hover:bg-white hover:text-[#F24E29] px-8 py-3 rounded-full text-[#F24E29] bg-transparent"
+            className="border-white hover:bg-white hover:text-[#F24E29] px-8 py-3 rounded-full text-[#F24E29]"
           >
             <Square className="w-5 h-5 mr-2" />
-            {t("reset")}
+            Parar
           </Button>
         </div>
 
         {/* Fasting Benefits */}
         <div className="bg-white/10 rounded-lg p-4">
-          <h4 className="font-semibold text-white mb-2">{t("currentBenefits")}:</h4>
+          <h4 className="font-semibold text-white mb-2">Benefícios Atuais:</h4>
           <ul className="text-sm text-white/90 space-y-1">
-            {progress > 25 && <li>• {t("insulinStabilization")}</li>}
-            {progress > 50 && <li>• {t("fatBurningStart")}</li>}
-            {progress > 75 && <li>• {t("ketoneProduction")}</li>}
-            {progress > 90 && <li>• {t("cellularAutophagy")}</li>}
-            {progress === 0 && !isActive && <li className="text-white/70 italic">• {t("clickStartForBenefits")}</li>}
-            {isActive && progress < 25 && <li>• {t("lastMealDigestion")}</li>}
+            {progress > 25 && <li>• Estabilização da insulina</li>}
+            {progress > 50 && <li>• Início da queima de gordura</li>}
+            {progress > 75 && <li>• Produção de cetonas</li>}
+            {progress > 90 && <li>• Autofagia celular ativada</li>}
+            {progress === 0 && !isActive && (
+              <li className="text-white/70 italic">
+                • Clique em "Iniciar" para começar a receber os benefícios do jejum
+              </li>
+            )}
+            {isActive && progress < 25 && <li>• Digestão da última refeição em andamento</li>}
           </ul>
         </div>
       </CardContent>

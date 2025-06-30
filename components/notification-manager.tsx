@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input"
 import { Bell, BellOff, Clock, Trophy, Lightbulb, Timer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { notificationManager } from "@/lib/notifications"
-import { useLanguage } from "@/context/languageContext"
 
 interface NotificationSettings {
   timerNotifications: boolean
@@ -20,7 +19,6 @@ interface NotificationSettings {
 }
 
 export default function NotificationManager() {
-  const { t } = useLanguage()
   const [permission, setPermission] = useState<NotificationPermission>("default")
   const [isSupported, setIsSupported] = useState(false)
   const [isPushEnabled, setIsPushEnabled] = useState(false)

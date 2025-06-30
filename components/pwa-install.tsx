@@ -92,7 +92,7 @@ export default function PWAInstall() {
         instructions = "No navegador: Menu → 'Instalar FastTrack' ou ícone de instalação na barra de endereço"
       }
 
-      alert(`Para instalar o Save Nutri:\n\n${instructions}`)
+      alert(`Para instalar o FastTrack:\n\n${instructions}`)
       setShowInstallPrompt(false)
     }
   }
@@ -123,7 +123,7 @@ export default function PWAInstall() {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900">📱 Instalar Save Nutri</p>
+              <p className="text-sm font-medium text-gray-900">📱 Instalar FastTrack</p>
               <p className="text-xs text-gray-600">Acesso rápido e offline!</p>
             </div>
 

@@ -5,13 +5,13 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Home, User, Clock, BarChart3, BookOpen, Menu, LogIn, ChefHat, Settings } from "lucide-react"
-import { useLanguage } from "@/context/languageContext"
+import { Home, User, Clock, BarChart3, BookOpen, Menu, LogIn, ChefHat } from "lucide-react"
+import { useLanguage } from "@/context/languageContext" // Import useLanguage
 
 export default function Navigation() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
-  const { t } = useLanguage()
+  const { t } = useLanguage() // Use the t function
 
   const navItems = [
     { href: "/", labelKey: "home" as const, icon: Home },
@@ -20,7 +20,6 @@ export default function Navigation() {
     { href: "/learn", labelKey: "learn" as const, icon: BookOpen },
     { href: "/recipes", labelKey: "recipes" as const, icon: ChefHat },
     { href: "/profile", labelKey: "profile" as const, icon: User },
-    { href: "/settings", labelKey: "settings" as const, icon: Settings },
   ]
 
   const NavLink = ({
@@ -30,7 +29,7 @@ export default function Navigation() {
     mobile = false,
   }: {
     href: string
-    labelKey: "home" | "timer" | "progress" | "learn" | "recipes" | "profile" | "settings"
+    labelKey: "home" | "timer" | "progress" | "learn" | "recipes" | "profile"
     icon: any
     mobile?: boolean
   }) => (
@@ -63,7 +62,7 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {navItems.slice(0, 6).map((item) => (
+            {navItems.map((item) => (
               <NavLink key={item.href} href={item.href} labelKey={item.labelKey} icon={item.icon} />
             ))}
           </div>
@@ -71,9 +70,10 @@ export default function Navigation() {
           {/* Auth Button */}
           <div className="hidden md:block">
             <Link href="/auth">
+              {/* Assuming "Entrar" is a general "Login" or "Sign In" */}
               <Button className="bg-gradient-to-r from-[#F27D16] to-[#F24E29] hover:from-[#F27D16]/90 hover:to-[#F24E29]/90 text-white">
                 <LogIn className="w-4 h-4 mr-2" />
-                {t("login")}
+                {t("login")} {/* Placeholder, ideally a "login" key */}
               </Button>
             </Link>
           </div>
@@ -94,7 +94,7 @@ export default function Navigation() {
                   <Link href="/auth" onClick={() => setIsOpen(false)}>
                     <Button className="w-full bg-gradient-to-r from-[#F27D16] to-[#F24E29] hover:from-[#F27D16]/90 hover:to-[#F24E29]/90 text-white">
                       <LogIn className="w-4 h-4 mr-2" />
-                      {t("login")}
+                      {t("login")} {/* Placeholder */}
                     </Button>
                   </Link>
                 </div>

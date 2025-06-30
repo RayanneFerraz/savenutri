@@ -1,20 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-// Use your provided VAPID keys
-const VAPID_PUBLIC_KEY =
-  process.env.VAPID_PUBLIC_KEY ||
-  "BGVxsToCXmpx4iPM9ecvi0MavKZq0MTDBuRyWdwDB4Jrqn5EkG-GLjbnJd4I6iwd3i8us70ZOZvX1p0v-ZKATdU"
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY
+// Em produção, essas chaves devem estar em variáveis de ambiente
+const VAPID_PUBLIC_KEY = "BEl62iUYgUivxIkv69yViEuiBIa40HcCWLrUjHLjdMorGDlLVW6SCDhHxiHSNOHIS03v7VdHoTxKryaHXr6tmlA"
+const VAPID_PRIVATE_KEY = "your-vapid-private-key-here"
 
 export async function POST(request: NextRequest) {
   try {
-    if (!VAPID_PRIVATE_KEY) {
-      console.error("VAPID_PRIVATE_KEY environment variable is not set")
-      return NextResponse.json({ success: false, error: "Server configuration error" }, { status: 500 })
-    }
-
     const { title, body, data } = await request.json()
 
+    // Em produção, você buscaria os tokens do banco de dados
+    // Por enquanto, vamos simular o envio
     const notification = {
       title,
       body,
@@ -24,24 +19,25 @@ export async function POST(request: NextRequest) {
       actions: [
         {
           action: "open",
-          title: "Open App",
+          title: "Abrir App",
         },
         {
           action: "close",
-          title: "Close",
+          title: "Fechar",
         },
       ],
     }
 
-    // In production, send to all registered tokens using web-push library
-    console.log("Sending notification:", notification)
+    // Aqui você enviaria para todos os tokens registrados
+    // usando uma biblioteca como web-push
+    console.log("Enviando notificação:", notification)
 
     return NextResponse.json({
       success: true,
-      message: "Notification sent successfully",
+      message: "Notificação enviada com sucesso",
     })
   } catch (error) {
-    console.error("Error sending notification:", error)
-    return NextResponse.json({ success: false, error: "Failed to send notification" }, { status: 500 })
+    console.error("Erro ao enviar notificação:", error)
+    return NextResponse.json({ success: false, error: "Falha ao enviar notificação" }, { status: 500 })
   }
 }
