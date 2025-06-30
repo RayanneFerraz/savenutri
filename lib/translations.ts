@@ -1945,4 +1945,9 @@ export const translations = {
     readTime3min: "3 min de lectura",
     readTime4min: "4 min de lectura",
   },
-}
+  fr: {},
+} as const
+
+export type Translations = typeof translations
+export type Language = keyof Translations
+export type TranslationKey = keyof Translations["en"]
