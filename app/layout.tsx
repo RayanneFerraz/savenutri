@@ -7,8 +7,8 @@ import { LanguageProvider } from "@/context/languageContext"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as SonnerToaster } from "sonner"
 import { AnalyticsProvider } from "@/components/analytics-provider"
-import { PWANotifications } from "@/components/pwa-notifications"
-import { PWAInstall } from "@/components/pwa-install"
+import PWANotifications from "@/components/pwa-notifications"
+import PWAInstall from "@/components/pwa-install"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { Suspense } from "react"
 
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   icons: {
     apple: "/placeholder.svg?height=180&width=180&text=FT",
   },
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
