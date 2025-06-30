@@ -1,15 +1,12 @@
 {
   "name": "FastTrack - Jejum Intermitente",
   "short_name": "FastTrack",
-  "description": "Seu companheiro para uma jornada saudável com jejum intermitente",
+  "description": "Aplicativo completo para acompanhar seu jejum intermitente",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#10b981",
-  "orientation": "portrait-primary",
-  "categories": ["health", "fitness", "lifestyle"],
-  "lang": "pt-BR",
-  "scope": "/",
+  "theme_color": "#F24E29",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/placeholder.svg?height=72&width=72&text=FT",
@@ -42,22 +39,14 @@
       "purpose": "any"
     },
     {
-      "src": "/placeholder.svg?height=192&width=192&text=FT",
+      "src": "/placeholder-logo.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "/placeholder.svg?height=384&width=384&text=FT",
-      "sizes": "384x384",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/placeholder.svg?height=512&width=512&text=FT",
+      "src": "/placeholder-logo.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ],
   "shortcuts": [
@@ -100,5 +89,10 @@
         }
       ]
     }
-  ]
+  ],
+  "categories": ["health", "lifestyle", "productivity"],
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
 }

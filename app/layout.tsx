@@ -10,12 +10,13 @@ import { AnalyticsProvider } from "@/components/analytics-provider"
 import PWANotifications from "@/components/pwa-notifications"
 import PWAInstall from "@/components/pwa-install"
 import { ScrollToTop } from "@/components/scroll-to-top"
+import Navigation from "@/components/navigation"
 import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "FastTrack - Jejum Intermitente",
+  title: "SaveNutri - Jejum Intermitente",
   description: "Aplicativo completo para acompanhar seu jejum intermitente",
   manifest: "/manifest.json",
   themeColor: "#F24E29",
@@ -23,10 +24,10 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "FastTrack",
+    title: "SaveNutri",
   },
   icons: {
-    apple: "/placeholder.svg?height=180&width=180&text=FT",
+    apple: "/placeholder.svg?height=180&width=180&text=SN",
   },
   generator: "v0.dev",
 }
@@ -43,15 +44,18 @@ export default function RootLayout({
         <meta name="theme-color" content="#F24E29" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="FastTrack" />
-        <link rel="apple-touch-icon" href="/placeholder.svg?height=180&width=180&text=FT" />
+        <meta name="apple-mobile-web-app-title" content="SaveNutri" />
+        <link rel="apple-touch-icon" href="/placeholder.svg?height=180&width=180&text=SN" />
       </head>
       <body className={inter.className}>
         <Suspense fallback={null}>
           <LanguageProvider>
             <AuthProvider>
               <AnalyticsProvider>
-                {children}
+                <div className="min-h-screen bg-gray-50">
+                  <Navigation />
+                  <main className="pb-16 md:pb-0">{children}</main>
+                </div>
                 <Toaster />
                 <SonnerToaster />
                 <PWANotifications />

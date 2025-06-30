@@ -8,16 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Clock, Play, Pause, RotateCcw, Settings, User } from "lucide-react"
 import Link from "next/link"
-import { useLanguage } from "@/context/languageContext" // Import useLanguage
+import { useLanguage } from "@/context/languageContext"
 
 export default function TimerPage() {
-  const { t } = useLanguage() // Use the t function
+  const { t } = useLanguage()
 
   const [selectedPlan, setSelectedPlan] = useState("16:8")
   const [isActive, setIsActive] = useState(false)
   const [timeLeft, setTimeLeft] = useState(16 * 60 * 60) // 16 horas em segundos
   const [totalTime, setTotalTime] = useState(16 * 60 * 60)
-  const [fastingStage, setFastingStageInternal] = useState(t("preparation")) // Use t for initial state
+  const [fastingStage, setFastingStage] = useState("")
   const [startTime, setStartTime] = useState<Date | null>(null)
   const [customSettings, setCustomSettings] = useState({
     fastHours: 16,
@@ -30,17 +30,18 @@ export default function TimerPage() {
     "16:8": { fast: 16, eat: 8, description: `16h ${t("fasting").toLowerCase()}, 8h ${t("eating").toLowerCase()}` },
     "18:6": { fast: 18, eat: 6, description: `18h ${t("fasting").toLowerCase()}, 6h ${t("eating").toLowerCase()}` },
     "20:4": { fast: 20, eat: 4, description: `20h ${t("fasting").toLowerCase()}, 4h ${t("eating").toLowerCase()}` },
-    OMAD: { fast: 23, eat: 1, description: t("OMADDescription") || "Uma refeição por dia" }, // Add OMADDescription to translations
-    "5:2": { fast: 24, eat: 0, description: t("fiveTwoDescription") || "2 dias de jejum por semana" }, // Add fiveTwoDescription
+    OMAD: { fast: 23, eat: 1, description: t("OMADDescription") || "Uma refeição por dia" },
+    "5:2": { fast: 24, eat: 0, description: t("fiveTwoDescription") || "2 dias de jejum por semana" },
     Personalizado: {
       fast: customSettings.fastHours,
       eat: 24 - customSettings.fastHours,
       description: `${customSettings.fastHours}h ${t("customFasting").toLowerCase()}`,
     },
   }
-  // Update fastingStage with translated value when language changes
+
+  // Initialize fasting stage with translated value
   useEffect(() => {
-    setFastingStageInternal(t("preparation"))
+    setFastingStage(t("preparation"))
   }, [t])
 
   // Carregar estado do timer e configurações
@@ -89,14 +90,14 @@ export default function TimerPage() {
           if (timerState.timeLeft < timerState.totalTime && timerState.timeLeft > 0) {
             updateFastingStage(timerState.totalTime - timerState.timeLeft)
           } else {
-            setFastingStageInternal(t("preparation"))
+            setFastingStage(t("preparation"))
           }
         }
       } catch (error) {
         console.log("Erro ao carregar estado do timer:", error)
       }
     }
-  }, []) // Removed `t` from dependencies here as it might cause loop with setFastingStageInternal
+  }, [t])
 
   useEffect(() => {
     const timerState = {
@@ -128,7 +129,7 @@ export default function TimerPage() {
             if (timerState.timeLeft < timerState.totalTime && timerState.timeLeft > 0) {
               updateFastingStage(timerState.totalTime - timerState.timeLeft)
             } else {
-              setFastingStageInternal(t("preparation"))
+              setFastingStage(t("preparation"))
             }
           }
         } catch (error) {
@@ -138,7 +139,7 @@ export default function TimerPage() {
     }
     window.addEventListener("storage", handleStorageChange)
     return () => window.removeEventListener("storage", handleStorageChange)
-  }, [t]) // Added t here for stage update on sync
+  }, [t])
 
   useEffect(() => {
     const handleFocus = () => {
@@ -176,7 +177,7 @@ export default function TimerPage() {
     setTotalTime(newTotalTime)
     if (!isActive) {
       setTimeLeft(newTotalTime)
-      setFastingStageInternal(t("preparation"))
+      setFastingStage(t("preparation"))
     }
   }, [selectedPlan, customSettings, isActive, t])
 
@@ -192,7 +193,7 @@ export default function TimerPage() {
       }, 1000)
     } else if (timeLeft === 0 && isActive) {
       setIsActive(false)
-      setFastingStageInternal(t("fastCompleted"))
+      setFastingStage(t("fastCompleted"))
     }
     return () => {
       if (interval) clearInterval(interval)
@@ -201,14 +202,14 @@ export default function TimerPage() {
 
   const updateFastingStage = (elapsedTime: number) => {
     const hours = elapsedTime / 3600
-    if (hours < 2) setFastingStageInternal(t("digestionStarted"))
-    else if (hours < 4) setFastingStageInternal(t("insulinStabilizing"))
-    else if (hours < 8) setFastingStageInternal(t("fatBurningStarted"))
-    else if (hours < 12) setFastingStageInternal(t("metabolismBoost"))
-    else if (hours < 16) setFastingStageInternal(t("ketosisInitial"))
-    else if (hours < 18) setFastingStageInternal(t("autophagyActivated"))
-    else if (hours < 20) setFastingStageInternal(t("mentalClarity"))
-    else setFastingStageInternal(t("peakEfficiency"))
+    if (hours < 2) setFastingStage(t("digestionStarted"))
+    else if (hours < 4) setFastingStage(t("insulinStabilizing"))
+    else if (hours < 8) setFastingStage(t("fatBurningStarted"))
+    else if (hours < 12) setFastingStage(t("metabolismBoost"))
+    else if (hours < 16) setFastingStage(t("ketosisInitial"))
+    else if (hours < 18) setFastingStage(t("autophagyActivated"))
+    else if (hours < 20) setFastingStage(t("mentalClarity"))
+    else setFastingStage(t("peakEfficiency"))
   }
 
   const formatTime = (seconds: number) => {
@@ -236,7 +237,7 @@ export default function TimerPage() {
   const resetTimer = () => {
     setIsActive(false)
     setTimeLeft(totalTime)
-    setFastingStageInternal(t("preparation"))
+    setFastingStage(t("preparation"))
     setStartTime(null)
   }
 
@@ -344,7 +345,7 @@ export default function TimerPage() {
           color: "bg-yellow-100",
           description: `${t("paused")} - ${fastingStage}`,
         },
-      ] // Add a "paused" key
+      ]
     }
 
     return benefits
@@ -410,8 +411,7 @@ export default function TimerPage() {
                         disabled={timeLeft === 0 && totalTime > 0} // Disable if fast is completed but not reset
                       >
                         <Play className="w-5 h-5 mr-2" />
-                        {timeLeft < totalTime && timeLeft > 0 ? t("resume") : t("startFasting")}{" "}
-                        {/* Add "resume" key */}
+                        {timeLeft < totalTime && timeLeft > 0 ? t("resume") : t("startFasting")}
                       </Button>
                     ) : (
                       <Button
@@ -425,7 +425,7 @@ export default function TimerPage() {
                     <Button
                       onClick={resetTimer}
                       variant="outline"
-                      className="border-white text-[#F24E29] hover:bg-white hover:text-[#F24E29] px-8 py-3 rounded-full"
+                      className="border-white text-[#F24E29] hover:bg-white hover:text-[#F24E29] px-8 py-3 rounded-full bg-transparent"
                     >
                       <RotateCcw className="w-5 h-5 mr-2" />
                       {t("reset")}

@@ -2,228 +2,436 @@
 
 import { useLanguage } from "@/context/languageContext"
 
-export interface MultiLangString {
-  en: string
-  pt: string
-  es: string
-  fr: string
+// Define the type for multi-language strings that can be either string or string array
+type MultiLangString = {
+  en: string | string[]
+  pt: string | string[]
+  es: string | string[]
+  fr: string | string[]
 }
 
-// Mapeamento de traduções para títulos e categorias comuns
-const contentTranslations = {
-  // Categorias de Artigos
-  Ciência: {
-    en: "Science",
-    pt: "Ciência",
-    es: "Ciencia",
-    fr: "Science",
-    ru: "Наука",
-    hi: "विज्ञान",
+// Content translations for recipe ingredients, instructions, and other content
+const contentTranslations: Record<string, MultiLangString> = {
+  // Recipe categories
+  "Café da Manhã": {
+    en: "Breakfast",
+    pt: "Café da Manhã",
+    es: "Desayuno",
+    fr: "Petit-déjeuner",
   },
-  Fundamentos: {
-    en: "Fundamentals",
-    pt: "Fundamentos",
-    es: "Fundamentos",
-    fr: "Fondamentaux",
-    ru: "Основы",
-    hi: "बुनियादी बातें",
+  Almoço: {
+    en: "Lunch",
+    pt: "Almoço",
+    es: "Almuerzo",
+    fr: "Déjeuner",
   },
-  Benefícios: {
-    en: "Benefits",
-    pt: "Benefícios",
-    es: "Beneficios",
-    fr: "Avantages",
-    ru: "Преимущества",
-    hi: "लाभ",
+  Jantar: {
+    en: "Dinner",
+    pt: "Jantar",
+    es: "Cena",
+    fr: "Dîner",
   },
-  Mitos: {
-    en: "Myths",
-    pt: "Mitos",
-    es: "Mitos",
-    fr: "Mythes",
-    ru: "Мифы",
-    hi: "मिथक",
-  },
-  Preparação: {
-    en: "Preparation",
-    pt: "Preparação",
-    es: "Preparación",
-    fr: "Préparation",
-    ru: "Подготовка",
-    hi: "तैयारी",
-  },
-  Protocolos: {
-    en: "Protocols",
-    pt: "Protocolos",
-    es: "Protocolos",
-    fr: "Protocoles",
-    ru: "Протоколы",
-    hi: "प्रोटोकॉल",
-  },
-  Alimentação: {
-    en: "Nutrition",
-    pt: "Alimentação",
-    es: "Alimentación",
-    fr: "Nutrition",
-    ru: "Питание",
-    hi: "पोषण",
-  },
-  Desafios: {
-    en: "Challenges",
-    pt: "Desafios",
-    es: "Desafíos",
-    fr: "Défis",
-    ru: "Вызовы",
-    hi: "चुनौतियां",
-  },
-  Potencializadores: {
-    en: "Enhancers",
-    pt: "Potencializadores",
-    es: "Potenciadores",
-    fr: "Améliorateurs",
-    ru: "Усилители",
-    hi: "बढ़ाने वाले",
-  },
-  "Estilo de Vida": {
-    en: "Lifestyle",
-    pt: "Estilo de Vida",
-    es: "Estilo de Vida",
-    fr: "Mode de vie",
-    ru: "Образ жизни",
-    hi: "जीवन शैली",
-  },
-  Monitoramento: {
-    en: "Monitoring",
-    pt: "Monitoramento",
-    es: "Monitoreo",
-    fr: "Surveillance",
-    ru: "Мониторинг",
-    hi: "निगरानी",
-  },
-
-  // Categorias de Receitas
-  "Almoço/Jantar": {
-    en: "Lunch/Dinner",
-    pt: "Almoço/Jantar",
-    es: "Almuerzo/Cena",
-    fr: "Déjeuner/Dîner",
-    ru: "Обед/Ужин",
-    hi: "दोपहर/रात का खाना",
-  },
-  Lanches: {
-    en: "Snacks",
-    pt: "Lanches",
-    es: "Aperitivos",
-    fr: "Collations",
-    ru: "Закуски",
-    hi: "नाश्ता",
+  Lanche: {
+    en: "Snack",
+    pt: "Lanche",
+    es: "Merienda",
+    fr: "Collation",
   },
   Bebidas: {
     en: "Beverages",
     pt: "Bebidas",
     es: "Bebidas",
     fr: "Boissons",
-    ru: "Напитки",
-    hi: "पेय",
-  },
-  Saladas: {
-    en: "Salads",
-    pt: "Saladas",
-    es: "Ensaladas",
-    fr: "Salades",
-    ru: "Салаты",
-    hi: "सलाद",
   },
   Sobremesas: {
     en: "Desserts",
     pt: "Sobremesas",
     es: "Postres",
     fr: "Desserts",
-    ru: "Десерты",
-    hi: "मिठाई",
   },
 
-  // Dificuldades
+  // Recipe difficulty levels
   Fácil: {
     en: "Easy",
     pt: "Fácil",
     es: "Fácil",
     fr: "Facile",
-    ru: "Легко",
-    hi: "आसान",
   },
   Médio: {
     en: "Medium",
     pt: "Médio",
     es: "Medio",
     fr: "Moyen",
-    ru: "Средний",
-    hi: "मध्यम",
   },
   Difícil: {
     en: "Hard",
     pt: "Difícil",
     es: "Difícil",
     fr: "Difficile",
-    ru: "Сложный",
-    hi: "कठिन",
   },
 
-  // Títulos comuns de artigos
-  "A Ciência por Trás do Jejum Intermitente": {
-    en: "The Science Behind Intermittent Fasting",
-    pt: "A Ciência por Trás do Jejum Intermitente",
-    es: "La Ciencia Detrás del Ayuno Intermitente",
-    fr: "La Science derrière le Jeûne Intermittent",
-    ru: "Наука интервального голодания",
-    hi: "आंतरायिक उपवास के पीछे का विज्ञान",
+  // Article categories
+  Ciência: {
+    en: "Science",
+    pt: "Ciência",
+    es: "Ciencia",
+    fr: "Science",
   },
-  "Como Começar o Jejum Intermitente": {
-    en: "How to Start Intermittent Fasting",
-    pt: "Como Começar o Jejum Intermitente",
-    es: "Cómo Empezar el Ayuno Intermitente",
-    fr: "Comment Commencer le Jeûne Intermittent",
-    ru: "Как начать интервальное голодание",
-    hi: "आंतरायिक उपवास कैसे शुरू करें",
+  Fundamentos: {
+    en: "Fundamentals",
+    pt: "Fundamentos",
+    es: "Fundamentos",
+    fr: "Fondamentaux",
   },
-  "Protocolo 16:8 - Guia Completo": {
-    en: "16:8 Protocol - Complete Guide",
-    pt: "Protocolo 16:8 - Guia Completo",
-    es: "Protocolo 16:8 - Guía Completa",
-    fr: "Protocole 16:8 - Guide Complet",
-    ru: "Протокол 16:8 - Полное руководство",
-    hi: "16:8 प्रोटोकॉल - पूर्ण गाइड",
+  Benefícios: {
+    en: "Benefits",
+    pt: "Benefícios",
+    es: "Beneficios",
+    fr: "Avantages",
   },
-  "Benefícios do Jejum para o Cérebro": {
-    en: "Fasting Benefits for the Brain",
-    pt: "Benefícios do Jejum para o Cérebro",
-    es: "Beneficios del Ayuno para el Cerebro",
-    fr: "Avantages du Jeûne pour le Cerveau",
-    ru: "Преимущества голодания для мозга",
-    hi: "मस्तिष्क के लिए उपवास के लाभ",
+  Mitos: {
+    en: "Myths",
+    pt: "Mitos",
+    es: "Mitos",
+    fr: "Mythes",
   },
-  "Mitos e Verdades sobre Jejum": {
-    en: "Myths and Truths about Fasting",
-    pt: "Mitos e Verdades sobre Jejum",
-    es: "Mitos y Verdades sobre el Ayuno",
-    fr: "Mythes et Vérités sur le Jeûne",
-    ru: "Мифы и правда о голодании",
-    hi: "उपवास के बारे में मिथक और सच्चाई",
+  Preparação: {
+    en: "Preparation",
+    pt: "Preparação",
+    es: "Preparación",
+    fr: "Préparation",
   },
-} as const
+  Protocolos: {
+    en: "Protocols",
+    pt: "Protocolos",
+    es: "Protocolos",
+    fr: "Protocoles",
+  },
+  Alimentação: {
+    en: "Nutrition",
+    pt: "Alimentação",
+    es: "Alimentación",
+    fr: "Alimentation",
+  },
+  Desafios: {
+    en: "Challenges",
+    pt: "Desafios",
+    es: "Desafíos",
+    fr: "Défis",
+  },
+  Potencializadores: {
+    en: "Enhancers",
+    pt: "Potencializadores",
+    es: "Potenciadores",
+    fr: "Amplificateurs",
+  },
+  "Estilo de Vida": {
+    en: "Lifestyle",
+    pt: "Estilo de Vida",
+    es: "Estilo de Vida",
+    fr: "Mode de vie",
+  },
+  Monitoramento: {
+    en: "Monitoring",
+    pt: "Monitoramento",
+    es: "Monitoreo",
+    fr: "Surveillance",
+  },
 
-export const useContentTranslation = () => {
-  const { language, t } = useLanguage()
+  // Common recipe ingredients
+  Ovos: {
+    en: "Eggs",
+    pt: "Ovos",
+    es: "Huevos",
+    fr: "Œufs",
+  },
+  Abacate: {
+    en: "Avocado",
+    pt: "Abacate",
+    es: "Aguacate",
+    fr: "Avocat",
+  },
+  Salmão: {
+    en: "Salmon",
+    pt: "Salmão",
+    es: "Salmón",
+    fr: "Saumon",
+  },
+  Azeite: {
+    en: "Olive Oil",
+    pt: "Azeite",
+    es: "Aceite de Oliva",
+    fr: "Huile d'olive",
+  },
+  Limão: {
+    en: "Lemon",
+    pt: "Limão",
+    es: "Limón",
+    fr: "Citron",
+  },
+  Sal: {
+    en: "Salt",
+    pt: "Sal",
+    es: "Sal",
+    fr: "Sel",
+  },
+  Pimenta: {
+    en: "Pepper",
+    pt: "Pimenta",
+    es: "Pimienta",
+    fr: "Poivre",
+  },
+  Alho: {
+    en: "Garlic",
+    pt: "Alho",
+    es: "Ajo",
+    fr: "Ail",
+  },
+  Cebola: {
+    en: "Onion",
+    pt: "Cebola",
+    es: "Cebolla",
+    fr: "Oignon",
+  },
+  Tomate: {
+    en: "Tomato",
+    pt: "Tomate",
+    es: "Tomate",
+    fr: "Tomate",
+  },
+  Espinafre: {
+    en: "Spinach",
+    pt: "Espinafre",
+    es: "Espinaca",
+    fr: "Épinard",
+  },
+  Queijo: {
+    en: "Cheese",
+    pt: "Queijo",
+    es: "Queso",
+    fr: "Fromage",
+  },
+  Frango: {
+    en: "Chicken",
+    pt: "Frango",
+    es: "Pollo",
+    fr: "Poulet",
+  },
+  Brócolis: {
+    en: "Broccoli",
+    pt: "Brócolis",
+    es: "Brócoli",
+    fr: "Brocoli",
+  },
+  "Couve-flor": {
+    en: "Cauliflower",
+    pt: "Couve-flor",
+    es: "Coliflor",
+    fr: "Chou-fleur",
+  },
+  Abobrinha: {
+    en: "Zucchini",
+    pt: "Abobrinha",
+    es: "Calabacín",
+    fr: "Courgette",
+  },
+  Pimentão: {
+    en: "Bell Pepper",
+    pt: "Pimentão",
+    es: "Pimiento",
+    fr: "Poivron",
+  },
+  Cogumelos: {
+    en: "Mushrooms",
+    pt: "Cogumelos",
+    es: "Champiñones",
+    fr: "Champignons",
+  },
+  Manjericão: {
+    en: "Basil",
+    pt: "Manjericão",
+    es: "Albahaca",
+    fr: "Basilic",
+  },
+  Orégano: {
+    en: "Oregano",
+    pt: "Orégano",
+    es: "Orégano",
+    fr: "Origan",
+  },
+  Salsa: {
+    en: "Parsley",
+    pt: "Salsa",
+    es: "Perejil",
+    fr: "Persil",
+  },
+  Cebolinha: {
+    en: "Chives",
+    pt: "Cebolinha",
+    es: "Cebollino",
+    fr: "Ciboulette",
+  },
+  Manteiga: {
+    en: "Butter",
+    pt: "Manteiga",
+    es: "Mantequilla",
+    fr: "Beurre",
+  },
+  "Creme de leite": {
+    en: "Heavy Cream",
+    pt: "Creme de leite",
+    es: "Crema de leche",
+    fr: "Crème fraîche",
+  },
+  "Leite de coco": {
+    en: "Coconut Milk",
+    pt: "Leite de coco",
+    es: "Leche de coco",
+    fr: "Lait de coco",
+  },
+  "Óleo de coco": {
+    en: "Coconut Oil",
+    pt: "Óleo de coco",
+    es: "Aceite de coco",
+    fr: "Huile de coco",
+  },
+  Amêndoas: {
+    en: "Almonds",
+    pt: "Amêndoas",
+    es: "Almendras",
+    fr: "Amandes",
+  },
+  Nozes: {
+    en: "Walnuts",
+    pt: "Nozes",
+    es: "Nueces",
+    fr: "Noix",
+  },
+  Castanhas: {
+    en: "Cashews",
+    pt: "Castanhas",
+    es: "Anacardos",
+    fr: "Noix de cajou",
+  },
+  "Sementes de chia": {
+    en: "Chia Seeds",
+    pt: "Sementes de chia",
+    es: "Semillas de chía",
+    fr: "Graines de chia",
+  },
+  Linhaça: {
+    en: "Flaxseed",
+    pt: "Linhaça",
+    es: "Linaza",
+    fr: "Graines de lin",
+  },
+  Água: {
+    en: "Water",
+    pt: "Água",
+    es: "Agua",
+    fr: "Eau",
+  },
+  Vinagre: {
+    en: "Vinegar",
+    pt: "Vinagre",
+    es: "Vinagre",
+    fr: "Vinaigre",
+  },
+  Mostarda: {
+    en: "Mustard",
+    pt: "Mostarda",
+    es: "Mostaza",
+    fr: "Moutarde",
+  },
+  Paprica: {
+    en: "Paprika",
+    pt: "Paprica",
+    es: "Pimentón",
+    fr: "Paprika",
+  },
+  Cominho: {
+    en: "Cumin",
+    pt: "Cominho",
+    es: "Comino",
+    fr: "Cumin",
+  },
+  Açafrão: {
+    en: "Turmeric",
+    pt: "Açafrão",
+    es: "Cúrcuma",
+    fr: "Curcuma",
+  },
+  Gengibre: {
+    en: "Ginger",
+    pt: "Gengibre",
+    es: "Jengibre",
+    fr: "Gingembre",
+  },
+  Canela: {
+    en: "Cinnamon",
+    pt: "Canela",
+    es: "Canela",
+    fr: "Cannelle",
+  },
+  Baunilha: {
+    en: "Vanilla",
+    pt: "Baunilha",
+    es: "Vainilla",
+    fr: "Vanille",
+  },
+  "Cacau em pó": {
+    en: "Cocoa Powder",
+    pt: "Cacau em pó",
+    es: "Cacao en polvo",
+    fr: "Poudre de cacao",
+  },
+  Stevia: {
+    en: "Stevia",
+    pt: "Stevia",
+    es: "Stevia",
+    fr: "Stévia",
+  },
+  Eritritol: {
+    en: "Erythritol",
+    pt: "Eritritol",
+    es: "Eritritol",
+    fr: "Érythritol",
+  },
+}
 
-  const translateContent = (content: string | MultiLangString): string => {
+export function useContentTranslation() {
+  const { language } = useLanguage()
+
+  const translateContent = (content: string | string[] | MultiLangString): string | string[] => {
+    // If content is already a string or string array, try to find translation
     if (typeof content === "string") {
-      // If it's a string, treat it as a translation key
-      return t(content as any)
-    } else if (typeof content === "object" && content !== null && language in content) {
-      // If it's a MultiLangString object, return the text for the current language
-      return content[language as keyof MultiLangString] || content.en
+      const translation = contentTranslations[content]
+      if (translation) {
+        const translatedValue = translation[language as keyof MultiLangString]
+        return translatedValue || translation.en || content
+      }
+      return content
     }
-    return "" // Fallback for undefined content
+
+    // If content is an array of strings, translate each item
+    if (Array.isArray(content)) {
+      return content.map((item) => {
+        const translation = contentTranslations[item]
+        if (translation) {
+          const translatedValue = translation[language as keyof MultiLangString]
+          return (translatedValue as string) || (translation.en as string) || item
+        }
+        return item
+      })
+    }
+
+    // If content is a MultiLangString object, return the appropriate language
+    if (content && typeof content === "object" && "en" in content) {
+      const translatedValue = content[language as keyof MultiLangString]
+      return translatedValue || content.en || ""
+    }
+
+    return content as string
   }
 
   return { translateContent }

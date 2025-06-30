@@ -11,10 +11,15 @@ export default function FastingTimer() {
   const [isActive, setIsActive] = useState(false)
   const [timeLeft, setTimeLeft] = useState(16 * 60 * 60) // 16 horas em segundos
   const [totalTime, setTotalTime] = useState(16 * 60 * 60)
-  const [fastingStage, setFastingStage] = useState("Início do Jejum")
+  const [fastingStage, setFastingStage] = useState("")
   const [startTime, setStartTime] = useState<Date | null>(null)
 
   const { t } = useLanguage()
+
+  // Initialize fasting stage with translated value
+  useEffect(() => {
+    setFastingStage(t("preparation"))
+  }, [t])
 
   // Carregar estado do timer do localStorage
   useEffect(() => {
@@ -35,9 +40,13 @@ export default function FastingTimer() {
           const newTimeLeft = Math.max(0, timerState.totalTime - elapsedSeconds)
           setTimeLeft(newTimeLeft)
           setTotalTime(timerState.totalTime)
+          updateFastingStage(timerState.totalTime - newTimeLeft)
         } else {
           setTimeLeft(timerState.timeLeft || 16 * 60 * 60)
           setTotalTime(timerState.totalTime || 16 * 60 * 60)
+          if (timerState.timeLeft < timerState.totalTime && timerState.timeLeft > 0) {
+            updateFastingStage(timerState.totalTime - timerState.timeLeft)
+          }
         }
       } catch (error) {
         console.log("Erro ao carregar estado do timer:", error)
@@ -69,7 +78,7 @@ export default function FastingTimer() {
         console.log("Erro ao carregar perfil:", error)
       }
     }
-  }, [])
+  }, [t])
 
   // Salvar estado do timer no localStorage sempre que mudar
   useEffect(() => {
@@ -97,8 +106,12 @@ export default function FastingTimer() {
             const elapsedSeconds = Math.floor((now - startTimeMs) / 1000)
             const newTimeLeft = Math.max(0, timerState.totalTime - elapsedSeconds)
             setTimeLeft(newTimeLeft)
+            updateFastingStage(timerState.totalTime - newTimeLeft)
           } else {
             setTimeLeft(timerState.timeLeft)
+            if (timerState.timeLeft < timerState.totalTime && timerState.timeLeft > 0) {
+              updateFastingStage(timerState.totalTime - timerState.timeLeft)
+            }
           }
           setTotalTime(timerState.totalTime)
         } catch (error) {
@@ -109,7 +122,7 @@ export default function FastingTimer() {
 
     window.addEventListener("storage", handleStorageChange)
     return () => window.removeEventListener("storage", handleStorageChange)
-  }, [])
+  }, [t])
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
@@ -124,25 +137,26 @@ export default function FastingTimer() {
       }, 1000)
     } else if (timeLeft === 0) {
       setIsActive(false)
+      setFastingStage(t("fastCompleted"))
     }
 
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isActive, timeLeft, totalTime])
+  }, [isActive, timeLeft, totalTime, t])
 
   const updateFastingStage = (elapsedTime: number) => {
     const hours = elapsedTime / 3600
     if (hours < 4) {
-      setFastingStage("digestionAndAbsorption")
+      setFastingStage(t("digestionAndAbsorption"))
     } else if (hours < 8) {
-      setFastingStage("metabolicTransition")
+      setFastingStage(t("metabolicTransition"))
     } else if (hours < 12) {
-      setFastingStage("fatBurning")
+      setFastingStage(t("fatBurning"))
     } else if (hours < 16) {
-      setFastingStage("initialKetosis")
+      setFastingStage(t("initialKetosis"))
     } else {
-      setFastingStage("completeFast")
+      setFastingStage(t("completeFast"))
     }
   }
 
@@ -165,7 +179,7 @@ export default function FastingTimer() {
   const resetTimer = () => {
     setIsActive(false)
     setTimeLeft(totalTime)
-    setFastingStage("fastingStart")
+    setFastingStage(t("preparation"))
     setStartTime(null)
   }
 
@@ -184,7 +198,7 @@ export default function FastingTimer() {
         {/* Timer Display */}
         <div className="text-center">
           <div className="text-6xl font-mono font-bold text-white mb-2">{formatTime(timeLeft)}</div>
-          <p className="text-white/80 text-lg">{t(fastingStage)}</p>
+          <p className="text-white/80 text-lg">{fastingStage}</p>
           {startTime && isActive && (
             <p className="text-white/70 text-sm mt-1">
               {t("startedAt")} {startTime.toLocaleTimeString()}
@@ -217,7 +231,7 @@ export default function FastingTimer() {
           <Button
             onClick={resetTimer}
             variant="outline"
-            className="border-white hover:bg-white hover:text-[#F24E29] px-8 py-3 rounded-full text-[#F24E29]"
+            className="border-white hover:bg-white hover:text-[#F24E29] px-8 py-3 rounded-full text-[#F24E29] bg-transparent"
           >
             <Square className="w-5 h-5 mr-2" />
             {t("reset")}
