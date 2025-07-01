@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import type { WeightEntry, Language } from "@/types" // Declare the WeightEntry and Language types here
+import type { WeightEntry } from "@/types"
+import type { Language } from "@/lib/translations"
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
