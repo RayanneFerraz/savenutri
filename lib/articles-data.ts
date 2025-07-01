@@ -9,6 +9,17 @@ export interface ContentSection {
   items?: string[]
 }
 
+import type { Language } from "@/lib/translations"
+
+export interface ArticleTranslation {
+  title?: string
+  description?: string
+  category?: string
+  publishDate?: string
+  tags?: string[]
+  content?: ContentSection[]
+}
+
 export interface Article {
   id: number
   title: string
@@ -22,6 +33,7 @@ export interface Article {
   image: string
   tags: string[]
   content: ContentSection[]
+  translations?: Partial<Record<Language, ArticleTranslation>>
 }
 
 export interface ArticlesData {
@@ -135,6 +147,29 @@ const articlesData: ArticlesData = {
         ],
       },
     ],
+    translations: {
+      en: {
+        title: "The Science Behind Intermittent Fasting",
+        description: "How your body reacts to fasting and what science reveals about metabolic health, autophagy and hormones",
+        category: "Science",
+        publishDate: "June 23, 2025",
+        tags: ["Fasting", "Science", "Metabolism", "Autophagy", "HGH"],
+      },
+      es: {
+        title: "La Ciencia Detrás del Ayuno Intermitente",
+        description: "Cómo reacciona tu cuerpo al ayuno y lo que la ciencia revela sobre salud metabólica, autofagia y hormonas",
+        category: "Ciencia",
+        publishDate: "23 de junio de 2025",
+        tags: ["Ayuno", "Ciencia", "Metabolismo", "Autofagia", "HGH"],
+      },
+      fr: {
+        title: "La Science du Jeûne Intermittent",
+        description: "Comment votre corps réagit au jeûne et ce que la science révèle sur la santé métabolique, l'autophagie et les hormones",
+        category: "Science",
+        publishDate: "23 juin 2025",
+        tags: ["Jeûne", "Science", "Métabolisme", "Autophagie", "HGH"],
+      },
+    },
   },
 
   "2": {
@@ -5113,3 +5148,17 @@ const articlesData: ArticlesData = {
 }
 
 export default articlesData
+
+export function getArticleById(id: number, lang?: Language): Article | undefined {
+  const article = articlesData[String(id)]
+  if (!article) return undefined
+  if (lang && article.translations?.[lang]) {
+    const trans = article.translations[lang]!
+    return {
+      ...article,
+      ...trans,
+      content: trans.content || article.content,
+    }
+  }
+  return article
+}

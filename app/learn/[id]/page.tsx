@@ -22,13 +22,32 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { useLanguage } from "@/context/languageContext" // Certifique-se que este é o seu hook de linguagem
-import articlesData, { type Article, type ContentSection } from "@/lib/articles-data" // Usando a fonte de dados original
+import articlesData, { getArticleById, type Article, type ContentSection } from "@/lib/articles-data" // Usando a fonte de dados original
+import { translateArticle } from "@/lib/auto-translate"
 
 export default function ArticleDetailPage({ params }: { params: { id: string } }) {
-  const { t } = useLanguage() // Usando seu hook de linguagem
-  const article: Article | undefined = articlesData[params.id]
+  const { t, language } = useLanguage() // Usando seu hook de linguagem
+  const baseArticle: Article | undefined = articlesData[params.id]
+  const [article, setArticle] = useState<Article | undefined>(
+    getArticleById(Number(params.id), language)
+  )
   const router = useRouter()
   const [isBookmarked, setIsBookmarked] = useState(false)
+
+  useEffect(() => {
+    if (!baseArticle) return
+    async function load() {
+      if (language === "pt") {
+        setArticle(baseArticle)
+      } else if (baseArticle.translations?.[language]) {
+        setArticle(getArticleById(Number(params.id), language)!)
+      } else {
+        const tr = await translateArticle(baseArticle, language)
+        setArticle(tr)
+      }
+    }
+    load()
+  }, [language, params.id, baseArticle])
 
   if (!article) {
     notFound()
@@ -166,6 +185,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
     <div className="min-h-screen bg-gradient-to-br from-[#F2EAE4] to-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
+
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" onClick={() => router.push("/learn")} className="p-2">

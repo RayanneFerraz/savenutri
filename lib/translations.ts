@@ -473,6 +473,8 @@ export const translations = {
     storageInfo: "Keep refrigerated for up to 3 days. For smoothies, consume immediately or within 24h.",
     // intermittentFastingConsideration: "Intermittent Fasting", // More descriptive
     intermittentFastingConsiderationInfo: "Ideal for breaking the fast due to balanced macronutri",
+    articleUnavailable: "This article is only available in Portuguese for now.",
+    recipeUnavailable: "This recipe is only available in Portuguese for now.",
   },
 
   pt: {
@@ -1209,6 +1211,8 @@ export const translations = {
     readTime2min: "2 min de leitura",
     readTime3min: "3 min de leitura",
     readTime4min: "4 min de leitura", // Corrigido para 4 min
+    articleUnavailable: "Este artigo está disponível apenas em português no momento.",
+    recipeUnavailable: "Esta receita está disponível apenas em português no momento.",
   },
   es: {
     // Navigation
@@ -1944,5 +1948,15 @@ export const translations = {
     readTime2min: "2 min de lectura",
     readTime3min: "3 min de lectura",
     readTime4min: "4 min de lectura",
+    articleUnavailable: "Este artículo solo está disponible en portugués por ahora.",
+    recipeUnavailable: "Esta receta solo está disponible en portugués por ahora.",
   },
-}
+  fr: {
+    articleUnavailable: "Cet article est uniquement disponible en portugais pour le moment.",
+    recipeUnavailable: "Cette recette est uniquement disponible en portugais pour le moment.",
+  },
+} as const
+
+export type Translations = typeof translations
+export type Language = keyof Translations
+export type TranslationKey = keyof Translations["en"]
