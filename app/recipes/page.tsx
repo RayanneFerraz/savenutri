@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ChefHat, Users, Search, Heart, Leaf, Droplets, Eye, CakeSlice, Clock, Star, Flame } from "lucide-react"
-import { recipesDatabase } from "@/lib/recipes-data"
+import { recipesDatabase, getRecipeById } from "@/lib/recipes-data"
+import { translateRecipe } from "@/lib/auto-translate"
 import { useLanguage } from "@/context/languageContext"
 import type { TranslationKey } from "@/lib/translations"
 
@@ -15,7 +16,8 @@ export default function RecipesPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [favorites, setFavorites] = useState<number[]>([])
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
+  const [recipes, setRecipes] = useState<any[]>([])
 
   useEffect(() => {
     // Load favorites from localStorage
@@ -34,11 +36,30 @@ export default function RecipesPage() {
     { id: "Sobremesas", nameKey: "desserts" as TranslationKey, icon: <CakeSlice className="w-4 h-4" /> },
   ]
 
-  const filteredRecipes = recipesDatabase.filter((recipe) => {
+  useEffect(() => {
+    async function load() {
+      const arr = await Promise.all(
+        recipesDatabase.map(async (recipe) => {
+          let tr: any
+          if (language === "pt") tr = recipe
+          else if ((recipe as any).translations?.[language]) {
+            tr = getRecipeById(recipe.id, language)
+          } else {
+            tr = await translateRecipe(recipe, language)
+          }
+          return { ...tr, baseCategory: recipe.category }
+        })
+      )
+      setRecipes(arr)
+    }
+    load()
+  }, [language])
+
+  const filteredRecipes = recipes.filter((recipe) => {
     const matchesSearch =
       recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       recipe.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === "all" || recipe.category === selectedCategory
+    const matchesCategory = selectedCategory === "all" || recipe.baseCategory === selectedCategory
     return matchesSearch && matchesCategory
   })
 

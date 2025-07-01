@@ -1,6 +1,8 @@
 import * as React from "react"
+import Link from "next/link"
 
 import { cn } from "@/lib/utils"
+import { Button } from "./button"
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -56,12 +58,25 @@ const CardDescription = React.forwardRef<
 ))
 CardDescription.displayName = "CardDescription"
 
-const CardContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
-))
+interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  href?: string
+  linkText?: string
+}
+
+const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
+  ({ className, href, linkText = "Read Article", children, ...props }, ref) => (
+    <div ref={ref} className={cn("p-6 pt-0", className)} {...props}>
+      {children}
+      {href && (
+        <Link href={href} className="mt-4 block">
+          <Button className="w-full bg-[#F24E29] hover:bg-[#F27D16]">
+            {linkText}
+          </Button>
+        </Link>
+      )}
+    </div>
+  )
+)
 CardContent.displayName = "CardContent"
 
 const CardFooter = React.forwardRef<
