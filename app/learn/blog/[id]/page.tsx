@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useLanguage } from "@/context/languageContext"
+import { useState, useEffect } from "react"
 import {
   ArrowLeft,
   BookOpen,
@@ -15,17 +16,37 @@ import {
   Lightbulb,
   CheckCircle,
 } from "lucide-react"
-import articlesData, { type Article, type ContentSection } from "lib/articles-data"
+import articlesData, { getArticleById, type Article, type ContentSection } from "@/lib/articles-data"
+import { translateArticle } from "@/lib/auto-translate"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
-  const { t } = useLanguage()
-  const article: Article | undefined = articlesData[params.id]
+  const { t, language } = useLanguage()
+  const baseArticle: Article | undefined = articlesData[params.id]
+  const [article, setArticle] = useState<Article | undefined>(
+    getArticleById(Number(params.id), language)
+  )
+  const translated = baseArticle?.translations?.[language]
 
-  if (!article) {
+  if (!baseArticle) {
     notFound()
   }
+
+  useEffect(() => {
+    if (!baseArticle) return
+    async function load() {
+      if (language === "pt") {
+        setArticle(baseArticle)
+      } else if (baseArticle.translations?.[language]) {
+        setArticle(getArticleById(Number(params.id), language)!)
+      } else {
+        const tr = await translateArticle(baseArticle, language)
+        setArticle(tr)
+      }
+    }
+    load()
+  }, [language, params.id, baseArticle])
 
   const renderContentSection = (section: ContentSection, index: number) => {
     switch (section.type) {
@@ -103,6 +124,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           {t("backToArticles")}
         </Link>
 
+
         <article>
           <header className="mb-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-3">{article.title}</h1>
@@ -152,28 +174,29 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             {Object.values(articlesData)
               .filter((a) => a.id !== article.id && a.category === article.category)
               .slice(0, 2)
-              .map((relatedArticle) => (
-                <Card
-                  key={relatedArticle.id}
-                  className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                >
-                  <img
-                    src={relatedArticle.image || "/placeholder.svg"}
-                    alt={relatedArticle.title}
-                    className="w-full h-40 object-cover"
-                  />
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-md font-semibold h-12 overflow-hidden">{relatedArticle.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4">
-                    <Link href={`/learn/blog/${relatedArticle.id}`}>
-                      <Button variant="outline" className="w-full">
-                        {t("readMore")}
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
+              .map((relatedArticle) => {
+                const rel = getArticleById(relatedArticle.id, language) || relatedArticle
+                return (
+                  <Card
+                    key={relatedArticle.id}
+                    className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  >
+                    <img
+                      src={rel.image || "/placeholder.svg"}
+                      alt={rel.title}
+                      className="w-full h-40 object-cover"
+                    />
+                    <CardHeader className="p-4">
+                      <CardTitle className="text-md font-semibold h-12 overflow-hidden">{rel.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent
+                      className="p-4"
+                      href={`/learn/blog/${relatedArticle.id}`}
+                      linkText={t("readMore")}
+                    />
+                  </Card>
+                )
+              })}
           </div>
         </section>
 

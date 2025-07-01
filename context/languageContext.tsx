@@ -12,7 +12,11 @@ interface LanguageContextValue {
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("pt")
+  const [language, setLanguageState] = useState<Language>("en")
+
+  useEffect(() => {
+    document.documentElement.lang = language === "pt" ? "pt-BR" : language
+  }, [language])
 
   useEffect(() => {
     if (typeof window === "undefined") return
@@ -22,6 +26,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         const parsedLang = JSON.parse(saved) as Language
         if (translations[parsedLang]) {
           setLanguageState(parsedLang)
+          document.documentElement.lang =
+            parsedLang === "pt" ? "pt-BR" : parsedLang
         }
       } catch {
         localStorage.removeItem("app_language")
@@ -32,6 +38,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
     localStorage.setItem("app_language", JSON.stringify(lang))
+    document.documentElement.lang = lang === "pt" ? "pt-BR" : lang
   }
 
   const t = (key: TranslationKey, variables?: Record<string, string | number>): string => {
