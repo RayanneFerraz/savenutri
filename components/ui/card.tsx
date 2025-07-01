@@ -1,8 +1,6 @@
 import * as React from "react"
-import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Button } from "./button"
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -68,11 +66,14 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
     <div ref={ref} className={cn("p-6 pt-0", className)} {...props}>
       {children}
       {href && (
-        <Link href={href} className="mt-4 block">
-          <Button className="w-full bg-[#F24E29] hover:bg-[#F27D16]">
+        <a
+          href={href}
+          className="mt-4 inline-block w-full text-center no-underline"
+        >
+          <button className="w-full rounded-md bg-[#F24E29] px-4 py-2 font-medium text-white hover:bg-[#F27D16]">
             {linkText}
-          </Button>
-        </Link>
+          </button>
+        </a>
       )}
     </div>
   )

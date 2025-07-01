@@ -25,13 +25,11 @@ import {
   ArrowLeft,
   ArrowRight,
   RotateCcw,
-  Globe,
 } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { Slider } from "@/components/ui/slider"
 import { savePhotoBlob, getPhotoBlobUrl, deletePhotoBlob } from "@/lib/photo-storage"
 import { useLanguage } from "@/context/languageContext"
-import type { Language } from "@/lib/translations"
 
 const defaultProfile = {
   name: "",
@@ -431,40 +429,40 @@ export default function ProfilePage() {
                     </CardContent>
                   </Card>
                 )}
-              </CardContent>
-              </Card>
+            </CardContent>
+          </Card>
 
-              {/* Language */}
-              <Card className="shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-purple-500 to-blue-500 text-white">
-                  <CardTitle className="flex items-center gap-2">
-                    <Globe className="w-5 h-5" />
-                    {t("language")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="language-select">{t("selectLanguage")}</Label>
-                    <Select
-                      value={language}
-                      onValueChange={(val) => setLanguage(val as Language)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="pt">Português</SelectItem>
-                        <SelectItem value="es">Español</SelectItem>
-                        <SelectItem value="fr">Français</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Language Selection */}
+          <Card className="shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-[#F2AEE7] to-[#F2C12E] text-white">
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="w-5 h-5" />
+                {t("language")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="language-select">{t("selectLanguage")}</Label>
+                <Select
+                  value={language}
+                  onValueChange={(val) => setLanguage(val as Language)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="pt">Português</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
+                    <SelectItem value="fr">Français</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
 
-              {/* Notifications */}
-            <Card className="shadow-lg">
+          {/* Notifications */}
+          <Card className="shadow-lg">
               <CardHeader className="bg-gradient-to-r from-[#F2C12E] to-[#F27D16] text-white">
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="w-5 h-5" />

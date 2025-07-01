@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -27,7 +27,6 @@ import {
 } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { getRecipeById } from "@/lib/recipes-data"
-import { translateRecipe } from "@/lib/auto-translate"
 import { useLanguage } from "@/context/languageContext"
 import type { TranslationKey } from "@/lib/translations"
 
@@ -39,26 +38,10 @@ export default function RecipeDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false)
   const [servings, setServings] = useState(2)
 
-  const { t, language } = useLanguage()
-  const baseRecipe = getRecipeById(Number(params.id))
-  const [recipe, setRecipe] = useState(baseRecipe)
+  const recipe = getRecipeById(Number(params.id))
+  const { t } = useLanguage()
 
-  useEffect(() => {
-    if (!baseRecipe) return
-    async function load() {
-      if (language === "pt") {
-        setRecipe(baseRecipe)
-      } else if ((baseRecipe as any).translations?.[language]) {
-        setRecipe(getRecipeById(Number(params.id), language)!)
-      } else {
-        const tr = await translateRecipe(baseRecipe, language)
-        setRecipe(tr)
-      }
-    }
-    load()
-  }, [language, params.id, baseRecipe])
-
-  if (!baseRecipe) {
+  if (!recipe) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#F2EAE4] to-white flex items-center justify-center">
         <div className="text-center">
