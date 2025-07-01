@@ -63,3 +63,23 @@ export async function translateRecipe(recipe: Recipe, lang: Language): Promise<R
     ),
   }
 }
+
+export interface BlogPostForTranslate {
+  id: number
+  title: string
+  description: string
+  excerpt: string
+  content: string
+  tags: string[]
+}
+
+export async function translateBlogPost(post: BlogPostForTranslate, lang: Language): Promise<BlogPostForTranslate> {
+  return {
+    ...post,
+    title: await translate(post.title, lang),
+    description: await translate(post.description, lang),
+    excerpt: await translate(post.excerpt, lang),
+    content: await translate(post.content, lang),
+    tags: await Promise.all(post.tags.map((t) => translate(t, lang))),
+  }
+}

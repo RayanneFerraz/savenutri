@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -28,6 +28,8 @@ import Link from "next/link"
 import { useLanguage } from "@/context/languageContext"
 import type { TranslationKey } from "@/lib/translations"
 import articlesData, { getArticleById } from "@/lib/articles-data"
+import { blogPosts as blogData, getBlogPostById } from "@/lib/blog-data"
+import { translateArticle, translateBlogPost } from "@/lib/auto-translate"
 
 const CATEGORY_COLORS: { [key: string]: string } = {
   Ciência: "bg-blue-100 text-blue-800",
@@ -65,32 +67,62 @@ export default function LearnPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("recent")
   const [activeTab, setActiveTab] = useState("artigos")
+  const [articles, setArticles] = useState<any[]>([])
+  const [blogPosts, setBlogPosts] = useState<any[]>([])
 
-  const articles = useMemo(
-    () =>
-      Object.values(articlesData).map((article, index) => {
-        const translated = getArticleById(article.id, language) || article
-        return {
-          ...translated,
-          id: article.id,
-          excerpt: translated.description,
-          views: article.reviews * 17,
-          author: {
-            name: translated.author,
-            avatar: translated.author
-              .split(" ")
-              .map((n) => n[0])
-              .join(""),
-            bio: "Especialista em Jejum Intermitente",
-          },
-          featured: index < 2,
-          trending: index < 5,
-          type: "article",
-          baseCategory: article.category,
-        }
-      }),
-    [language],
-  )
+  useEffect(() => {
+    async function loadArticles() {
+      const arr = await Promise.all(
+        Object.values(articlesData).map(async (article, index) => {
+          let translated: any
+          if (language === "pt") translated = article
+          else if (article.translations?.[language]) {
+            translated = getArticleById(article.id, language)
+          } else {
+            translated = await translateArticle(article, language)
+          }
+          return {
+            ...translated,
+            id: article.id,
+            excerpt: translated.description,
+            views: article.reviews * 17,
+            author: {
+              name: translated.author,
+              avatar: translated.author
+                .split(" ")
+                .map((n: string) => n[0])
+                .join(""),
+              bio: "Especialista em Jejum Intermitente",
+            },
+            featured: index < 2,
+            trending: index < 5,
+            type: "article",
+            baseCategory: article.category,
+          }
+        })
+      )
+      setArticles(arr)
+    }
+
+    async function loadBlogs() {
+      const arr = await Promise.all(
+        blogData.map(async (post) => {
+          let translated: any
+          if (language === "pt") translated = post
+          else if (post.translations?.[language]) {
+            translated = getBlogPostById(post.id, language)
+          } else {
+            translated = await translateBlogPost(post, language)
+          }
+          return { ...translated, type: "blog" }
+        })
+      )
+      setBlogPosts(arr)
+    }
+
+    loadArticles()
+    loadBlogs()
+  }, [language])
 
   const categories = useMemo(() => {
     const categoryColors = CATEGORY_COLORS
@@ -114,196 +146,28 @@ export default function LearnPage() {
   ]
 }, [articles])
 
-  const blogPosts = [
-    {
-      id: 101,
-      title: "Minha Jornada de 90 Dias com Jejum 16:8",
-      description: "Como o jejum intermitente transformou minha vida e rotina diária",
-      excerpt:
-        "Há 3 meses decidi experimentar o jejum 16:8 e os resultados me surpreenderam! Aqui conto tudo sobre minha experiência, os desafios e as conquistas.",
-      category: "experiences" as TranslationKey,
-      readTime: "5 min",
-      views: 1850,
-      likes: 124,
-      comments: 23,
-      publishDate: "2025-06-18",
-      author: {
-        name: "Marina Santos",
-        avatar: "MS",
-        bio: "Praticante de jejum intermitente há 2 anos",
-        isVerified: false,
-      },
-      image: "/placeholder.svg?height=200&width=300",
-      tags: ["Experiência Pessoal", "16:8", "Transformação"],
-      featured: false,
-      trending: true,
-      type: "blog",
-    },
-    {
-      id: 102,
-      title: "5 Erros que Cometi no Meu Primeiro Mês de Jejum",
-      description: "Aprenda com os meus erros para ter uma jornada mais suave",
-      excerpt:
-        "No início, cometi alguns erros básicos que atrapalharam meus resultados. Compartilho aqui os principais para que você não passe pelo mesmo! 😅",
-      category: "experiences" as TranslationKey,
-      readTime: "4 min",
-      views: 1420,
-      likes: 89,
-      comments: 31,
-      publishDate: "2025-06-16",
-      author: {
-        name: "Carlos Mendes",
-        avatar: "CM",
-        bio: "Iniciante no jejum intermitente",
-        isVerified: false,
-      },
-      image: "/placeholder.svg?height=200&width=300",
-      tags: ["Erros Comuns", "Iniciante", "Dicas"],
-      type: "blog",
-    },
-    {
-      id: 103,
-      title: "Receita: Smoothie Perfeito para Quebrar o Jejum",
-      description: "Uma receita nutritiva e deliciosa para sua primeira refeição",
-      excerpt:
-        "Depois de testar várias combinações, encontrei a receita perfeita! Rico em nutrientes e super saboroso. Vou ensinar o passo a passo! 🥤",
-      category: "recipes" as TranslationKey,
-      readTime: "3 min",
-      views: 980,
-      likes: 67,
-      comments: 15,
-      publishDate: "2025-06-14",
-      author: {
-        name: "Chef Ana Paula",
-        avatar: "AP",
-        bio: "Culinarista especializada em alimentação saudável",
-        isVerified: true,
-      },
-      image: "/placeholder.svg?height=200&width=300",
-      tags: ["Receita", "Smoothie", "Quebra-Jejum"],
-      type: "blog",
-    },
-    {
-      id: 104,
-      title: "Como Manter a Motivação nos Dias Difíceis",
-      description: "Estratégias para não desistir quando a vontade de comer bater forte",
-      excerpt:
-        "Todos temos aqueles dias em que a fome parece insuportável. Aqui estão minhas estratégias favoritas para manter o foco! 💪",
-      category: "motivation" as TranslationKey,
-      readTime: "4 min",
-      views: 1230,
-      likes: 95,
-      comments: 28,
-      publishDate: "2025-06-12",
-      author: {
-        name: "Psicóloga Laura Dias",
-        avatar: "LD",
-        bio: "Especialista em mudança de hábitos",
-        isVerified: true,
-      },
-      image: "/placeholder.svg?height=200&width=300",
-      tags: ["Motivação", "Mindset", "Persistência"],
-      trending: true,
-      type: "blog",
-    },
-    {
-      id: 105,
-      title: "Dica Rápida: Como Lidar com a Fome Social",
-      description: "O que fazer quando todos estão comendo e você está em jejum",
-      excerpt:
-        "Aquele momento constrangedor quando você está em jejum e todos estão comendo... Tenho algumas dicas que funcionam! 🤝",
-      category: "quickTips" as TranslationKey,
-      readTime: "2 min",
-      views: 890,
-      likes: 52,
-      comments: 19,
-      publishDate: "2025-06-10",
-      author: {
-        name: "Roberto Silva",
-        avatar: "RS",
-        bio: "Praticante de jejum há 3 anos",
-        isVerified: false,
-      },
-      image: "/placeholder.svg?height=200&width=300",
-      tags: ["Dica Rápida", "Social", "Estratégia"],
-      type: "blog",
-    },
-    {
-      id: 106,
-      title: "Por Que Quase Desisti (E Como Não Desisti)",
-      description: "Minha crise de motivação na terceira semana e como superei",
-      excerpt:
-        "Na terceira semana, pensei seriamente em desistir. A balança não se mexia e eu estava frustrada. Mas algo mudou... ✨",
-      category: "motivation" as TranslationKey,
-      readTime: "6 min",
-      views: 1560,
-      likes: 118,
-      comments: 42,
-      publishDate: "2025-06-08",
-      author: {
-        name: "Juliana Costa",
-        avatar: "JC",
-        bio: "Transformação em andamento",
-        isVerified: false,
-      },
-      image: "/placeholder.svg?height=200&width=300",
-      tags: ["Superação", "Motivação", "Persistência"],
-      type: "blog",
-    },
-    {
-      id: 107,
-      title: "Jejum no Trabalho: Minhas Estratégias",
-      description: "Como manter o jejum mesmo com a rotina corrida do escritório",
-      excerpt:
-        "Trabalhar 8h por dia e manter o jejum pode ser desafiador. Compartilho minhas estratégias que realmente funcionam! 💼",
-      category: "quickTips" as TranslationKey,
-      readTime: "4 min",
-      views: 1340,
-      likes: 78,
-      comments: 25,
-      publishDate: "2025-06-06",
-      author: {
-        name: "Pedro Oliveira",
-        avatar: "PO",
-        bio: "Executivo e praticante de jejum",
-        isVerified: false,
-      },
-      image: "/placeholder.svg?height=200&width=300",
-      tags: ["Trabalho", "Rotina", "Estratégia"],
-      type: "blog",
-    },
-    {
-      id: 108,
-      title: "Celebrando Meus Primeiros 10kg Perdidos! 🎉",
-      description: "Um marco importante na minha jornada de emagrecimento",
-      excerpt:
-        "Hoje completei 4 meses de jejum e perdi 10kg! Quero compartilhar essa alegria e algumas reflexões sobre o processo. 🎊",
-      category: "experiences" as TranslationKey,
-      readTime: "5 min",
-      views: 2100,
-      likes: 156,
-      comments: 38,
-      publishDate: "2025-06-04",
-      author: {
-        name: "Fernanda Lima",
-        avatar: "FL",
-        bio: "Em transformação há 4 meses",
-        isVerified: false,
-      },
-      image: "/placeholder.svg?height=200&width=300",
-      tags: ["Conquista", "Emagrecimento", "Celebração"],
-      featured: true,
-      type: "blog",
-    },
-  ]
 
-  const blogCategories = [
-    { nameKey: "all" as TranslationKey, count: 8, color: "bg-gray-100 text-gray-800" },
-    { nameKey: "experiences" as TranslationKey, count: 3, color: "bg-blue-100 text-blue-800" },
-    { nameKey: "quickTips" as TranslationKey, count: 2, color: "bg-green-100 text-green-800" },
-    { nameKey: "motivation" as TranslationKey, count: 2, color: "bg-purple-100 text-purple-800" },
-    { nameKey: "recipes" as TranslationKey, count: 1, color: "bg-orange-100 text-orange-800" },
-  ]
+  const blogCategories = useMemo(() => {
+    const counts = blogPosts.reduce((acc: Record<string, number>, post) => {
+      acc[post.category] = (acc[post.category] || 0) + 1
+      return acc
+    }, {})
+    const colorMap: Record<string, string> = {
+      experiences: "bg-blue-100 text-blue-800",
+      quickTips: "bg-green-100 text-green-800",
+      motivation: "bg-purple-100 text-purple-800",
+      recipes: "bg-orange-100 text-orange-800",
+      all: "bg-gray-100 text-gray-800",
+    }
+    return [
+      { nameKey: "all" as TranslationKey, count: blogPosts.length, color: colorMap.all },
+      ...Object.keys(counts).map((c) => ({
+        nameKey: c as TranslationKey,
+        count: counts[c],
+        color: colorMap[c] || colorMap.all,
+      })),
+    ]
+  }, [blogPosts])
 
   const currentCategories = activeTab === "artigos" ? categories : blogCategories
   const currentContent = activeTab === "artigos" ? articles : blogPosts
