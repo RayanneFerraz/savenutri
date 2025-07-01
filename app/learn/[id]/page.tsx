@@ -130,7 +130,10 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
               {section.title}
             </h2>
             {section.content && (
-              <p className="text-gray-700 leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: section.content }} />
+              <div
+                className="text-gray-700 leading-relaxed mb-6 text-base font-normal tracking-wide"
+                dangerouslySetInnerHTML={{ __html: section.content }}
+              />
             )}
             {section.subsections &&
               section.subsections.map((subsection, subIndex) => (
