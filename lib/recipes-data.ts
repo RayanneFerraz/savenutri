@@ -109,21 +109,6 @@ export const recipesDatabase: Recipe[] = [
           "Sal y pimienta",
         ],
       },
-      fr: {
-        title: "Poulet Grillé avec Légumes Vapeur",
-        description: "Poitrine de poulet grillée accompagnée d'un mélange coloré de légumes vapeur.",
-        category: "Déjeuner/Dîner",
-        difficulty: "Facile",
-        ingredients: [
-          "Poitrine de poulet",
-          "Brocoli",
-          "Carottes",
-          "Haricots verts",
-          "Huile d'olive",
-          "Jus de citron",
-          "Sel et poivre",
-        ],
-      },
     },
   },
   {

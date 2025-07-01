@@ -162,13 +162,6 @@ const articlesData: ArticlesData = {
         publishDate: "23 de junio de 2025",
         tags: ["Ayuno", "Ciencia", "Metabolismo", "Autofagia", "HGH"],
       },
-      fr: {
-        title: "La Science du Jeûne Intermittent",
-        description: "Comment votre corps réagit au jeûne et ce que la science révèle sur la santé métabolique, l'autophagie et les hormones",
-        category: "Science",
-        publishDate: "23 juin 2025",
-        tags: ["Jeûne", "Science", "Métabolisme", "Autophagie", "HGH"],
-      },
     },
   },
 
