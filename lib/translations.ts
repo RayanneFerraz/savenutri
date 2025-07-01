@@ -473,6 +473,31 @@ export const translations = {
     storageInfo: "Keep refrigerated for up to 3 days. For smoothies, consume immediately or within 24h.",
     // intermittentFastingConsideration: "Intermittent Fasting", // More descriptive
     intermittentFastingConsiderationInfo: "Ideal for breaking the fast due to balanced macronutri",
+    prepareIngredients: "Prepare the ingredients",
+    prepareIngredientsDesc: "Wash and prepare all ingredients as listed.",
+    prepareIngredientsTip: "Gather everything before starting the recipe.",
+    startPreparation: "Start preparation",
+    startPreparationDesc: "Begin following the ingredient order for best results.",
+    startPreparationTip: "Keep the proper temperature throughout the process.",
+    combineIngredients: "Combine ingredients",
+    combineIngredientsDesc: "Mix the ingredients using the appropriate technique.",
+    combineIngredientsTip: "Avoid overmixing to preserve the ideal texture.",
+    finalizePreparation: "Finish the preparation",
+    finalizePreparationDesc: "Complete the recipe according to the instructions.",
+    finalizePreparationTip: "Adjust seasonings and flavors to your liking.",
+    presentAndServe: "Present and serve",
+    presentAndServeDesc: "Finish plating and serve immediately for the best experience.",
+    presentAndServeTip: "Serve at the ideal temperature to highlight every flavor.",
+    recipeTipPrepBefore: "Prepare all ingredients before you start",
+    recipeTipTemp: "Maintain the proper temperature while cooking",
+    recipeTipSeason: "Season according to your personal taste",
+    recipeTipServeHot: "Serve immediately for better flavor",
+    variationLightName: "Light Version",
+    variationLightDesc: "Reduce the amount of fats and use lower calorie ingredients",
+    variationVeganName: "Vegan Version",
+    variationVeganDesc: "Replace animal ingredients with plant-based alternatives",
+    variationGlutenFreeName: "Gluten-Free Version",
+    variationGlutenFreeDesc: "Use gluten-free ingredients for those with restrictions",
   },
 
   pt: {
@@ -1945,4 +1970,9 @@ export const translations = {
     readTime3min: "3 min de lectura",
     readTime4min: "4 min de lectura",
   },
+  fr: {},
 }
+
+export type Translations = typeof translations
+export type Language = keyof Translations
+export type TranslationKey = keyof Translations["en"]

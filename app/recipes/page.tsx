@@ -9,13 +9,15 @@ import { Badge } from "@/components/ui/badge"
 import { ChefHat, Users, Search, Heart, Leaf, Droplets, Eye, CakeSlice, Clock, Star, Flame } from "lucide-react"
 import { recipesDatabase } from "@/lib/recipes-data"
 import { useLanguage } from "@/context/languageContext"
+import { translateRecipe } from "@/lib/auto-translate"
 import type { TranslationKey } from "@/lib/translations"
 
 export default function RecipesPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [favorites, setFavorites] = useState<number[]>([])
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
+  const [recipes, setRecipes] = useState(recipesDatabase)
 
   useEffect(() => {
     // Load favorites from localStorage
@@ -24,6 +26,24 @@ export default function RecipesPage() {
       setFavorites(JSON.parse(savedFavorites))
     }
   }, [])
+
+  useEffect(() => {
+    let active = true
+    async function run() {
+      if (language === "pt") {
+        setRecipes(recipesDatabase)
+      } else {
+        const translated = await Promise.all(
+          recipesDatabase.map((r) => translateRecipe(r, language))
+        )
+        if (active) setRecipes(translated)
+      }
+    }
+    run()
+    return () => {
+      active = false
+    }
+  }, [language])
 
   const categories = [
     { id: "all", nameKey: "all" as TranslationKey, icon: <ChefHat className="w-4 h-4" /> },
@@ -34,7 +54,7 @@ export default function RecipesPage() {
     { id: "Sobremesas", nameKey: "desserts" as TranslationKey, icon: <CakeSlice className="w-4 h-4" /> },
   ]
 
-  const filteredRecipes = recipesDatabase.filter((recipe) => {
+  const filteredRecipes = recipes.filter((recipe) => {
     const matchesSearch =
       recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       recipe.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -185,12 +205,11 @@ export default function RecipesPage() {
                     </div>
                   </div>
 
-                  <Link href={`/recipes/${recipe.id}`}>
-                    <Button className="w-full bg-gradient-to-r from-[#F27D16] to-[#F24E29] hover:from-[#F27D16]/90 hover:to-[#F24E29]/90 text-white group-hover:shadow-md transition-shadow">
-                      <Eye className="w-4 h-4 mr-2" />
-                      {t("viewFullRecipe")}
-                    </Button>
-                  </Link>
+                  <CardContent
+                    href={`/recipes/${recipe.id}`}
+                    linkText={t("viewFullRecipe")}
+                    className="pt-0"
+                  />
                 </CardContent>
               </Card>
             ))}
