@@ -27,10 +27,40 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import Link from "next/link"
 import { useLanguage } from "@/context/languageContext"
 import type { TranslationKey } from "@/lib/translations"
-import articlesData from "@/lib/articles-data"
+import articlesData, { getArticleById } from "@/lib/articles-data"
+
+const CATEGORY_COLORS: { [key: string]: string } = {
+  Ciência: "bg-blue-100 text-blue-800",
+  Science: "bg-blue-100 text-blue-800",
+  Ciencia: "bg-blue-100 text-blue-800",
+  Fundamentos: "bg-gray-100 text-gray-800",
+  Fundamentals: "bg-gray-100 text-gray-800",
+  Benefícios: "bg-green-100 text-green-800",
+  Benefits: "bg-green-100 text-green-800",
+  Beneficios: "bg-green-100 text-green-800",
+  Mitos: "bg-red-100 text-red-800",
+  Myths: "bg-red-100 text-red-800",
+  Preparação: "bg-yellow-100 text-yellow-800",
+  Preparation: "bg-yellow-100 text-yellow-800",
+  Preparacion: "bg-yellow-100 text-yellow-800",
+  Protocolos: "bg-indigo-100 text-indigo-800",
+  Protocols: "bg-indigo-100 text-indigo-800",
+  Alimentação: "bg-orange-100 text-orange-800",
+  Nutrition: "bg-orange-100 text-orange-800",
+  Alimentacion: "bg-orange-100 text-orange-800",
+  Desafios: "bg-purple-100 text-purple-800",
+  Challenges: "bg-purple-100 text-purple-800",
+  Potencializadores: "bg-pink-100 text-pink-800",
+  Enhancers: "bg-pink-100 text-pink-800",
+  "Estilo de Vida": "bg-teal-100 text-teal-800",
+  Lifestyle: "bg-teal-100 text-teal-800",
+  Monitoramento: "bg-cyan-100 text-cyan-800",
+  Tracking: "bg-cyan-100 text-cyan-800",
+  default: "bg-gray-100 text-gray-800",
+}
 
 export default function LearnPage() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("recent")
@@ -38,45 +68,37 @@ export default function LearnPage() {
 
   const articles = useMemo(
     () =>
-      Object.values(articlesData).map((article, index) => ({
-        ...article,
-        id: article.id,
-        excerpt: article.description,
-        views: article.reviews * 17,
-        author: {
-          name: article.author,
-          avatar: article.author
-            .split(" ")
-            .map((n) => n[0])
-            .join(""),
-          bio: "Especialista em Jejum Intermitente",
-        },
-        featured: index < 2,
-        trending: index < 5,
-        type: "article",
-      })),
-    [],
+      Object.values(articlesData).map((article, index) => {
+        const translated = getArticleById(article.id, language) || article
+        return {
+          ...translated,
+          id: article.id,
+          excerpt: translated.description,
+          views: article.reviews * 17,
+          author: {
+            name: translated.author,
+            avatar: translated.author
+              .split(" ")
+              .map((n) => n[0])
+              .join(""),
+            bio: "Especialista em Jejum Intermitente",
+          },
+          featured: index < 2,
+          trending: index < 5,
+          type: "article",
+          baseCategory: article.category,
+        }
+      }),
+    [language],
   )
 
   const categories = useMemo(() => {
-    const categoryColors: { [key: string]: string } = {
-      Ciência: "bg-blue-100 text-blue-800",
-      Fundamentos: "bg-gray-100 text-gray-800",
-      Benefícios: "bg-green-100 text-green-800",
-      Mitos: "bg-red-100 text-red-800",
-      Preparação: "bg-yellow-100 text-yellow-800",
-      Protocolos: "bg-indigo-100 text-indigo-800",
-      Alimentação: "bg-orange-100 text-orange-800",
-      Desafios: "bg-purple-100 text-purple-800",
-      Potencializadores: "bg-pink-100 text-pink-800",
-      "Estilo de Vida": "bg-teal-100 text-teal-800",
-      Monitoramento: "bg-cyan-100 text-cyan-800",
-      default: "bg-gray-100 text-gray-800",
-    }
+    const categoryColors = CATEGORY_COLORS
 
     const categoryCounts = articles.reduce(
       (acc, article) => {
-        acc[article.category] = (acc[article.category] || 0) + 1
+        const key = (article as any).baseCategory || article.category
+        acc[key] = (acc[key] || 0) + 1
         return acc
       },
       {} as { [key: string]: number },
@@ -89,8 +111,8 @@ export default function LearnPage() {
         count: categoryCounts[category],
         color: categoryColors[category] || categoryColors.default,
       })),
-    ]
-  }, [articles])
+  ]
+}, [articles])
 
   const blogPosts = [
     {
@@ -288,7 +310,8 @@ export default function LearnPage() {
 
   const filteredContent = useMemo(() => {
     const filtered = currentContent.filter((item) => {
-      const matchesCategory = selectedCategory === "all" || item.category === selectedCategory
+      const baseCat = (item as any).baseCategory || item.category
+      const matchesCategory = selectedCategory === "all" || baseCat === selectedCategory
       const matchesSearch =
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -483,9 +506,13 @@ export default function LearnPage() {
                             </Badge>
                           )}
                         </div>
-                        <CardContent className="p-6">
+                        <CardContent
+                          className="p-6"
+                          href={`/learn/${article.id}`}
+                          linkText={t("readArticle")}
+                        >
                           <div className="flex items-center gap-2 mb-3">
-                            <Badge className={categories.find((c) => c.name === article.category)?.color}>
+                            <Badge className={CATEGORY_COLORS[article.category] || CATEGORY_COLORS.default}>
                               {article.category}
                             </Badge>
                             <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -515,12 +542,6 @@ export default function LearnPage() {
                                 </div>
                               </div>
                             </div>
-                            <Link href={`/learn/${article.id}`}>
-                              <Button className="bg-[#F24E29] hover:bg-[#F27D16]">
-                                {t("readArticle")}
-                                <ChevronRight className="w-4 h-4 ml-1" />
-                              </Button>
-                            </Link>
                           </div>
                         </CardContent>
                       </Card>
@@ -599,7 +620,11 @@ export default function LearnPage() {
                             </Badge>
                           )}
                         </div>
-                        <CardContent className="p-6">
+                        <CardContent
+                          className="p-6"
+                          href={`/learn/blog/${post.id}`}
+                          linkText={t("readPost")}
+                        >
                           <div className="flex items-center gap-2 mb-3">
                             <Badge className={blogCategories.find((c) => c.nameKey === post.category)?.color}>
                               {t(post.category)}
@@ -638,12 +663,7 @@ export default function LearnPage() {
                                 </div>
                               </div>
                             </div>
-                            <Link href={`/learn/blog/${post.id}`}>
-                              <Button className="bg-[#F27D16] hover:bg-[#F24E29]">
-                                {t("readPost")}
-                                <ChevronRight className="w-4 h-4 ml-1" />
-                              </Button>
-                            </Link>
+                            
                           </div>
                         </CardContent>
                       </Card>
@@ -807,11 +827,15 @@ export default function LearnPage() {
                       )}
                     </div>
 
-                    <CardContent className="p-6 bg-red-100 border-4 border-red-500">
-                      <div className="text-red-600 font-bold text-xl mb-4">
-                        🔴 TESTE - SE VOCÊ VÊ ISSO, A MUDANÇA FUNCIONOU!
-                      </div>
-
+                    <CardContent
+                      className="p-6"
+                      href={
+                        activeTab === "artigos"
+                          ? `/learn/${item.id}`
+                          : `/learn/blog/${item.id}`
+                      }
+                      linkText={t(activeTab === "artigos" ? "readArticle" : "readPost")}
+                    >
                       <div className="mb-3">
                         <span className="text-xs font-semibold text-[#F24E29] uppercase tracking-wide bg-yellow-200 px-2 py-1">
                           {activeTab === "artigos" ? item.category : t(item.category as TranslationKey)}

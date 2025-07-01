@@ -1,7 +1,47 @@
 // Combined 100 Universal Recipes - Traduzido para Português Brasileiro
 // Nutritional values for fiber, sugar, sodium, and cholesterol ADDED / CORRECTED
+import type { Language } from "@/lib/translations"
 
-export const recipesDatabase = [
+export interface RecipeTranslation {
+  title?: string
+  description?: string
+  category?: string
+  difficulty?: string
+  ingredients?: string[]
+  tags?: string[]
+}
+
+export interface Recipe {
+  id: number
+  title: string
+  description: string
+  category: string
+  prepTime: number
+  cookTime: number
+  totalTime: number
+  servings: number
+  calories: number
+  difficulty: string
+  rating: number
+  reviews: number
+  tags: string[]
+  ingredients: { item: string; amount: string; calories: number }[]
+  nutrition: {
+    perServing: {
+      calories: number
+      protein: number
+      carbs: number
+      fat: number
+      fiber: number
+      sugar: number
+      sodium: number
+      cholesterol: number
+    }
+  }
+  translations?: Partial<Record<Language, RecipeTranslation>>
+}
+
+export const recipesDatabase: Recipe[] = [
   // ========== ALMOÇO/JANTAR (IDs 1-40) ==========
   {
     id: 1,
@@ -36,6 +76,38 @@ export const recipesDatabase = [
         sugar: 8, // CORRIGIDO (Açúcares naturais dos vegetais)
         sodium: 180, // CORRIGIDO (Sal temperado + sódio natural)
         cholesterol: 85, // CORRIGIDO (Do peito de frango)
+      },
+    },
+    translations: {
+      en: {
+        title: "Grilled Chicken with Steamed Vegetables",
+        description: "Simple grilled chicken breast with a colorful mix of steamed vegetables.",
+        category: "Lunch/Dinner",
+        difficulty: "Easy",
+        ingredients: [
+          "Chicken breast",
+          "Broccoli",
+          "Carrots",
+          "Green beans",
+          "Olive oil",
+          "Lemon juice",
+          "Salt and pepper",
+        ],
+      },
+      es: {
+        title: "Pollo a la Parrilla con Verduras al Vapor",
+        description: "Pechuga de pollo a la parrilla con una colorida mezcla de verduras al vapor.",
+        category: "Almuerzo/Cena",
+        difficulty: "Fácil",
+        ingredients: [
+          "Pechuga de pollo",
+          "Brócoli",
+          "Zanahorias",
+          "Ejotes",
+          "Aceite de oliva",
+          "Jugo de limón",
+          "Sal y pimienta",
+        ],
       },
     },
   },
@@ -3592,8 +3664,22 @@ export const recipesDatabase = [
   },
 ]
 
-export const getRecipeById = (id: number) => {
-  return recipesDatabase.find((recipe) => recipe.id === id)
+
+export const getRecipeById = (id: number, lang?: Language) => {
+  const recipe = recipesDatabase.find((r) => r.id === id)
+  if (!recipe) return undefined
+  const trans = (recipe as any).translations?.[lang ?? ""]
+  if (trans) {
+    return {
+      ...recipe,
+      ...trans,
+      ingredients: recipe.ingredients.map((ing: any, idx: number) => ({
+        ...ing,
+        item: trans.ingredients?.[idx] || ing.item,
+      })),
+    }
+  }
+  return recipe
 }
 
 export const getRecipesByCategory = (category: string) => {

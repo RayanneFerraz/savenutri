@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ChefHat, Users, Search, Heart, Leaf, Droplets, Eye, CakeSlice, Clock, Star, Flame } from "lucide-react"
-import { recipesDatabase } from "@/lib/recipes-data"
+import { recipesDatabase, getRecipeById } from "@/lib/recipes-data"
 import { useLanguage } from "@/context/languageContext"
 import type { TranslationKey } from "@/lib/translations"
 
@@ -15,7 +15,7 @@ export default function RecipesPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [favorites, setFavorites] = useState<number[]>([])
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   useEffect(() => {
     // Load favorites from localStorage
@@ -34,11 +34,16 @@ export default function RecipesPage() {
     { id: "Sobremesas", nameKey: "desserts" as TranslationKey, icon: <CakeSlice className="w-4 h-4" /> },
   ]
 
-  const filteredRecipes = recipesDatabase.filter((recipe) => {
+  const translatedRecipes = recipesDatabase.map((recipe) => {
+    const translated = getRecipeById(recipe.id, language) || recipe
+    return { ...translated, baseCategory: recipe.category }
+  })
+
+  const filteredRecipes = translatedRecipes.filter((recipe) => {
     const matchesSearch =
       recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       recipe.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === "all" || recipe.category === selectedCategory
+    const matchesCategory = selectedCategory === "all" || recipe.baseCategory === selectedCategory
     return matchesSearch && matchesCategory
   })
 

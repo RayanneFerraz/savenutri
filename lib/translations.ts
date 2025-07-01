@@ -414,10 +414,9 @@ export const translations = {
     celebratingFirst10kgLost: "Celebrating My First 10kg Lost! 🎉",
 
     // Recipes Page (app/recipes/page.tsx)
-    // recipesPageTitle: "Delicious Recipes for Your Eating Window", // Duplicated key
-    // recipesPageSubtitle: "Find healthy and satisfying meals to complement your fasting lifestyle.", // Duplicated key
+    recipesPageTitle: "Delicious Recipes for Your Eating Window",
+    recipesPageSubtitle: "Nutritious meals to break your fast and stay healthy",
     healthyRecipes: "Healthy Recipes",
-    // recipesPageSubtitle: "Nutritious meals to break your fast and stay healthy", // Duplicated key
     searchRecipes: "Search recipes...",
     // categories like "Breakfast", "Lunch/Dinner", "Snacks", "Drinks" are covered by nav/general keys
     difficulty: "Difficulty",
@@ -471,8 +470,35 @@ export const translations = {
     importantInformation: "Important Information",
     storage: "Storage",
     storageInfo: "Keep refrigerated for up to 3 days. For smoothies, consume immediately or within 24h.",
-    // intermittentFastingConsideration: "Intermittent Fasting", // More descriptive
-    intermittentFastingConsiderationInfo: "Ideal for breaking the fast due to balanced macronutri",
+    intermittentFastingConsideration: "Intermittent Fasting",
+    intermittentFastingConsiderationInfo: "Ideal for breaking the fast thanks to balanced macronutrients and easy digestion.",
+    prepareIngredients: "Prepare the ingredients",
+    prepareIngredientsDesc: "Wash and prepare all ingredients as listed.",
+    prepareIngredientsTip: "Organize all ingredients before starting.",
+    startPreparation: "Start preparation",
+    startPreparationDesc: "Begin following the ingredient order for best results.",
+    startPreparationTip: "Maintain the proper temperature throughout.",
+    combineIngredients: "Combine ingredients",
+    combineIngredientsDesc: "Mix the ingredients using the appropriate technique for this recipe.",
+    combineIngredientsTip: "Avoid overmixing to preserve the ideal texture.",
+    finalizePreparation: "Finish preparation",
+    finalizePreparationDesc: "Complete the dish following the recipe-specific techniques.",
+    finalizePreparationTip: "Adjust seasoning and flavors to taste.",
+    presentAndServe: "Present and serve",
+    presentAndServeDesc: "Finish the presentation and serve immediately for best experience.",
+    presentAndServeTip: "Serve at the ideal temperature to highlight all flavors.",
+    recipeTipPrepBefore: "Prepare all ingredients before starting",
+    recipeTipTemp: "Maintain the proper temperature during preparation",
+    recipeTipSeason: "Adjust seasoning to your personal taste",
+    recipeTipServeHot: "Serve immediately for best flavor",
+    variationLightName: "Light Version",
+    variationLightDesc: "Reduce the amount of fat and use lower-calorie ingredients",
+    variationVeganName: "Vegan Version",
+    variationVeganDesc: "Replace animal ingredients with plant-based alternatives",
+    variationGlutenFreeName: "Gluten-Free Version",
+    variationGlutenFreeDesc: "Use gluten-free ingredients for those with restrictions",
+    articleUnavailable: "This article is only available in Portuguese for now.",
+    recipeUnavailable: "This recipe is only available in Portuguese for now.",
   },
 
   pt: {
@@ -885,9 +911,8 @@ export const translations = {
 
     // Recipes Page (app/recipes/page.tsx)
     recipesPageTitle: "Receitas Deliciosas para Sua Janela de Alimentação",
-    // recipesPageSubtitle: "Encontre refeições saudáveis e satisfatórias para complementar seu estilo de vida de jejum.", // Duplicated
+    recipesPageSubtitle: "Refeições nutritivas para quebrar o jejum e manter a saúde",
     healthyRecipes: "Receitas Saudáveis",
-    // recipesPageSubtitle: "Refeições nutritivas para quebrar o jejum e manter a saúde", // Duplicated
     searchRecipes: "Buscar receitas...",
     difficulty: "Dificuldade",
     easy: "Fácil",
@@ -1209,6 +1234,8 @@ export const translations = {
     readTime2min: "2 min de leitura",
     readTime3min: "3 min de leitura",
     readTime4min: "4 min de leitura", // Corrigido para 4 min
+    articleUnavailable: "Este artigo está disponível apenas em português no momento.",
+    recipeUnavailable: "Esta receita está disponível apenas em português no momento.",
   },
   es: {
     // Navigation
@@ -1621,9 +1648,8 @@ export const translations = {
 
     // Recipes Page (app/recipes/page.tsx)
     recipesPageTitle: "Recetas Deliciosas para Tu Ventana de Alimentación", // Corrected
-    // recipesPageSubtitle: "Find healthy and satisfying meals to complement your fasting lifestyle.", // Duplicated
+    recipesPageSubtitle: "Comidas nutritivas para romper tu ayuno y mantenerte saludable",
     healthyRecipes: "Recetas Saludables",
-    // recipesPageSubtitle: "Comidas nutritivas para romper tu ayuno y mantenerte saludable", // Duplicated
     searchRecipes: "Buscar recetas...",
     difficulty: "Dificultad",
     easy: "Fácil",
@@ -1944,5 +1970,33 @@ export const translations = {
     readTime2min: "2 min de lectura",
     readTime3min: "3 min de lectura",
     readTime4min: "4 min de lectura",
+    articleUnavailable: "Este artículo solo está disponible en portugués por ahora.",
+    recipeUnavailable: "Esta receta solo está disponible en portugués por ahora.",
   },
-}
+  fr: {
+    home: "Accueil",
+    timer: "Minuteur",
+    recipes: "Recettes",
+    learn: "Apprendre",
+    progress: "Progrès",
+    profile: "Profil",
+    settings: "Paramètres",
+    admin: "Admin",
+    login: "Connexion",
+    logout: "Déconnexion",
+    readArticle: "Lire l'Article",
+    homeTitle: "Save Nutri",
+    homeSubtitle: "Votre compagnon pour le jeûne intermittent",
+    quickActionsTitle: "Actions Rapides",
+    healthyRecipes: "Recettes Saines",
+    recipesPageSubtitle: "Repas nutritifs pour rompre votre jeûne et rester en bonne santé",
+    language: "Langue",
+    selectLanguage: "Choisissez votre langue",
+    articleUnavailable: "Cet article est uniquement disponible en portugais pour le moment.",
+    recipeUnavailable: "Cette recette est uniquement disponible en portugais pour le moment.",
+  },
+} as const
+
+export type Translations = typeof translations
+export type Language = keyof Translations
+export type TranslationKey = keyof Translations["en"]
