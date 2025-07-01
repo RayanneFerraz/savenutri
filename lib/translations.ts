@@ -471,8 +471,35 @@ export const translations = {
     importantInformation: "Important Information",
     storage: "Storage",
     storageInfo: "Keep refrigerated for up to 3 days. For smoothies, consume immediately or within 24h.",
-    // intermittentFastingConsideration: "Intermittent Fasting", // More descriptive
-    intermittentFastingConsiderationInfo: "Ideal for breaking the fast due to balanced macronutri",
+    intermittentFastingConsideration: "Intermittent Fasting",
+    intermittentFastingConsiderationInfo: "Ideal for breaking the fast thanks to balanced macronutrients and easy digestion.",
+    prepareIngredients: "Prepare the ingredients",
+    prepareIngredientsDesc: "Wash and prepare all ingredients as listed.",
+    prepareIngredientsTip: "Organize all ingredients before starting.",
+    startPreparation: "Start preparation",
+    startPreparationDesc: "Begin following the ingredient order for best results.",
+    startPreparationTip: "Maintain the proper temperature throughout.",
+    combineIngredients: "Combine ingredients",
+    combineIngredientsDesc: "Mix the ingredients using the appropriate technique for this recipe.",
+    combineIngredientsTip: "Avoid overmixing to preserve the ideal texture.",
+    finalizePreparation: "Finish preparation",
+    finalizePreparationDesc: "Complete the dish following the recipe-specific techniques.",
+    finalizePreparationTip: "Adjust seasoning and flavors to taste.",
+    presentAndServe: "Present and serve",
+    presentAndServeDesc: "Finish the presentation and serve immediately for best experience.",
+    presentAndServeTip: "Serve at the ideal temperature to highlight all flavors.",
+    recipeTipPrepBefore: "Prepare all ingredients before starting",
+    recipeTipTemp: "Maintain the proper temperature during preparation",
+    recipeTipSeason: "Adjust seasoning to your personal taste",
+    recipeTipServeHot: "Serve immediately for best flavor",
+    variationLightName: "Light Version",
+    variationLightDesc: "Reduce the amount of fat and use lower-calorie ingredients",
+    variationVeganName: "Vegan Version",
+    variationVeganDesc: "Replace animal ingredients with plant-based alternatives",
+    variationGlutenFreeName: "Gluten-Free Version",
+    variationGlutenFreeDesc: "Use gluten-free ingredients for those with restrictions",
+    articleUnavailable: "This article is only available in Portuguese for now.",
+    recipeUnavailable: "This recipe is only available in Portuguese for now.",
   },
 
   pt: {
@@ -1209,6 +1236,8 @@ export const translations = {
     readTime2min: "2 min de leitura",
     readTime3min: "3 min de leitura",
     readTime4min: "4 min de leitura", // Corrigido para 4 min
+    articleUnavailable: "Este artigo está disponível apenas em português no momento.",
+    recipeUnavailable: "Esta receita está disponível apenas em português no momento.",
   },
   es: {
     // Navigation
@@ -1944,5 +1973,28 @@ export const translations = {
     readTime2min: "2 min de lectura",
     readTime3min: "3 min de lectura",
     readTime4min: "4 min de lectura",
+    articleUnavailable: "Este artículo solo está disponible en portugués por ahora.",
+    recipeUnavailable: "Esta receta solo está disponible en portugués por ahora.",
   },
-}
+  fr: {
+    home: "Accueil",
+    timer: "Minuteur",
+    recipes: "Recettes",
+    learn: "Apprendre",
+    progress: "Progrès",
+    profile: "Profil",
+    settings: "Paramètres",
+    admin: "Admin",
+    login: "Connexion",
+    logout: "Déconnexion",
+    readArticle: "Lire l'Article",
+    language: "Langue",
+    selectLanguage: "Choisissez votre langue",
+    articleUnavailable: "Cet article est uniquement disponible en portugais pour le moment.",
+    recipeUnavailable: "Cette recette est uniquement disponible en portugais pour le moment.",
+  },
+} as const
+
+export type Translations = typeof translations
+export type Language = keyof Translations
+export type TranslationKey = keyof Translations["en"]
