@@ -288,7 +288,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
                       </CardHeader>
                       <CardContent className="p-4">
                         <Link href={`/learn/${relatedArticle.id}`}>
-                          <Button variant="outline" className="w-full">
+                          <Button variant="outline" className="w-full bg-transparent">
                             {t("readMore")}
                           </Button>
                         </Link>
