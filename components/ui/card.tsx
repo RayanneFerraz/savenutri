@@ -38,16 +38,14 @@ interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, href, linkText = "Read Article", children, ...props }, ref) => (
     <div ref={ref} className={cn("p-6 pt-0", className)} {...props}>
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">{children}</div>
-        {href && (
-          <div className="flex-shrink-0">
-            <Link href={href}>
-              <Button className="bg-[#F24E29] hover:bg-[#F27D16] whitespace-nowrap">{linkText}</Button>
-            </Link>
-          </div>
-        )}
-      </div>
+      <div>{children}</div>
+      {href && (
+        <div className="mt-4 flex justify-end">
+          <Link href={href}>
+            <Button className="bg-[#F24E29] hover:bg-[#F27D16]">{linkText}</Button>
+          </Link>
+        </div>
+      )}
     </div>
   ),
 )
