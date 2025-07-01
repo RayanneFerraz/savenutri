@@ -129,7 +129,9 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
             <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">
               {section.title}
             </h2>
-            {section.content && <p className="text-gray-700 leading-relaxed mb-4">{section.content}</p>}
+            {section.content && (
+              <p className="text-gray-700 leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: section.content }} />
+            )}
             {section.subsections &&
               section.subsections.map((subsection, subIndex) => (
                 <div key={subIndex} className="mb-4 ml-4 p-4 border-l-4 border-blue-500 bg-gray-50 rounded">
@@ -306,11 +308,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
                           {relatedArticle.title}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent
-                        className="p-4"
-                        href={`/learn/${relatedArticle.id}`}
-                        linkText={t("readMore")}
-                      />
+                      <CardContent className="p-4" href={`/learn/${relatedArticle.id}`} linkText={t("readMore")} />
                     </Card>
                   ))}
               </div>
