@@ -66,22 +66,32 @@ class AnalyticsService {
   }
 
   async initializeSession(): Promise<void> {
+    // Helper: fetch JSON with a 5 s timeout
+    const fetchJSON = async (url: string, timeout = 5000) => {
+      const controller = new AbortController()
+      const id = setTimeout(() => controller.abort(), timeout)
+      try {
+        const res = await fetch(url, { signal: controller.signal })
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`)
+        return await res.json()
+      } finally {
+        clearTimeout(id)
+      }
+    }
+
     try {
-      // Obter IP do usuário
-      const ipResponse = await fetch("https://api.ipify.org?format=json")
-      const { ip } = await ipResponse.json()
+      /* ────────────────────────────────────────────────
+         We query *one* endpoint that already provides
+         both the IP and all geo-location info.
+         ipapi.co has wide CORS support.
+      ──────────────────────────────────────────────── */
+      const locationData = await fetchJSON("https://ipapi.co/json/")
 
-      // Obter informações de geolocalização
-      const locationResponse = await fetch(`https://ipapi.co/${ip}/json/`)
-      const locationData = await locationResponse.json()
-
-      // Detectar dispositivo e navegador
       const deviceInfo = this.detectDevice()
 
-      // Criar sessão
       this.currentSession = {
         id: this.generateSessionId(),
-        ip,
+        ip: locationData.ip ?? "Unknown",
         userAgent: navigator.userAgent,
         timestamp: Date.now(),
         location: locationData.error
@@ -97,7 +107,6 @@ class AnalyticsService {
         device: deviceInfo,
         demographics: {
           language: navigator.language,
-          // Estimativas baseadas em dados demográficos regionais
           estimatedAge: this.estimateAgeGroup(locationData),
           estimatedGender: this.estimateGender(locationData),
         },
@@ -108,14 +117,13 @@ class AnalyticsService {
         },
       }
 
-      // Salvar sessão
       this.saveSession()
-
-      // Iniciar tracking de tempo
       this.startTimeTracking()
     } catch (error) {
-      console.error("Erro ao inicializar analytics:", error)
-      // Criar sessão básica mesmo com erro
+      // Only log once at "debug" level to avoid noisy console in preview
+      if (process.env.NODE_ENV === "development") {
+        console.debug("AnalyticsService: falling back to basic session →", error)
+      }
       this.createBasicSession()
     }
   }
