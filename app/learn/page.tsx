@@ -807,11 +807,7 @@ export default function LearnPage() {
                       )}
                     </div>
 
-                    <CardContent className="p-6 bg-red-100 border-4 border-red-500">
-                      <div className="text-red-600 font-bold text-xl mb-4">
-                        🔴 TESTE - SE VOCÊ VÊ ISSO, A MUDANÇA FUNCIONOU!
-                      </div>
-
+                    <CardContent className="p-6">
                       <div className="mb-3">
                         <span className="text-xs font-semibold text-[#F24E29] uppercase tracking-wide bg-yellow-200 px-2 py-1">
                           {activeTab === "artigos" ? item.category : t(item.category as TranslationKey)}
