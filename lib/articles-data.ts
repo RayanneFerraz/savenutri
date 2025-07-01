@@ -154,6 +154,99 @@ const articlesData: ArticlesData = {
         category: "Science",
         publishDate: "June 23, 2025",
         tags: ["Fasting", "Science", "Metabolism", "Autophagy", "HGH"],
+        content: [
+          {
+            type: "intro",
+            title: "The Scientific Revolution of Fasting",
+            content:
+              "Intermittent fasting isn't just a passing trend - it's a practice backed by decades of rigorous scientific research. Recent studies reveal that when you fast your body initiates a cascade of biological processes that go far beyond simple calorie burning. You're literally reprogramming your metabolism at the cellular level, activating ancient survival mechanisms that promote health, longevity and vitality.",
+          },
+          {
+            type: "section",
+            title: "The Metabolic Shift: Your First Steps Toward Transformation",
+            content:
+              "In the first 12-16 hours of fasting your body undergoes a fundamental metabolic shift. Initially you use stored glucose in the liver and muscles as glycogen. But here's where the magic happens: when those stores run out your body doesn't panic - it adapts.",
+            subsections: [
+              {
+                title: "Awakening Ketosis",
+                content:
+                  "After 12-16 hours your liver begins converting fatty acids into ketones - a premium fuel for your brain and muscles. This process, called ketosis, is like switching from regular gasoline to high octane fuel. Studies show ketones not only provide more efficient energy but also have neuroprotective properties improving focus and mental clarity.",
+              },
+              {
+                title: "Releasing Fat Stores",
+                content:
+                  "During fasting your insulin levels plummet signaling fat cells to release stored fat. It's as if you finally have access to your energy \"vault\". Research shows lipolysis (fat breakdown) increases up to 300% during fasting turning your body into an efficient fat burning machine.",
+              },
+            ],
+          },
+          {
+            type: "section",
+            title: "Growth Hormone: Your Anti-Aging Ally",
+            content:
+              "One of the most impressive discoveries about fasting is its effect on human growth hormone (HGH). During fasting HGH levels can rise five to fourteen fold creating an anabolic environment that preserves muscle mass while accelerating fat burning.",
+            subsections: [
+              {
+                title: "Muscle Preservation During Weight Loss",
+                content:
+                  "Contrary to the myth that fasting causes muscle loss, the increase in HGH during fasting actually protects and preserves your lean mass. Comparative studies show people who practice intermittent fasting retain more muscle during weight loss than those on conventional calorie-restrictive diets.",
+              },
+              {
+                title: "Anti-Aging Benefits",
+                content:
+                  "Elevated HGH during fasting not only aids body composition but also promotes cellular regeneration, improves skin quality, strengthens bones and tendons, and contributes to a more youthful hormonal profile. It's like activating your own internal anti-aging system.",
+              },
+            ],
+          },
+          {
+            type: "section",
+            title: "Autophagy: Cellular Cleaning That Transforms Health",
+            content:
+              "Perhaps the most fascinating process triggered by fasting is autophagy - literally 'self-eating'. This cellular mechanism, which earned the 2016 Nobel Prize in Medicine, is your body's cleaning and recycling system at the cellular level.",
+            subsections: [
+              {
+                title: "The Cellular Renewal Process",
+                content:
+                  "During autophagy your cells literally digest damaged components, misfolded proteins and dysfunctional organelles. It's like a full renovation of every cell in your body. This process removes the cellular 'trash' accumulated over the years allowing your cells to function more efficiently and youthfully.",
+              },
+              {
+                title: "Disease Protection",
+                content:
+                  "Fasting-induced autophagy has been linked to the prevention of cancer, neurodegenerative diseases like Alzheimer's and Parkinson's, cardiovascular diseases and type 2 diabetes. Research suggests this cellular cleansing process is crucial for long-term longevity and health.",
+              },
+            ],
+          },
+          {
+            type: "benefits",
+            title: "Proven Scientific Benefits",
+            items: [
+              "300-500% increase in fat burning while fasting",
+              "5-14x rise in growth hormone levels",
+              "20-40% improvement in insulin sensitivity",
+              "10-25% reduction in inflammatory markers",
+              "200-300% increase in BDNF production",
+              "Autophagy activation after 16-24 hours of fasting",
+              "15-30% boost in cognitive function and mental focus",
+            ],
+          },
+          {
+            type: "section",
+            title: "The Impact on Longevity: Living Longer and Better",
+            content:
+              "Animal studies consistently show intermittent fasting can extend lifespan by 20-40%. While human research is ongoing the observed biological mechanisms suggest similar benefits for our species.",
+            subsections: [
+              {
+                title: "Activation of Longevity Genes",
+                content:
+                  "Fasting activates a family of genes called sirtuins, known as 'longevity genes'. These genes regulate fundamental cellular processes like DNA repair, stress resistance and energy metabolism. It's as if fasting flips a genetic switch that promotes health and longevity.",
+              },
+              {
+                title: "Reduction of Oxidative Stress",
+                content:
+                  "Fasting significantly reduces the production of free radicals and increases the production of endogenous antioxidants. This improved balance between oxidants and antioxidants protects your cells from premature aging and age-related diseases.",
+              },
+            ],
+          },
+        ],
       },
       es: {
         title: "La Ciencia Detrás del Ayuno Intermitente",
@@ -161,6 +254,199 @@ const articlesData: ArticlesData = {
         category: "Ciencia",
         publishDate: "23 de junio de 2025",
         tags: ["Ayuno", "Ciencia", "Metabolismo", "Autofagia", "HGH"],
+        content: [
+          {
+            type: "intro",
+            title: "La Revolución Científica del Ayuno",
+            content:
+              "El ayuno intermitente no es solo una moda pasajera; es una práctica respaldada por décadas de rigurosa investigación científica. Los estudios recientes revelan que cuando ayunas tu cuerpo inicia una cascada de procesos biológicos que van mucho más allá de simplemente quemar calorías. Estás reprogramando literalmente tu metabolismo a nivel celular, activando mecanismos ancestrales de supervivencia que promueven salud, longevidad y vitalidad.",
+          },
+          {
+            type: "section",
+            title: "La Transición Metabólica: Tus Primeros Pasos Hacia la Transformación",
+            content:
+              "En las primeras 12-16 horas de ayuno tu cuerpo atraviesa una transición metabólica fundamental. Inicialmente utilizas la glucosa almacenada en el hígado y los músculos como glucógeno. Pero aquí ocurre la magia: cuando esas reservas se agotan tu cuerpo no entra en pánico, se adapta.",
+            subsections: [
+              {
+                title: "El Despertar de la Cetosis",
+                content:
+                  "Después de 12-16 horas tu hígado comienza a convertir ácidos grasos en cetonas, un combustible premium para tu cerebro y tus músculos. Este proceso, llamado cetosis, es como cambiar de gasolina normal a combustible de alto octanaje. Los estudios demuestran que las cetonas no solo proveen energía más eficiente sino que también poseen propiedades neuroprotectoras que mejoran el enfoque y la claridad mental.",
+              },
+              {
+                title: "Liberación de las Reservas de Grasa",
+                content:
+                  "Durante el ayuno tus niveles de insulina caen en picada señalando a las células adiposas que liberen la grasa almacenada. Es como si por fin tuvieras acceso a tu 'caja fuerte' de energía. Las investigaciones muestran que la lipólisis (descomposición de grasa) aumenta hasta un 300% durante el ayuno, convirtiendo tu cuerpo en una máquina eficiente para quemar grasa.",
+              },
+            ],
+          },
+          {
+            type: "section",
+            title: "La Hormona del Crecimiento: Tu Aliada Antienvejecimiento",
+            content:
+              "Uno de los descubrimientos más impresionantes sobre el ayuno es su efecto en la hormona del crecimiento humano (HGH). Durante el ayuno los niveles de HGH pueden incrementarse de cinco a catorce veces, creando un ambiente anabólico que preserva la masa muscular mientras acelera la quema de grasa.",
+            subsections: [
+              {
+                title: "Preservación Muscular Durante la Pérdida de Peso",
+                content:
+                  "Contrario al mito de que el ayuno causa pérdida muscular, el aumento de HGH durante el ayuno en realidad protege y preserva tu masa magra. Los estudios comparativos muestran que las personas que practican ayuno intermitente mantienen más músculo durante la pérdida de peso que aquellas en dietas convencionales de restricción calórica.",
+              },
+              {
+                title: "Beneficios Antienvejecimiento",
+                content:
+                  "El HGH elevado durante el ayuno no solo ayuda en la composición corporal sino que también promueve la regeneración celular, mejora la calidad de la piel, fortalece huesos y tendones y contribuye a un perfil hormonal más juvenil. Es como activar tu propio sistema antienvejecimiento interno.",
+              },
+            ],
+          },
+          {
+            type: "section",
+            title: "Autofagia: La Limpieza Celular que Transforma tu Salud",
+            content:
+              "Quizás el proceso más fascinante activado por el ayuno sea la autofagia: literalmente 'comerse a uno mismo'. Este mecanismo celular, que otorgó el Premio Nobel de Medicina en 2016, es el sistema de limpieza y reciclaje de tu cuerpo a nivel celular.",
+            subsections: [
+              {
+                title: "El Proceso de Renovación Celular",
+                content:
+                  "Durante la autofagia tus células literalmente 'digiere' componentes dañados, proteínas mal formadas y orgánulos disfuncionales. Es como una renovación completa de cada célula de tu cuerpo. Este proceso elimina la 'basura celular' acumulada a lo largo de los años, permitiendo que tus células funcionen de manera más eficiente y joven.",
+              },
+              {
+                title: "Protección contra Enfermedades",
+                content:
+                  "La autofagia activada por el ayuno se ha asociado con la prevención del cáncer, enfermedades neurodegenerativas como Alzheimer y Parkinson, enfermedades cardiovasculares y diabetes tipo 2. Las investigaciones sugieren que este proceso de limpieza celular es fundamental para la longevidad y la salud a largo plazo.",
+              },
+            ],
+          },
+          {
+            type: "benefits",
+            title: "Beneficios Científicos Comprobados",
+            items: [
+              "Aumento del 300-500% en la quema de grasa durante el ayuno",
+              "Aumento de 5-14 veces en los niveles de la hormona del crecimiento",
+              "Mejora del 20-40% en la sensibilidad a la insulina",
+              "Reducción del 10-25% en los marcadores inflamatorios",
+              "Incremento del 200-300% en la producción de BDNF",
+              "Activación de la autofagia después de 16-24 horas de ayuno",
+              "Mejora del 15-30% en la función cognitiva y el enfoque mental",
+            ],
+          },
+          {
+            type: "section",
+            title: "El Impacto en la Longevidad: Vivir Más y Mejor",
+            content:
+              "Los estudios en animales muestran de forma consistente que el ayuno intermitente puede ampliar la expectativa de vida en un 20-40%. Aunque la investigación en humanos aún está en curso, los mecanismos biológicos observados sugieren beneficios similares para nuestra especie.",
+            subsections: [
+              {
+                title: "Activación de los Genes de la Longevidad",
+                content:
+                  "El ayuno activa una familia de genes llamada sirtuinas, conocidos como 'genes de la longevidad'. Estos genes regulan procesos celulares fundamentales como la reparación del ADN, la resistencia al estrés y el metabolismo energético. Es como si el ayuno accionara un interruptor genético que promueve salud y longevidad.",
+              },
+              {
+                title: "Reducción del Estrés Oxidativo",
+                content:
+                  "El ayuno reduce significativamente la producción de radicales libres y aumenta la producción de antioxidantes endógenos. Este equilibrio mejorado entre oxidantes y antioxidantes protege tus células del envejecimiento prematuro y las enfermedades relacionadas con la edad.",
+              },
+            ],
+          },
+        ],
+      },
+      fr: {
+        title: "La Science derrière le Jeûne Intermittent",
+        description: "Comment votre corps réagit au jeûne et ce que la science révèle sur la santé métabolique, l'autophagie et les hormones",
+        category: "Science",
+        publishDate: "23 juin 2025",
+        tags: ["Jeûne", "Science", "Métabolisme", "Autophagie", "HGH"],
+        content: [
+          {
+            type: "intro",
+            title: "La Révolution Scientifique du Jeûne",
+            content:
+              "Le jeûne intermittent n'est pas qu'une mode passagère - c'est une pratique étayée par des décennies de recherche scientifique rigoureuse. Des études récentes révèlent que lorsque vous jeûnez, votre corps déclenche une cascade de processus biologiques qui vont bien au-delà de la simple combustion de calories. Vous reprogrammez littéralement votre métabolisme au niveau cellulaire, activant des mécanismes ancestraux de survie qui favorisent la santé, la longévité et la vitalité.",
+          },
+          {
+            type: "section",
+            title: "La Transition Métabolique : Vos Premiers Pas vers la Transformation",
+            content:
+              "Au cours des 12 à 16 premières heures de jeûne, votre corps subit une transition métabolique fondamentale. Au départ, vous utilisez le glucose stocké dans le foie et les muscles sous forme de glycogène. Mais voici la magie : lorsque ces réserves s'épuisent, votre corps ne panique pas - il s'adapte.",
+            subsections: [
+              {
+                title: "L'Éveil de la Cétose",
+                content:
+                  "Après 12 à 16 heures, votre foie commence à convertir les acides gras en cétones - un carburant de choix pour votre cerveau et vos muscles. Ce processus, appelé cétose, revient à passer de l'essence ordinaire à un carburant haute performance. Les études montrent que les cétones fournissent non seulement une énergie plus efficace mais possèdent aussi des propriétés neuroprotectrices améliorant la concentration et la clarté mentale.",
+              },
+              {
+                title: "Libération des Réserves de Graisse",
+                content:
+                  "Pendant le jeûne, vos niveaux d'insuline chutent, signalant aux cellules adipeuses de libérer la graisse stockée. C'est comme si vous aviez enfin accès à votre 'coffre-fort' d'énergie. Les recherches montrent que la lipolyse (dégradation des graisses) augmente jusqu'à 300 % pendant le jeûne, transformant votre corps en une machine efficace de combustion des graisses.",
+              },
+            ],
+          },
+          {
+            type: "section",
+            title: "L'Hormone de Croissance : Votre Allié Anti-Âge",
+            content:
+              "L'une des découvertes les plus impressionnantes concernant le jeûne est son effet sur l'hormone de croissance humaine (HGH). Pendant le jeûne, les niveaux de HGH peuvent être multipliés par cinq à quatorze, créant un environnement anabolique qui préserve la masse musculaire tout en accélérant la combustion des graisses.",
+            subsections: [
+              {
+                title: "Préservation Musculaire lors de la Perte de Poids",
+                content:
+                  "Contrairement au mythe selon lequel le jeûne entraîne une perte musculaire, l'augmentation de HGH pendant le jeûne protège et préserve en réalité votre masse maigre. Des études comparatives montrent que les personnes pratiquant le jeûne intermittent conservent plus de muscle lors de la perte de poids que celles suivant des régimes classiques de restriction calorique.",
+              },
+              {
+                title: "Bénéfices Anti-Âge",
+                content:
+                  "Un taux élevé de HGH pendant le jeûne aide non seulement à la composition corporelle mais favorise également la régénération cellulaire, améliore la qualité de la peau, renforce les os et les tendons et contribue à un profil hormonal plus jeune. C'est comme activer votre propre système anti-âge interne.",
+              },
+            ],
+          },
+          {
+            type: "section",
+            title: "Autophagie : Le Nettoyage Cellulaire qui Transforme la Santé",
+            content:
+              "Peut-être le processus le plus fascinant déclenché par le jeûne est-il l'autophagie - littéralement 'se manger soi-même'. Ce mécanisme cellulaire, qui a valu le prix Nobel de Médecine en 2016, est le système de nettoyage et de recyclage de votre corps au niveau cellulaire.",
+            subsections: [
+              {
+                title: "Le Processus de Renouvellement Cellulaire",
+                content:
+                  "Au cours de l'autophagie, vos cellules digèrent littéralement les composants endommagés, les protéines malformées et les organites dysfonctionnels. C'est comme une rénovation complète de chaque cellule de votre corps. Ce processus élimine les 'déchets cellulaires' accumulés au fil des ans, permettant à vos cellules de fonctionner de manière plus efficace et plus jeune.",
+              },
+              {
+                title: "Protection contre les Maladies",
+                content:
+                  "L'autophagie induite par le jeûne a été associée à la prévention du cancer, aux maladies neurodégénératives telles qu'Alzheimer et Parkinson, aux maladies cardiovasculaires et au diabète de type 2. Les recherches suggèrent que ce processus de nettoyage cellulaire est essentiel pour la longévité et la santé à long terme.",
+              },
+            ],
+          },
+          {
+            type: "benefits",
+            title: "Bénéfices Scientifiques Prouvés",
+            items: [
+              "Augmentation de 300 à 500 % de la combustion des graisses pendant le jeûne",
+              "Multiplication par 5 à 14 des niveaux d'hormone de croissance",
+              "Amélioration de 20 à 40 % de la sensibilité à l'insuline",
+              "Réduction de 10 à 25 % des marqueurs inflammatoires",
+              "Augmentation de 200 à 300 % de la production de BDNF",
+              "Activation de l'autophagie après 16 à 24 heures de jeûne",
+              "Amélioration de 15 à 30 % des fonctions cognitives et de la concentration mentale",
+            ],
+          },
+          {
+            type: "section",
+            title: "Impact sur la Longévité : Vivre Plus Longtemps et en Meilleure Santé",
+            content:
+              "Les études animales montrent de façon constante que le jeûne intermittent peut prolonger l'espérance de vie de 20 à 40 %. Bien que la recherche humaine soit encore en cours, les mécanismes biologiques observés suggèrent des bénéfices similaires pour notre espèce.",
+            subsections: [
+              {
+                title: "Activation des Gènes de Longévité",
+                content:
+                  "Le jeûne active une famille de gènes appelés sirtuines, connus sous le nom de 'gènes de la longévité'. Ces gènes régulent des processus cellulaires fondamentaux tels que la réparation de l'ADN, la résistance au stress et le métabolisme énergétique. C'est comme si le jeûne actionnait un interrupteur génétique favorisant la santé et la longévité.",
+              },
+              {
+                title: "Réduction du Stress Oxydatif",
+                content:
+                  "Le jeûne réduit considérablement la production de radicaux libres et augmente la production d'antioxydants endogènes. Cet équilibre amélioré entre oxydants et antioxydants protège vos cellules du vieillissement prématuré et des maladies liées à l'âge.",
+              },
+            ],
+          },
+        ],
       },
     },
   },

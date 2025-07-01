@@ -1976,6 +1976,23 @@ export const translations = {
     articleUnavailable: "Este artículo solo está disponible en portugués por ahora.",
     recipeUnavailable: "Esta receta solo está disponible en portugués por ahora.",
   },
+  fr: {
+    home: "Accueil",
+    timer: "Minuteur",
+    recipes: "Recettes",
+    learn: "Apprendre",
+    progress: "Progrès",
+    profile: "Profil",
+    settings: "Paramètres",
+    admin: "Admin",
+    login: "Connexion",
+    logout: "Déconnexion",
+    readArticle: "Lire l'Article",
+    language: "Langue",
+    selectLanguage: "Choisissez votre langue",
+    articleUnavailable: "Cet article est uniquement disponible en portugais pour le moment.",
+    recipeUnavailable: "Cette recette est uniquement disponible en portugais pour le moment.",
+  },
 } as const
 
 export type Translations = typeof translations

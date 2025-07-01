@@ -456,6 +456,7 @@ export default function ProfilePage() {
                         <SelectItem value="en">English</SelectItem>
                         <SelectItem value="pt">Português</SelectItem>
                         <SelectItem value="es">Español</SelectItem>
+                        <SelectItem value="fr">Français</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
