@@ -22,13 +22,32 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { useLanguage } from "@/context/languageContext" // Certifique-se que este é o seu hook de linguagem
-import articlesData, { type Article, type ContentSection } from "@/lib/articles-data" // Usando a fonte de dados original
+import articlesData, { getArticleById, type Article, type ContentSection } from "@/lib/articles-data" // Usando a fonte de dados original
+import { translateArticle } from "@/lib/auto-translate"
 
 export default function ArticleDetailPage({ params }: { params: { id: string } }) {
-  const { t } = useLanguage() // Usando seu hook de linguagem
-  const article: Article | undefined = articlesData[params.id]
+  const { t, language } = useLanguage() // Usando seu hook de linguagem
+  const baseArticle: Article | undefined = articlesData[params.id]
+  const [article, setArticle] = useState<Article | undefined>(
+    getArticleById(Number(params.id), language)
+  )
   const router = useRouter()
   const [isBookmarked, setIsBookmarked] = useState(false)
+
+  useEffect(() => {
+    if (!baseArticle) return
+    async function load() {
+      if (language === "pt") {
+        setArticle(baseArticle)
+      } else if (baseArticle.translations?.[language]) {
+        setArticle(getArticleById(Number(params.id), language)!)
+      } else {
+        const tr = await translateArticle(baseArticle, language)
+        setArticle(tr)
+      }
+    }
+    load()
+  }, [language, params.id, baseArticle])
 
   if (!article) {
     notFound()
@@ -99,7 +118,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
       case "intro":
         return (
           <section key={index} className="mb-8 p-6 bg-blue-50 rounded-lg shadow">
-            <h2 className="text-2xl font-semibold text-blue-700 mb-3">{t(section.titleKey)}</h2>
+            <h2 className="text-2xl font-semibold text-blue-700 mb-3">{section.title}</h2>
             <p className="text-gray-700 leading-relaxed">{section.content}</p>
           </section>
         )
@@ -107,13 +126,13 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
         return (
           <section key={index} className="mb-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">
-              {t(section.titleKey)}
+              {section.title}
             </h2>
             {section.content && <p className="text-gray-700 leading-relaxed mb-4">{section.content}</p>}
             {section.subsections &&
               section.subsections.map((subsection, subIndex) => (
                 <div key={subIndex} className="mb-4 ml-4 p-4 border-l-4 border-blue-500 bg-gray-50 rounded">
-                  <h3 className="text-lg font-medium text-gray-700 mb-2">{t(subsection.titleKey)}</h3>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">{subsection.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{subsection.content}</p>
                 </div>
               ))}
@@ -124,11 +143,11 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
           <section key={index} className="mb-8 p-6 bg-green-50 rounded-lg shadow">
             <h2 className="text-xl font-semibold text-green-700 mb-3 flex items-center">
               <CheckCircle className="w-6 h-6 mr-2" />
-              {t(section.titleKey)}
+              {section.title}
             </h2>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
-              {section.items?.map((itemKey, itemIndex) => (
-                <li key={itemIndex}>{t(itemKey)}</li>
+              {section.items?.map((item, itemIndex) => (
+                <li key={itemIndex}>{item}</li>
               ))}
             </ul>
           </section>
@@ -138,11 +157,11 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
           <section key={index} className="mb-8 p-6 bg-yellow-50 rounded-lg shadow">
             <h2 className="text-xl font-semibold text-yellow-700 mb-3 flex items-center">
               <Lightbulb className="w-6 h-6 mr-2" />
-              {t(section.titleKey)}
+              {section.title}
             </h2>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
-              {section.items?.map((tipKey, tipIndex) => (
-                <li key={tipIndex}>{t(tipKey)}</li>
+              {section.items?.map((tip, tipIndex) => (
+                <li key={tipIndex}>{tip}</li>
               ))}
             </ul>
           </section>
@@ -152,7 +171,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
           <section key={index} className="mb-8 p-6 bg-red-50 rounded-lg shadow">
             <h2 className="text-xl font-semibold text-red-700 mb-3 flex items-center">
               <AlertTriangle className="w-6 h-6 mr-2" />
-              {t(section.titleKey)}
+              {section.title}
             </h2>
             <p className="text-gray-700 leading-relaxed">{section.content}</p>
           </section>
@@ -166,6 +185,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
     <div className="min-h-screen bg-gradient-to-br from-[#F2EAE4] to-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
+
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" onClick={() => router.push("/learn")} className="p-2">

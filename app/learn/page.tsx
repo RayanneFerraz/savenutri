@@ -29,6 +29,36 @@ import { useLanguage } from "@/context/languageContext"
 import type { TranslationKey } from "@/lib/translations"
 import articlesData from "@/lib/articles-data"
 
+const CATEGORY_COLORS: { [key: string]: string } = {
+  Ciência: "bg-blue-100 text-blue-800",
+  Science: "bg-blue-100 text-blue-800",
+  Ciencia: "bg-blue-100 text-blue-800",
+  Fundamentos: "bg-gray-100 text-gray-800",
+  Fundamentals: "bg-gray-100 text-gray-800",
+  Benefícios: "bg-green-100 text-green-800",
+  Benefits: "bg-green-100 text-green-800",
+  Beneficios: "bg-green-100 text-green-800",
+  Mitos: "bg-red-100 text-red-800",
+  Myths: "bg-red-100 text-red-800",
+  Preparação: "bg-yellow-100 text-yellow-800",
+  Preparation: "bg-yellow-100 text-yellow-800",
+  Preparacion: "bg-yellow-100 text-yellow-800",
+  Protocolos: "bg-indigo-100 text-indigo-800",
+  Protocols: "bg-indigo-100 text-indigo-800",
+  Alimentação: "bg-orange-100 text-orange-800",
+  Nutrition: "bg-orange-100 text-orange-800",
+  Alimentacion: "bg-orange-100 text-orange-800",
+  Desafios: "bg-purple-100 text-purple-800",
+  Challenges: "bg-purple-100 text-purple-800",
+  Potencializadores: "bg-pink-100 text-pink-800",
+  Enhancers: "bg-pink-100 text-pink-800",
+  "Estilo de Vida": "bg-teal-100 text-teal-800",
+  Lifestyle: "bg-teal-100 text-teal-800",
+  Monitoramento: "bg-cyan-100 text-cyan-800",
+  Tracking: "bg-cyan-100 text-cyan-800",
+  default: "bg-gray-100 text-gray-800",
+}
+
 export default function LearnPage() {
   const { t } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
@@ -59,20 +89,7 @@ export default function LearnPage() {
   )
 
   const categories = useMemo(() => {
-    const categoryColors: { [key: string]: string } = {
-      Ciência: "bg-blue-100 text-blue-800",
-      Fundamentos: "bg-gray-100 text-gray-800",
-      Benefícios: "bg-green-100 text-green-800",
-      Mitos: "bg-red-100 text-red-800",
-      Preparação: "bg-yellow-100 text-yellow-800",
-      Protocolos: "bg-indigo-100 text-indigo-800",
-      Alimentação: "bg-orange-100 text-orange-800",
-      Desafios: "bg-purple-100 text-purple-800",
-      Potencializadores: "bg-pink-100 text-pink-800",
-      "Estilo de Vida": "bg-teal-100 text-teal-800",
-      Monitoramento: "bg-cyan-100 text-cyan-800",
-      default: "bg-gray-100 text-gray-800",
-    }
+    const categoryColors = CATEGORY_COLORS
 
     const categoryCounts = articles.reduce(
       (acc, article) => {
@@ -485,7 +502,7 @@ export default function LearnPage() {
                         </div>
                         <CardContent className="p-6">
                           <div className="flex items-center gap-2 mb-3">
-                            <Badge className={categories.find((c) => c.name === article.category)?.color}>
+                            <Badge className={CATEGORY_COLORS[article.category] || CATEGORY_COLORS.default}>
                               {article.category}
                             </Badge>
                             <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -807,11 +824,7 @@ export default function LearnPage() {
                       )}
                     </div>
 
-                    <CardContent className="p-6 bg-red-100 border-4 border-red-500">
-                      <div className="text-red-600 font-bold text-xl mb-4">
-                        🔴 TESTE - SE VOCÊ VÊ ISSO, A MUDANÇA FUNCIONOU!
-                      </div>
-
+                    <CardContent className="p-6">
                       <div className="mb-3">
                         <span className="text-xs font-semibold text-[#F24E29] uppercase tracking-wide bg-yellow-200 px-2 py-1">
                           {activeTab === "artigos" ? item.category : t(item.category as TranslationKey)}
