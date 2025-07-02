@@ -28,27 +28,13 @@ const CardDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
 )
 CardDescription.displayName = "CardDescription"
 
-interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  href?: string
-  linkText?: string
-}
-
-const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
-  ({ className, href, linkText = "Read Article", children, ...props }, ref) => (
+const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("p-6 pt-0 text-gray-700 leading-relaxed text-base font-normal tracking-wide", className)}
+      className={cn("p-6 pt-0 text-base font-normal leading-relaxed tracking-wide text-gray-700 mb-6", className)}
       {...props}
-    >
-      {children}
-      {href && (
-        <a href={href} className="mt-4 inline-block w-full text-center no-underline">
-          <button className="w-full rounded-md bg-[#F24E29] px-4 py-2 font-medium text-white hover:bg-[#F27D16]">
-            {linkText}
-          </button>
-        </a>
-      )}
-    </div>
+    />
   ),
 )
 CardContent.displayName = "CardContent"
