@@ -66,6 +66,9 @@ class AnalyticsService {
   }
 
   async initializeSession(): Promise<void> {
+    // Skip analytics setup during SSR / Node environments
+    if (typeof window === "undefined") return
+
     try {
       // Obter IP do usuário
       const ipResponse = await fetch("https://api.ipify.org?format=json")
