@@ -1,5 +1,11 @@
 export type { Language } from "./translations"
 
+interface TranslationCache {
+  [key: string]: string
+}
+
+const translationCache: TranslationCache = {}
+
 // Simple in-memory and localStorage cache
 const cache = new Map<string, string>()
 
@@ -81,71 +87,124 @@ async function processBatch(queueKey: string) {
   }
 }
 
-export async function translateArticle(article: any, lang: string) {
-  const copy = { ...article }
-
-  try {
-    const translations = await Promise.allSettled([
-      autoTranslate(article.title, lang),
-      autoTranslate(article.description, lang),
-      autoTranslate(article.category, lang),
-      ...article.tags.map((t: string) => autoTranslate(t, lang)),
-    ])
-
-    copy.title = translations[0].status === "fulfilled" ? translations[0].value : article.title
-    copy.description = translations[1].status === "fulfilled" ? translations[1].value : article.description
-    copy.category = translations[2].status === "fulfilled" ? translations[2].value : article.category
-    copy.tags = article.tags.map((tag: string, index: number) => {
-      const result = translations[3 + index]
-      return result.status === "fulfilled" ? result.value : tag
-    })
-
-    // Translate content sections in parallel
-    copy.content = await Promise.all(
-      article.content.map(async (section: any) => {
-        const sec = { ...section }
-        const sectionTranslations = await Promise.allSettled([
-          autoTranslate(section.title, lang),
-          section.content ? autoTranslate(section.content, lang) : Promise.resolve(null),
-        ])
-
-        sec.title = sectionTranslations[0].status === "fulfilled" ? sectionTranslations[0].value : section.title
-        if (section.content) {
-          sec.content = sectionTranslations[1].status === "fulfilled" ? sectionTranslations[1].value : section.content
-        }
-
-        if (section.subsections) {
-          sec.subsections = await Promise.all(
-            section.subsections.map(async (sub: any) => {
-              const subTranslations = await Promise.allSettled([
-                autoTranslate(sub.title, lang),
-                autoTranslate(sub.content, lang),
-              ])
-              return {
-                ...sub,
-                title: subTranslations[0].status === "fulfilled" ? subTranslations[0].value : sub.title,
-                content: subTranslations[1].status === "fulfilled" ? subTranslations[1].value : sub.content,
-              }
-            }),
-          )
-        }
-
-        if (section.items) {
-          const itemTranslations = await Promise.allSettled(section.items.map((it: string) => autoTranslate(it, lang)))
-          sec.items = section.items.map((item: string, index: number) => {
-            const result = itemTranslations[index]
-            return result.status === "fulfilled" ? result.value : item
-          })
-        }
-
-        return sec
-      }),
-    )
-  } catch (error) {
-    console.warn("Translation failed, using original content:", error)
+// Batch translation function
+async function batchTranslate(texts: string[], targetLanguage: string): Promise<string[]> {
+  if (targetLanguage === "pt") {
+    return texts
   }
 
-  return copy
+  const cacheKey = `${targetLanguage}_${texts.join("|")}`
+  if (translationCache[cacheKey]) {
+    return translationCache[cacheKey].split("|")
+  }
+
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
+
+    const response = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=pt&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(texts.join("\n|||SEPARATOR|||\n"))}`,
+      {
+        signal: controller.signal,
+      },
+    )
+
+    clearTimeout(timeoutId)
+
+    if (!response.ok) {
+      throw new Error("Translation failed")
+    }
+
+    const data = await response.json()
+    const translatedText = data[0]?.map((item: any) => item[0]).join("") || texts.join("\n|||SEPARATOR|||\n")
+    const translatedTexts = translatedText.split("\n|||SEPARATOR|||\n")
+
+    // Cache the result
+    translationCache[cacheKey] = translatedTexts.join("|")
+
+    return translatedTexts.length === texts.length ? translatedTexts : texts
+  } catch (error) {
+    console.warn("Translation failed, using original text:", error)
+    return texts
+  }
+}
+
+export async function translateArticle(article: any, targetLanguage: string) {
+  if (targetLanguage === "pt") {
+    return article
+  }
+
+  try {
+    // Collect all texts to translate
+    const textsToTranslate: string[] = [
+      article.title,
+      article.description,
+      article.category,
+      article.author,
+      ...article.tags,
+    ]
+
+    // Add content texts
+    const contentTexts: string[] = []
+    article.content.forEach((section: any) => {
+      contentTexts.push(section.title)
+      if (section.content) contentTexts.push(section.content)
+      if (section.subsections) {
+        section.subsections.forEach((sub: any) => {
+          contentTexts.push(sub.title, sub.content)
+        })
+      }
+      if (section.items) {
+        contentTexts.push(...section.items)
+      }
+    })
+
+    textsToTranslate.push(...contentTexts)
+
+    // Batch translate all texts
+    const translatedTexts = await batchTranslate(textsToTranslate, targetLanguage)
+
+    let textIndex = 0
+    const translatedArticle = {
+      ...article,
+      title: translatedTexts[textIndex++] || article.title,
+      description: translatedTexts[textIndex++] || article.description,
+      category: translatedTexts[textIndex++] || article.category,
+      author: translatedTexts[textIndex++] || article.author,
+      tags: article.tags.map(() => translatedTexts[textIndex++] || ""),
+    }
+
+    // Translate content
+    translatedArticle.content = article.content.map((section: any) => {
+      const translatedSection = {
+        ...section,
+        title: translatedTexts[textIndex++] || section.title,
+      }
+
+      if (section.content) {
+        translatedSection.content = translatedTexts[textIndex++] || section.content
+      }
+
+      if (section.subsections) {
+        translatedSection.subsections = section.subsections.map((sub: any) => ({
+          ...sub,
+          title: translatedTexts[textIndex++] || sub.title,
+          content: translatedTexts[textIndex++] || sub.content,
+        }))
+      }
+
+      if (section.items) {
+        translatedSection.items = section.items.map(() => translatedTexts[textIndex++] || "")
+      }
+
+      return translatedSection
+    })
+
+    return translatedArticle
+  } catch (error) {
+    console.warn("Article translation failed, using original:", error)
+    return article
+  }
 }
 
 export async function translateRecipe(recipe: any, lang: string) {

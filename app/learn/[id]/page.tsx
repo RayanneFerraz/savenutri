@@ -25,10 +25,62 @@ import { useLanguage } from "@/context/languageContext"
 import articlesData, { type Article, type ContentSection } from "@/lib/articles-data"
 import { translateArticle } from "@/lib/auto-translate"
 
+// Function to find related articles with improved logic
+function findRelatedArticles(currentArticle: Article, allArticles: Article[], limit = 2): Article[] {
+  const related: { article: Article; score: number }[] = []
+
+  Object.values(allArticles).forEach((article) => {
+    if (article.id === currentArticle.id) return
+
+    let score = 0
+
+    // Same category gets highest score
+    if (article.category === currentArticle.category) {
+      score += 10
+    }
+
+    // Shared tags increase score
+    const sharedTags = article.tags.filter((tag) =>
+      currentArticle.tags.some(
+        (currentTag) =>
+          currentTag.toLowerCase().includes(tag.toLowerCase()) || tag.toLowerCase().includes(currentTag.toLowerCase()),
+      ),
+    )
+    score += sharedTags.length * 3
+
+    // Similar keywords in title/description
+    const currentWords = (currentArticle.title + " " + currentArticle.description).toLowerCase().split(" ")
+    const articleWords = (article.title + " " + article.description).toLowerCase().split(" ")
+    const commonWords = currentWords.filter((word) => word.length > 3 && articleWords.includes(word))
+    score += commonWords.length * 2
+
+    // Similar reading time (closer = better)
+    const currentTime = Number.parseInt(currentArticle.readTime) || 0
+    const articleTime = Number.parseInt(article.readTime) || 0
+    const timeDiff = Math.abs(currentTime - articleTime)
+    if (timeDiff <= 2) score += 2
+    else if (timeDiff <= 5) score += 1
+
+    // Higher rated articles get slight boost
+    if (article.rating >= 4.8) score += 1
+
+    if (score > 0) {
+      related.push({ article, score })
+    }
+  })
+
+  // Sort by score and return top articles
+  return related
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((item) => item.article)
+}
+
 export default function ArticleDetailPage({ params }: { params: { id: string } }) {
   const { t, language } = useLanguage()
   const original: Article | undefined = articlesData[params.id]
   const [article, setArticle] = useState<Article | undefined>(original)
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([])
   const router = useRouter()
   const [isBookmarked, setIsBookmarked] = useState(false)
 
@@ -59,11 +111,25 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
     let active = true
     async function run() {
       if (!original) return
+
       if (language === "pt") {
         setArticle(original)
+        // Find related articles for original
+        const related = findRelatedArticles(original, Object.values(articlesData), 3)
+        setRelatedArticles(related)
       } else {
         const translated = await translateArticle(original, language)
-        if (active) setArticle(translated)
+        if (active) {
+          setArticle(translated)
+          // Find related articles and translate them too
+          const related = findRelatedArticles(original, Object.values(articlesData), 3)
+          const translatedRelated = await Promise.all(
+            related.map((relatedArticle) => translateArticle(relatedArticle, language)),
+          )
+          if (active) {
+            setRelatedArticles(translatedRelated)
+          }
+        }
       }
     }
     run()
@@ -219,7 +285,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <Link href="/learn" className="hover:text-[#F24E29] transition-colors">
-              {t("learn")} {/* ESTA É A LINHA CORRIGIDA */}
+              {t("learn")}
             </Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-[#F24E29]">{article.title}</span>
@@ -282,40 +348,45 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
           </Card>
 
           {/* Related Articles */}
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle className="text-[#F24E29]">{t("relatedArticles")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.values(articlesData)
-                  .filter((a) => a.id !== article.id && a.category === article.category)
-                  .slice(0, 2)
-                  .map((relatedArticle) => (
+          {relatedArticles.length > 0 && (
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle className="text-[#F24E29]">{t("relatedArticles")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {relatedArticles.map((relatedArticle) => (
                     <Card
                       key={relatedArticle.id}
-                      className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                      className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group"
                     >
-                      <img
-                        src={relatedArticle.image || "/placeholder.svg?width=400&height=200&query=related+article"}
-                        alt={relatedArticle.title}
-                        className="w-full h-40 object-cover"
-                      />
+                      <div className="aspect-video bg-gradient-to-br from-[#F2AEE7] to-[#F2C12E] flex items-center justify-center">
+                        <BookOpen className="w-12 h-12 text-white" />
+                      </div>
                       <CardHeader className="p-4">
-                        <CardTitle className="text-md font-semibold h-12 overflow-hidden">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className="bg-[#F2AEE7] text-[#F24E29] text-xs">{relatedArticle.category}</Badge>
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Clock className="w-3 h-3" />
+                            {relatedArticle.readTime}
+                          </div>
+                        </div>
+                        <CardTitle className="text-md font-semibold h-12 overflow-hidden group-hover:text-[#F27D16] transition-colors">
                           {relatedArticle.title}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent
-                        className="p-4"
-                        href={`/learn/${relatedArticle.id}`}
-                        linkText={t("readMore")}
-                      />
+                      <CardContent className="p-4 pt-0">
+                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{relatedArticle.description}</p>
+                        <Link href={`/learn/${relatedArticle.id}`} className="block">
+                          <Button className="w-full bg-[#F24E29] hover:bg-[#F27D16] text-white">{t("readMore")}</Button>
+                        </Link>
+                      </CardContent>
                     </Card>
                   ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
