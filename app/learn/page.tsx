@@ -16,7 +16,6 @@ import {
   Search,
   TrendingUp,
   Award,
-  ChevronRight,
   MessageCircle,
   ThumbsUp,
   Coffee,
@@ -24,14 +23,13 @@ import {
   Target,
 } from "lucide-react"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
-import Link from "next/link"
 import { useLanguage } from "@/context/languageContext"
 import type { TranslationKey } from "@/lib/translations"
 import articlesData from "@/lib/articles-data"
 import { translateArticle } from "@/lib/auto-translate"
 
 export default function LearnPage() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("recent")
@@ -54,7 +52,7 @@ export default function LearnPage() {
       featured: index < 2,
       trending: index < 5,
       type: "article",
-    }))
+    })),
   )
 
   useEffect(() => {
@@ -78,12 +76,10 @@ export default function LearnPage() {
             featured: index < 2,
             trending: index < 5,
             type: "article",
-          }))
+          })),
         )
       } else {
-        const translated = await Promise.all(
-          Object.values(articlesData).map((a) => translateArticle(a, language))
-        )
+        const translated = await Promise.all(Object.values(articlesData).map((a) => translateArticle(a, language)))
         setArticles(
           translated.map((article, index) => ({
             ...article,
@@ -100,7 +96,7 @@ export default function LearnPage() {
             featured: index < 2,
             trending: index < 5,
             type: "article",
-          }))
+          })),
         )
       }
     }
@@ -567,12 +563,9 @@ export default function LearnPage() {
                                 </div>
                               </div>
                             </div>
-                            </div>
-                          </CardContent>
-                          <CardContent
-                            href={`/learn/${article.id}`}
-                            linkText={t("readArticle")}
-                          />
+                          </div>
+                        </CardContent>
+                        <CardContent href={`/learn/${article.id}`} linkText={t("readArticle")} />
                       </Card>
                     ))}
                 </div>
@@ -688,12 +681,9 @@ export default function LearnPage() {
                                 </div>
                               </div>
                             </div>
-                            </div>
-                          </CardContent>
-                          <CardContent
-                            href={`/learn/blog/${post.id}`}
-                            linkText={t("readPost")}
-                          />
+                          </div>
+                        </CardContent>
+                        <CardContent href={`/learn/blog/${post.id}`} linkText={t("readPost")} />
                       </Card>
                     ))}
                 </div>
