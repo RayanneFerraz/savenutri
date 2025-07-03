@@ -42,8 +42,8 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
     >
       {children}
       {href && (
-        <div className="mt-4">
-          <a href={href} className="inline-block w-full text-center no-underline">
+        <div className="mt-6 block">
+          <a href={href} className="block w-full text-center no-underline">
             <button className="w-full rounded-md bg-[#F24E29] px-4 py-2 font-medium text-white hover:bg-[#F27D16] transition-colors">
               {linkText}
             </button>
