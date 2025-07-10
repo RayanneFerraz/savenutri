@@ -165,13 +165,11 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
                   <CardHeader className="p-4">
                     <CardTitle className="text-md font-semibold h-12 overflow-hidden">{relatedArticle.title}</CardTitle>
                   </CardHeader>
-                  <CardContent className="p-4">
-                    <Link href={`/learn/blog/${relatedArticle.id}`}>
-                      <Button variant="outline" className="w-full">
-                        {t("readMore")}
-                      </Button>
-                    </Link>
-                  </CardContent>
+                  <CardContent
+                    className="p-4"
+                    href={`/learn/blog/${relatedArticle.id}`}
+                    linkText={t("readMore")}
+                  />
                 </Card>
               ))}
           </div>

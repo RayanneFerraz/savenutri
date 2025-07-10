@@ -46,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR">
+    <html lang="en">
       <head>
         {/* PWA Meta Tags */}
         <meta name="application-name" content="FastTrack" />

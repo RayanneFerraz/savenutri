@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -28,6 +28,7 @@ import Link from "next/link"
 import { useLanguage } from "@/context/languageContext"
 import type { TranslationKey } from "@/lib/translations"
 import articlesData from "@/lib/articles-data"
+import { translateArticle } from "@/lib/auto-translate"
 
 export default function LearnPage() {
   const { t } = useLanguage()
@@ -36,30 +37,82 @@ export default function LearnPage() {
   const [sortBy, setSortBy] = useState("recent")
   const [activeTab, setActiveTab] = useState("artigos")
 
-  const articles = useMemo(
-    () =>
-      Object.values(articlesData).map((article, index) => ({
-        ...article,
-        id: article.id,
-        excerpt: article.description,
-        views: article.reviews * 17,
-        author: {
-          name: article.author,
-          avatar: article.author
-            .split(" ")
-            .map((n) => n[0])
-            .join(""),
-          bio: "Especialista em Jejum Intermitente",
-        },
-        featured: index < 2,
-        trending: index < 5,
-        type: "article",
-      })),
-    [],
+  const [articles, setArticles] = useState(() =>
+    Object.values(articlesData).map((article, index) => ({
+      ...article,
+      id: article.id,
+      excerpt: article.description,
+      views: article.reviews * 17,
+      author: {
+        name: article.author,
+        avatar: article.author
+          .split(" ")
+          .map((n) => n[0])
+          .join(""),
+        bio: "Especialista em Jejum Intermitente",
+      },
+      featured: index < 2,
+      trending: index < 5,
+      type: "article",
+    }))
   )
+
+  useEffect(() => {
+    let active = true
+    async function run() {
+      if (language === "pt") {
+        setArticles(
+          Object.values(articlesData).map((article, index) => ({
+            ...article,
+            id: article.id,
+            excerpt: article.description,
+            views: article.reviews * 17,
+            author: {
+              name: article.author,
+              avatar: article.author
+                .split(" ")
+                .map((n) => n[0])
+                .join(""),
+              bio: "Especialista em Jejum Intermitente",
+            },
+            featured: index < 2,
+            trending: index < 5,
+            type: "article",
+          }))
+        )
+      } else {
+        const translated = await Promise.all(
+          Object.values(articlesData).map((a) => translateArticle(a, language))
+        )
+        setArticles(
+          translated.map((article, index) => ({
+            ...article,
+            excerpt: article.description,
+            views: article.reviews * 17,
+            author: {
+              name: article.author,
+              avatar: article.author
+                .split(" ")
+                .map((n) => n[0])
+                .join(""),
+              bio: "Especialista em Jejum Intermitente",
+            },
+            featured: index < 2,
+            trending: index < 5,
+            type: "article",
+          }))
+        )
+      }
+    }
+    run()
+    return () => {
+      active = false
+    }
+  }, [language])
 
   const categories = useMemo(() => {
     const categoryColors: { [key: string]: string } = {
+      // Portuguese
       Ciência: "bg-blue-100 text-blue-800",
       Fundamentos: "bg-gray-100 text-gray-800",
       Benefícios: "bg-green-100 text-green-800",
@@ -71,6 +124,30 @@ export default function LearnPage() {
       Potencializadores: "bg-pink-100 text-pink-800",
       "Estilo de Vida": "bg-teal-100 text-teal-800",
       Monitoramento: "bg-cyan-100 text-cyan-800",
+      // English
+      Science: "bg-blue-100 text-blue-800",
+      Fundamentals: "bg-gray-100 text-gray-800",
+      Benefits: "bg-green-100 text-green-800",
+      Myths: "bg-red-100 text-red-800",
+      Preparation: "bg-yellow-100 text-yellow-800",
+      Protocols: "bg-indigo-100 text-indigo-800",
+      Nutrition: "bg-orange-100 text-orange-800",
+      Challenges: "bg-purple-100 text-purple-800",
+      Boosters: "bg-pink-100 text-pink-800",
+      Lifestyle: "bg-teal-100 text-teal-800",
+      Tracking: "bg-cyan-100 text-cyan-800",
+      // Spanish
+      Ciencia: "bg-blue-100 text-blue-800",
+      Fundamentos: "bg-gray-100 text-gray-800",
+      Beneficios: "bg-green-100 text-green-800",
+      Mitos: "bg-red-100 text-red-800",
+      Preparación: "bg-yellow-100 text-yellow-800",
+      Protocolos: "bg-indigo-100 text-indigo-800",
+      Alimentación: "bg-orange-100 text-orange-800",
+      Desafíos: "bg-purple-100 text-purple-800",
+      Potenciadores: "bg-pink-100 text-pink-800",
+      "Estilo de Vida": "bg-teal-100 text-teal-800",
+      Monitoreo: "bg-cyan-100 text-cyan-800",
       default: "bg-gray-100 text-gray-800",
     }
 
@@ -515,14 +592,12 @@ export default function LearnPage() {
                                 </div>
                               </div>
                             </div>
-                            <Link href={`/learn/${article.id}`}>
-                              <Button className="bg-[#F24E29] hover:bg-[#F27D16]">
-                                {t("readArticle")}
-                                <ChevronRight className="w-4 h-4 ml-1" />
-                              </Button>
-                            </Link>
-                          </div>
-                        </CardContent>
+                            </div>
+                          </CardContent>
+                          <CardContent
+                            href={`/learn/${article.id}`}
+                            linkText={t("readArticle")}
+                          />
                       </Card>
                     ))}
                 </div>
@@ -638,14 +713,12 @@ export default function LearnPage() {
                                 </div>
                               </div>
                             </div>
-                            <Link href={`/learn/blog/${post.id}`}>
-                              <Button className="bg-[#F27D16] hover:bg-[#F24E29]">
-                                {t("readPost")}
-                                <ChevronRight className="w-4 h-4 ml-1" />
-                              </Button>
-                            </Link>
-                          </div>
-                        </CardContent>
+                            </div>
+                          </CardContent>
+                          <CardContent
+                            href={`/learn/blog/${post.id}`}
+                            linkText={t("readPost")}
+                          />
                       </Card>
                     ))}
                 </div>
@@ -807,11 +880,7 @@ export default function LearnPage() {
                       )}
                     </div>
 
-                    <CardContent className="p-6 bg-red-100 border-4 border-red-500">
-                      <div className="text-red-600 font-bold text-xl mb-4">
-                        🔴 TESTE - SE VOCÊ VÊ ISSO, A MUDANÇA FUNCIONOU!
-                      </div>
-
+                    <CardContent className="p-6">
                       <div className="mb-3">
                         <span className="text-xs font-semibold text-[#F24E29] uppercase tracking-wide bg-yellow-200 px-2 py-1">
                           {activeTab === "artigos" ? item.category : t(item.category as TranslationKey)}
