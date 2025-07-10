@@ -80,6 +80,45 @@ export default function FastingTimer() {
   }, [isActive, timeLeft, totalTime, startTime])
 
   // Escutar mudanças no localStorage (sincronização entre abas)
+  const handleStorageChange = (e: StorageEvent) => {
+    if (e.key !== "fastingTimerState" || !e.newValue) return
+
+    try {
+      const timerState = JSON.parse(e.newValue) as {
+        isActive: boolean
+        timeLeft: number
+        totalTime: number
+        startTime: string | null
+      }
+
+      // --- exit early if nothing actually changed ---------------------------
+      const same =
+        timerState.isActive === isActive &&
+        timerState.timeLeft === timeLeft &&
+        timerState.totalTime === totalTime &&
+        (timerState.startTime ?? null) === (startTime ? startTime.toISOString() : null)
+
+      if (same) return
+      // ----------------------------------------------------------------------
+
+      // apply changes only when they differ
+      setIsActive(timerState.isActive)
+      setStartTime(timerState.startTime ? new Date(timerState.startTime) : null)
+
+      if (timerState.isActive && timerState.startTime) {
+        const now = Date.now()
+        const elapsedSeconds = Math.floor((now - new Date(timerState.startTime).getTime()) / 1000)
+        setTimeLeft(Math.max(0, timerState.totalTime - elapsedSeconds))
+      } else {
+        setTimeLeft(timerState.timeLeft)
+      }
+
+      setTotalTime(timerState.totalTime)
+    } catch (error) {
+      console.error("Erro ao sincronizar timer:", error)
+    }
+  }
+
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "fastingTimerState" && e.newValue) {
@@ -208,7 +247,7 @@ export default function FastingTimer() {
           <Button
             onClick={resetTimer}
             variant="outline"
-            className="border-white hover:bg-white hover:text-[#F24E29] px-8 py-3 rounded-full text-[#F24E29]"
+            className="border-white hover:bg-white hover:text-[#F24E29] px-8 py-3 rounded-full text-[#F24E29] bg-transparent"
           >
             <Square className="w-5 h-5 mr-2" />
             Parar
