@@ -1,358 +1,284 @@
-interface UserSession {
+interface AnalyticsEvent {
   id: string
-  ip: string
-  userAgent: string
   timestamp: number
+  type: "page_view" | "user_action" | "session_start" | "session_end"
+  data: Record<string, any>
+  sessionId: string
+  userId?: string
+  ip?: string
+  userAgent: string
   location?: {
-    country: string
-    region: string
-    city: string
-    latitude: number
-    longitude: number
-    timezone: string
-  }
-  device: {
-    type: "mobile" | "tablet" | "desktop"
-    os: string
-    browser: string
-  }
-  demographics?: {
-    estimatedAge?: string
-    estimatedGender?: string
-    language: string
-  }
-  behavior: {
-    pagesVisited: string[]
-    timeSpent: number
-    actions: Array<{
-      type: string
-      timestamp: number
-      data?: any
-    }>
+    country?: string
+    city?: string
+    region?: string
   }
 }
 
-interface AnalyticsData {
-  totalUsers: number
-  activeUsers: number
-  sessions: UserSession[]
-  demographics: {
-    ageGroups: Record<string, number>
-    genderDistribution: Record<string, number>
-    topCountries: Record<string, number>
-    topCities: Record<string, number>
+interface AnalyticsSession {
+  id: string
+  startTime: number
+  endTime?: number
+  userId?: string
+  events: AnalyticsEvent[]
+  ip?: string
+  userAgent: string
+  location?: {
+    country?: string
+    city?: string
+    region?: string
   }
-  deviceStats: {
-    deviceTypes: Record<string, number>
-    browsers: Record<string, number>
-    operatingSystems: Record<string, number>
-  }
-  behaviorStats: {
-    averageSessionTime: number
-    mostVisitedPages: Record<string, number>
-    commonActions: Record<string, number>
+}
+
+// Helper function for safe fetch with timeout
+async function safeFetchJson(url: string, options: RequestInit = {}, timeoutMs = 5000): Promise<any> {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    })
+
+    clearTimeout(timeoutId)
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.warn(`Safe fetch failed for ${url}:`, error)
+    return null
   }
 }
 
 class AnalyticsService {
-  private static instance: AnalyticsService
-  private currentSession: UserSession | null = null
-
-  static getInstance(): AnalyticsService {
-    if (!AnalyticsService.instance) {
-      AnalyticsService.instance = new AnalyticsService()
-    }
-    return AnalyticsService.instance
-  }
-
-  /**
-   * Fetch JSON data with a timeout and swallow any network / CORS errors.
-   */
-  private async safeFetchJson<T = any>(url: string, timeoutMs = 5000): Promise<T | null> {
-    try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), timeoutMs)
-      const res = await fetch(url, { signal: controller.signal })
-      clearTimeout(timeout)
-      if (!res.ok) return null
-      return (await res.json()) as T
-    } catch {
-      // Network failure, CORS, or abort → return null so caller can fallback
-      return null
-    }
-  }
+  private currentSession: AnalyticsSession | null = null
+  private isInitialized = false
 
   async initializeSession(): Promise<void> {
+    if (typeof window === "undefined") return
+
     try {
-      // 1️⃣  Get the public IP (may fail on dev / offline / ad-blockers)
-      const ipData = await this.safeFetchJson<{ ip: string }>("https://api.ipify.org?format=json")
-      const ip = ipData?.ip ?? "Unknown"
+      // Get user IP and location with graceful fallback
+      let ip = "Unknown"
+      let location = undefined
 
-      // 2️⃣  Geo-lookup (only if we have an IP)
-      const locationData = ip !== "Unknown" ? await this.safeFetchJson<any>(`https://ipapi.co/${ip}/json/`) : null
+      const ipData = await safeFetchJson("https://api.ipify.org?format=json")
+      if (ipData?.ip) {
+        ip = ipData.ip
 
-      // Detectar dispositivo e navegador
-      const deviceInfo = this.detectDevice()
-
-      // Criar sessão
-      this.currentSession = {
-        id: this.generateSessionId(),
-        ip,
-        userAgent: navigator.userAgent,
-        timestamp: Date.now(),
-        location:
-          locationData && !locationData?.error
-            ? {
-                country: locationData.country_name,
-                region: locationData.region,
-                city: locationData.city,
-                latitude: locationData.latitude,
-                longitude: locationData.longitude,
-                timezone: locationData.timezone,
-              }
-            : undefined,
-        device: deviceInfo,
-        demographics: {
-          language: navigator.language,
-          // Estimativas baseadas em dados demográficos regionais
-          estimatedAge: this.estimateAgeGroup(locationData),
-          estimatedGender: this.estimateGender(locationData),
-        },
-        behavior: {
-          pagesVisited: [window.location.pathname],
-          timeSpent: 0,
-          actions: [],
-        },
+        // Try to get location data
+        const locationData = await safeFetchJson(`https://ipapi.co/${ip}/json/`)
+        if (locationData && !locationData.error) {
+          location = {
+            country: locationData.country_name || "Unknown",
+            city: locationData.city || "Unknown",
+            region: locationData.region || "Unknown",
+          }
+        }
       }
 
-      // Salvar sessão
-      this.saveSession()
+      const sessionId = this.generateSessionId()
+      const userAgent = navigator.userAgent
 
-      // Iniciar tracking de tempo
-      this.startTimeTracking()
+      this.currentSession = {
+        id: sessionId,
+        startTime: Date.now(),
+        events: [],
+        ip,
+        userAgent,
+        location,
+      }
+
+      // Track session start
+      this.trackEvent("session_start", {
+        sessionId,
+        timestamp: Date.now(),
+        userAgent,
+        ip,
+        location,
+      })
+
+      this.isInitialized = true
+      console.log("Analytics initialized successfully")
     } catch (error) {
-      console.debug("Analytics: falling back to basic session →", error)
-      // Criar sessão básica mesmo com erro
-      this.createBasicSession()
+      console.warn("Analytics initialization failed gracefully:", error)
+      // Create a minimal session even if external services fail
+      this.currentSession = {
+        id: this.generateSessionId(),
+        startTime: Date.now(),
+        events: [],
+        ip: "Unknown",
+        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "Unknown",
+      }
+      this.isInitialized = true
     }
   }
 
-  private detectDevice(): UserSession["device"] {
-    const ua = navigator.userAgent
+  trackEvent(type: AnalyticsEvent["type"], data: Record<string, any>): void {
+    if (typeof window === "undefined" || !this.currentSession) return
 
-    // Detectar tipo de dispositivo
-    let deviceType: "mobile" | "tablet" | "desktop" = "desktop"
-    if (/Mobile|Android|iPhone|iPod/.test(ua)) {
-      deviceType = "mobile"
-    } else if (/iPad|Tablet/.test(ua)) {
-      deviceType = "tablet"
+    const event: AnalyticsEvent = {
+      id: this.generateEventId(),
+      timestamp: Date.now(),
+      type,
+      data,
+      sessionId: this.currentSession.id,
+      userId: this.currentSession.userId,
+      ip: this.currentSession.ip,
+      userAgent: this.currentSession.userAgent,
+      location: this.currentSession.location,
     }
 
-    // Detectar OS
-    let os = "Unknown"
-    if (ua.includes("Windows")) os = "Windows"
-    else if (ua.includes("Mac")) os = "macOS"
-    else if (ua.includes("Linux")) os = "Linux"
-    else if (ua.includes("Android")) os = "Android"
-    else if (ua.includes("iOS")) os = "iOS"
-
-    // Detectar navegador
-    let browser = "Unknown"
-    if (ua.includes("Chrome")) browser = "Chrome"
-    else if (ua.includes("Firefox")) browser = "Firefox"
-    else if (ua.includes("Safari")) browser = "Safari"
-    else if (ua.includes("Edge")) browser = "Edge"
-
-    return { type: deviceType, os, browser }
+    this.currentSession.events.push(event)
+    this.saveToStorage()
   }
 
-  private estimateAgeGroup(locationData: any): string {
-    // Estimativa muito básica baseada em dados demográficos gerais
-    const random = Math.random()
-    if (random < 0.15) return "18-24"
-    if (random < 0.35) return "25-34"
-    if (random < 0.55) return "35-44"
-    if (random < 0.75) return "45-54"
-    return "55+"
+  trackPageView(path: string, title?: string): void {
+    this.trackEvent("page_view", {
+      path,
+      title: title || document.title,
+      referrer: document.referrer,
+      timestamp: Date.now(),
+    })
   }
 
-  private estimateGender(locationData: any): string {
-    // Estimativa aleatória - em produção você não faria isso
-    return Math.random() > 0.5 ? "Estimado: Feminino" : "Estimado: Masculino"
+  trackUserAction(action: string, details?: Record<string, any>): void {
+    this.trackEvent("user_action", {
+      action,
+      ...details,
+      timestamp: Date.now(),
+    })
+  }
+
+  setUserId(userId: string): void {
+    if (this.currentSession) {
+      this.currentSession.userId = userId
+      this.saveToStorage()
+    }
+  }
+
+  endSession(): void {
+    if (this.currentSession) {
+      this.currentSession.endTime = Date.now()
+      this.trackEvent("session_end", {
+        sessionId: this.currentSession.id,
+        duration: this.currentSession.endTime - this.currentSession.startTime,
+        eventCount: this.currentSession.events.length,
+      })
+      this.saveToStorage()
+    }
+  }
+
+  getAnalyticsData(): AnalyticsSession[] {
+    if (typeof window === "undefined") return []
+
+    try {
+      const stored = localStorage.getItem("analyticsData")
+      return stored ? JSON.parse(stored) : []
+    } catch (error) {
+      console.error("Error reading analytics data:", error)
+      return []
+    }
+  }
+
+  clearAnalyticsData(): void {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("analyticsData")
+    }
   }
 
   private generateSessionId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2)
+    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
-  private createBasicSession(): void {
-    this.currentSession = {
-      id: this.generateSessionId(),
-      ip: "Unknown",
-      userAgent: navigator.userAgent,
-      timestamp: Date.now(),
-      device: this.detectDevice(),
-      demographics: {
-        language: navigator.language,
-      },
-      behavior: {
-        pagesVisited: [window.location.pathname],
-        timeSpent: 0,
-        actions: [],
-      },
-    }
-    this.saveSession()
+  private generateEventId(): string {
+    return `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
-  private startTimeTracking(): void {
-    const startTime = Date.now()
+  private saveToStorage(): void {
+    if (typeof window === "undefined" || !this.currentSession) return
 
-    // Atualizar tempo gasto a cada 30 segundos
-    const interval = setInterval(() => {
-      if (this.currentSession) {
-        this.currentSession.behavior.timeSpent = Date.now() - startTime
-        this.saveSession()
-      }
-    }, 30000)
+    try {
+      const existingData = this.getAnalyticsData()
+      const sessionIndex = existingData.findIndex((s) => s.id === this.currentSession!.id)
 
-    // Limpar interval quando a página for fechada
-    window.addEventListener("beforeunload", () => {
-      clearInterval(interval)
-      if (this.currentSession) {
-        this.currentSession.behavior.timeSpent = Date.now() - startTime
-        this.saveSession()
-      }
-    })
-  }
-
-  trackPageView(page: string): void {
-    if (this.currentSession) {
-      if (!this.currentSession.behavior.pagesVisited.includes(page)) {
-        this.currentSession.behavior.pagesVisited.push(page)
-        this.saveSession()
-      }
-    }
-  }
-
-  trackAction(type: string, data?: any): void {
-    if (this.currentSession) {
-      this.currentSession.behavior.actions.push({
-        type,
-        timestamp: Date.now(),
-        data,
-      })
-      this.saveSession()
-    }
-  }
-
-  private saveSession(): void {
-    if (this.currentSession) {
-      const sessions = this.getAllSessions()
-      const existingIndex = sessions.findIndex((s) => s.id === this.currentSession!.id)
-
-      if (existingIndex >= 0) {
-        sessions[existingIndex] = this.currentSession
+      if (sessionIndex >= 0) {
+        existingData[sessionIndex] = this.currentSession
       } else {
-        sessions.push(this.currentSession)
+        existingData.push(this.currentSession)
       }
 
-      localStorage.setItem("analyticsData", JSON.stringify(sessions))
+      // Keep only last 100 sessions to prevent storage bloat
+      const recentSessions = existingData.slice(-100)
+      localStorage.setItem("analyticsData", JSON.stringify(recentSessions))
+    } catch (error) {
+      console.error("Error saving analytics data:", error)
     }
   }
 
-  getAllSessions(): UserSession[] {
-    const data = localStorage.getItem("analyticsData")
-    return data ? JSON.parse(data) : []
-  }
+  // Analytics summary methods
+  getSessionSummary(): {
+    totalSessions: number
+    totalEvents: number
+    averageSessionDuration: number
+    topPages: Array<{ path: string; views: number }>
+    topActions: Array<{ action: string; count: number }>
+  } {
+    const sessions = this.getAnalyticsData()
+    const totalSessions = sessions.length
+    const totalEvents = sessions.reduce((sum, session) => sum + session.events.length, 0)
 
-  getAnalyticsData(): AnalyticsData {
-    const sessions = this.getAllSessions()
-    const now = Date.now()
-    const dayMs = 24 * 60 * 60 * 1000
+    const completedSessions = sessions.filter((s) => s.endTime)
+    const averageSessionDuration =
+      completedSessions.length > 0
+        ? completedSessions.reduce((sum, session) => sum + (session.endTime! - session.startTime), 0) /
+          completedSessions.length
+        : 0
 
-    // Filtrar sessões ativas (últimas 24h)
-    const activeSessions = sessions.filter((s) => now - s.timestamp < dayMs)
-
-    // Calcular demographics
-    const demographics = {
-      ageGroups: {} as Record<string, number>,
-      genderDistribution: {} as Record<string, number>,
-      topCountries: {} as Record<string, number>,
-      topCities: {} as Record<string, number>,
-    }
-
-    sessions.forEach((session) => {
-      // Idade
-      if (session.demographics?.estimatedAge) {
-        demographics.ageGroups[session.demographics.estimatedAge] =
-          (demographics.ageGroups[session.demographics.estimatedAge] || 0) + 1
-      }
-
-      // Gênero
-      if (session.demographics?.estimatedGender) {
-        demographics.genderDistribution[session.demographics.estimatedGender] =
-          (demographics.genderDistribution[session.demographics.estimatedGender] || 0) + 1
-      }
-
-      // País
-      if (session.location?.country) {
-        demographics.topCountries[session.location.country] =
-          (demographics.topCountries[session.location.country] || 0) + 1
-      }
-
-      // Cidade
-      if (session.location?.city) {
-        demographics.topCities[session.location.city] = (demographics.topCities[session.location.city] || 0) + 1
-      }
-    })
-
-    // Calcular device stats
-    const deviceStats = {
-      deviceTypes: {} as Record<string, number>,
-      browsers: {} as Record<string, number>,
-      operatingSystems: {} as Record<string, number>,
-    }
+    // Top pages
+    const pageViews: Record<string, number> = {}
+    const userActions: Record<string, number> = {}
 
     sessions.forEach((session) => {
-      deviceStats.deviceTypes[session.device.type] = (deviceStats.deviceTypes[session.device.type] || 0) + 1
-      deviceStats.browsers[session.device.browser] = (deviceStats.browsers[session.device.browser] || 0) + 1
-      deviceStats.operatingSystems[session.device.os] = (deviceStats.operatingSystems[session.device.os] || 0) + 1
+      session.events.forEach((event) => {
+        if (event.type === "page_view" && event.data.path) {
+          pageViews[event.data.path] = (pageViews[event.data.path] || 0) + 1
+        }
+        if (event.type === "user_action" && event.data.action) {
+          userActions[event.data.action] = (userActions[event.data.action] || 0) + 1
+        }
+      })
     })
 
-    // Calcular behavior stats
-    const allPages: string[] = []
-    const allActions: string[] = []
-    let totalTime = 0
+    const topPages = Object.entries(pageViews)
+      .map(([path, views]) => ({ path, views }))
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 10)
 
-    sessions.forEach((session) => {
-      allPages.push(...session.behavior.pagesVisited)
-      allActions.push(...session.behavior.actions.map((a) => a.type))
-      totalTime += session.behavior.timeSpent
-    })
-
-    const mostVisitedPages = {} as Record<string, number>
-    allPages.forEach((page) => {
-      mostVisitedPages[page] = (mostVisitedPages[page] || 0) + 1
-    })
-
-    const commonActions = {} as Record<string, number>
-    allActions.forEach((action) => {
-      commonActions[action] = (commonActions[action] || 0) + 1
-    })
+    const topActions = Object.entries(userActions)
+      .map(([action, count]) => ({ action, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10)
 
     return {
-      totalUsers: sessions.length,
-      activeUsers: activeSessions.length,
-      sessions,
-      demographics,
-      deviceStats,
-      behaviorStats: {
-        averageSessionTime: sessions.length > 0 ? totalTime / sessions.length : 0,
-        mostVisitedPages,
-        commonActions,
-      },
+      totalSessions,
+      totalEvents,
+      averageSessionDuration,
+      topPages,
+      topActions,
     }
   }
 }
 
-export const analytics = AnalyticsService.getInstance()
+// Export singleton instance
+export const analytics = new AnalyticsService()
+
+// Auto-initialize when imported (client-side only)
+if (typeof window !== "undefined") {
+  analytics.initializeSession().catch((error) => {
+    console.warn("Analytics auto-initialization failed:", error)
+  })
+}
