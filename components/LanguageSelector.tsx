@@ -1,11 +1,16 @@
+"use client";
 import { useRouter, usePathname } from 'next/navigation'
+import { useLanguage } from '@/context/languageContext'
+import type { Language } from '@/lib/translations'
 
 export default function LanguageSelector() {
   const router = useRouter()
   const pathname = usePathname()
-  const currentLang = pathname.split('/')[1] || 'en'
+  const { language, setLanguage } = useLanguage()
+  const currentLang = pathname.split('/')[1] || language
 
   const changeLanguage = (lang: string) => {
+    setLanguage(lang as Language)
     router.push(`/${lang}`)
   }
 
