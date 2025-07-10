@@ -1970,7 +1970,6 @@ export const translations = {
     readTime3min: "3 min de lectura",
     readTime4min: "4 min de lectura",
   },
-  fr: {},
 }
 
 export type Translations = typeof translations

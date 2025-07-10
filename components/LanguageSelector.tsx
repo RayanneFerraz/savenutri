@@ -23,7 +23,6 @@ export default function LanguageSelector() {
       <option value="en">English</option>
       <option value="pt">Portuguese</option>
       <option value="es">Spanish</option>
-      <option value="fr">French</option>
     </select>
   )
 }

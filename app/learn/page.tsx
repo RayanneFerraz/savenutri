@@ -112,6 +112,7 @@ export default function LearnPage() {
 
   const categories = useMemo(() => {
     const categoryColors: { [key: string]: string } = {
+      // Portuguese
       Ciência: "bg-blue-100 text-blue-800",
       Fundamentos: "bg-gray-100 text-gray-800",
       Benefícios: "bg-green-100 text-green-800",
@@ -123,6 +124,30 @@ export default function LearnPage() {
       Potencializadores: "bg-pink-100 text-pink-800",
       "Estilo de Vida": "bg-teal-100 text-teal-800",
       Monitoramento: "bg-cyan-100 text-cyan-800",
+      // English
+      Science: "bg-blue-100 text-blue-800",
+      Fundamentals: "bg-gray-100 text-gray-800",
+      Benefits: "bg-green-100 text-green-800",
+      Myths: "bg-red-100 text-red-800",
+      Preparation: "bg-yellow-100 text-yellow-800",
+      Protocols: "bg-indigo-100 text-indigo-800",
+      Nutrition: "bg-orange-100 text-orange-800",
+      Challenges: "bg-purple-100 text-purple-800",
+      Boosters: "bg-pink-100 text-pink-800",
+      Lifestyle: "bg-teal-100 text-teal-800",
+      Tracking: "bg-cyan-100 text-cyan-800",
+      // Spanish
+      Ciencia: "bg-blue-100 text-blue-800",
+      Fundamentos: "bg-gray-100 text-gray-800",
+      Beneficios: "bg-green-100 text-green-800",
+      Mitos: "bg-red-100 text-red-800",
+      Preparación: "bg-yellow-100 text-yellow-800",
+      Protocolos: "bg-indigo-100 text-indigo-800",
+      Alimentación: "bg-orange-100 text-orange-800",
+      Desafíos: "bg-purple-100 text-purple-800",
+      Potenciadores: "bg-pink-100 text-pink-800",
+      "Estilo de Vida": "bg-teal-100 text-teal-800",
+      Monitoreo: "bg-cyan-100 text-cyan-800",
       default: "bg-gray-100 text-gray-800",
     }
 

@@ -1,4 +1,6 @@
+"use client"
 import * as React from "react"
+import { useLanguage } from "@/context/languageContext"
 
 import { cn } from "@/lib/utils"
 
@@ -62,28 +64,32 @@ interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
-  ({ className, href, linkText = "Read Article", children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "p-6 pt-0 text-gray-700 leading-relaxed text-base font-normal tracking-wide",
-        className
-      )}
-      {...props}
-    >
-      {children}
-      {href && (
-        <a
-          href={href}
-          className="mt-4 inline-block w-full text-center no-underline"
-        >
-          <button className="w-full rounded-md bg-[#F24E29] px-4 py-2 font-medium text-white hover:bg-[#F27D16]">
-            {linkText}
-          </button>
-        </a>
-      )}
-    </div>
-  )
+  ({ className, href, linkText, children, ...props }, ref) => {
+    const { t } = useLanguage()
+    const text = linkText ?? t("readArticle")
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "p-6 pt-0 text-gray-700 leading-relaxed text-base font-normal tracking-wide",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        {href && (
+          <a
+            href={href}
+            className="mt-4 inline-block w-full text-center no-underline"
+          >
+            <button className="w-full rounded-md bg-[#F24E29] px-4 py-2 font-medium text-white hover:bg-[#F27D16]">
+              {text}
+            </button>
+          </a>
+        )}
+      </div>
+    )
+  }
 )
 CardContent.displayName = "CardContent"
 

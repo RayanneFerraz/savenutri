@@ -38,7 +38,6 @@ export async function getStaticPaths() {
       { params: { lang: 'en' } },
       { params: { lang: 'pt' } },
       { params: { lang: 'es' } },
-      { params: { lang: 'fr' } },
     ],
     fallback: false,
   };
