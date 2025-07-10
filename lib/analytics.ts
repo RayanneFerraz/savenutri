@@ -65,15 +65,31 @@ class AnalyticsService {
     return AnalyticsService.instance
   }
 
+  /**
+   * Fetch JSON data with a timeout and swallow any network / CORS errors.
+   */
+  private async safeFetchJson<T = any>(url: string, timeoutMs = 5000): Promise<T | null> {
+    try {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), timeoutMs)
+      const res = await fetch(url, { signal: controller.signal })
+      clearTimeout(timeout)
+      if (!res.ok) return null
+      return (await res.json()) as T
+    } catch {
+      // Network failure, CORS, or abort → return null so caller can fallback
+      return null
+    }
+  }
+
   async initializeSession(): Promise<void> {
     try {
-      // Obter IP do usuário
-      const ipResponse = await fetch("https://api.ipify.org?format=json")
-      const { ip } = await ipResponse.json()
+      // 1️⃣  Get the public IP (may fail on dev / offline / ad-blockers)
+      const ipData = await this.safeFetchJson<{ ip: string }>("https://api.ipify.org?format=json")
+      const ip = ipData?.ip ?? "Unknown"
 
-      // Obter informações de geolocalização
-      const locationResponse = await fetch(`https://ipapi.co/${ip}/json/`)
-      const locationData = await locationResponse.json()
+      // 2️⃣  Geo-lookup (only if we have an IP)
+      const locationData = ip !== "Unknown" ? await this.safeFetchJson<any>(`https://ipapi.co/${ip}/json/`) : null
 
       // Detectar dispositivo e navegador
       const deviceInfo = this.detectDevice()
@@ -84,16 +100,17 @@ class AnalyticsService {
         ip,
         userAgent: navigator.userAgent,
         timestamp: Date.now(),
-        location: locationData.error
-          ? undefined
-          : {
-              country: locationData.country_name,
-              region: locationData.region,
-              city: locationData.city,
-              latitude: locationData.latitude,
-              longitude: locationData.longitude,
-              timezone: locationData.timezone,
-            },
+        location:
+          locationData && !locationData?.error
+            ? {
+                country: locationData.country_name,
+                region: locationData.region,
+                city: locationData.city,
+                latitude: locationData.latitude,
+                longitude: locationData.longitude,
+                timezone: locationData.timezone,
+              }
+            : undefined,
         device: deviceInfo,
         demographics: {
           language: navigator.language,
@@ -114,7 +131,7 @@ class AnalyticsService {
       // Iniciar tracking de tempo
       this.startTimeTracking()
     } catch (error) {
-      console.error("Erro ao inicializar analytics:", error)
+      console.debug("Analytics: falling back to basic session →", error)
       // Criar sessão básica mesmo com erro
       this.createBasicSession()
     }
