@@ -21,12 +21,14 @@ import { toast } from "sonner"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { useLanguage } from "@/context/languageContext" // Certifique-se que este é o seu hook de linguagem
-import articlesData, { type Article, type ContentSection } from "@/lib/articles-data" // Usando a fonte de dados original
+import { useLanguage } from "@/context/languageContext"
+import articlesData, { type Article, type ContentSection } from "@/lib/articles-data"
+import { translateArticle } from "@/lib/auto-translate"
 
 export default function ArticleDetailPage({ params }: { params: { id: string } }) {
-  const { t } = useLanguage() // Usando seu hook de linguagem
-  const article: Article | undefined = articlesData[params.id]
+  const { t, language } = useLanguage()
+  const original: Article | undefined = articlesData[params.id]
+  const [article, setArticle] = useState<Article | undefined>(original)
   const router = useRouter()
   const [isBookmarked, setIsBookmarked] = useState(false)
 
@@ -51,6 +53,24 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
       setIsBookmarked(bookmarks.includes(Number(params.id)))
     }
   }, [params.id])
+
+  // translate article when language changes
+  useEffect(() => {
+    let active = true
+    async function run() {
+      if (!original) return
+      if (language === "pt") {
+        setArticle(original)
+      } else {
+        const translated = await translateArticle(original, language)
+        if (active) setArticle(translated)
+      }
+    }
+    run()
+    return () => {
+      active = false
+    }
+  }, [language, original])
 
   const toggleBookmark = () => {
     if (typeof window !== "undefined") {
@@ -99,7 +119,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
       case "intro":
         return (
           <section key={index} className="mb-8 p-6 bg-blue-50 rounded-lg shadow">
-            <h2 className="text-2xl font-semibold text-blue-700 mb-3">{t(section.titleKey)}</h2>
+            <h2 className="text-2xl font-semibold text-blue-700 mb-3">{section.title}</h2>
             <p className="text-gray-700 leading-relaxed">{section.content}</p>
           </section>
         )
@@ -107,13 +127,13 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
         return (
           <section key={index} className="mb-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">
-              {t(section.titleKey)}
+              {section.title}
             </h2>
             {section.content && <p className="text-gray-700 leading-relaxed mb-4">{section.content}</p>}
             {section.subsections &&
               section.subsections.map((subsection, subIndex) => (
                 <div key={subIndex} className="mb-4 ml-4 p-4 border-l-4 border-blue-500 bg-gray-50 rounded">
-                  <h3 className="text-lg font-medium text-gray-700 mb-2">{t(subsection.titleKey)}</h3>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">{subsection.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{subsection.content}</p>
                 </div>
               ))}
@@ -124,11 +144,11 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
           <section key={index} className="mb-8 p-6 bg-green-50 rounded-lg shadow">
             <h2 className="text-xl font-semibold text-green-700 mb-3 flex items-center">
               <CheckCircle className="w-6 h-6 mr-2" />
-              {t(section.titleKey)}
+              {section.title}
             </h2>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
-              {section.items?.map((itemKey, itemIndex) => (
-                <li key={itemIndex}>{t(itemKey)}</li>
+              {section.items?.map((item, itemIndex) => (
+                <li key={itemIndex}>{item}</li>
               ))}
             </ul>
           </section>
@@ -138,11 +158,11 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
           <section key={index} className="mb-8 p-6 bg-yellow-50 rounded-lg shadow">
             <h2 className="text-xl font-semibold text-yellow-700 mb-3 flex items-center">
               <Lightbulb className="w-6 h-6 mr-2" />
-              {t(section.titleKey)}
+              {section.title}
             </h2>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
-              {section.items?.map((tipKey, tipIndex) => (
-                <li key={tipIndex}>{t(tipKey)}</li>
+              {section.items?.map((tip, tipIndex) => (
+                <li key={tipIndex}>{tip}</li>
               ))}
             </ul>
           </section>
@@ -152,7 +172,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
           <section key={index} className="mb-8 p-6 bg-red-50 rounded-lg shadow">
             <h2 className="text-xl font-semibold text-red-700 mb-3 flex items-center">
               <AlertTriangle className="w-6 h-6 mr-2" />
-              {t(section.titleKey)}
+              {section.title}
             </h2>
             <p className="text-gray-700 leading-relaxed">{section.content}</p>
           </section>
@@ -173,7 +193,7 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
             </Button>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-[#F2AEE7] text-[#F24E29]">{t(article.category)}</Badge>
+                <Badge className="bg-[#F2AEE7] text-[#F24E29]">{article.category}</Badge>
                 <div className="flex items-center gap-1 text-sm text-gray-500">
                   <Clock className="w-4 h-4" />
                   {article.readTime}
@@ -269,7 +289,11 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.values(articlesData)
-                  .filter((a) => a.id !== article.id && a.category === article.category)
+                  .filter(
+                    (a) =>
+                      a.id !== article.id &&
+                      a.category === (article as any).originalCategory
+                  )
                   .slice(0, 2)
                   .map((relatedArticle) => (
                     <Card
@@ -286,13 +310,11 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
                           {relatedArticle.title}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="p-4">
-                        <Link href={`/learn/${relatedArticle.id}`}>
-                          <Button variant="outline" className="w-full">
-                            {t("readMore")}
-                          </Button>
-                        </Link>
-                      </CardContent>
+                      <CardContent
+                        className="p-4"
+                        href={`/learn/${relatedArticle.id}`}
+                        linkText={t("readMore")}
+                      />
                     </Card>
                   ))}
               </div>

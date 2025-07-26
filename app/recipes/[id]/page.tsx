@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -28,6 +28,7 @@ import {
 import { toast } from "@/hooks/use-toast"
 import { getRecipeById } from "@/lib/recipes-data"
 import { useLanguage } from "@/context/languageContext"
+import { translateRecipe } from "@/lib/auto-translate"
 import type { TranslationKey } from "@/lib/translations"
 
 export default function RecipeDetailPage() {
@@ -38,8 +39,9 @@ export default function RecipeDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false)
   const [servings, setServings] = useState(2)
 
-  const recipe = getRecipeById(Number(params.id))
-  const { t } = useLanguage()
+  const originalRecipe = getRecipeById(Number(params.id))
+  const { t, language } = useLanguage()
+  const [recipe, setRecipe] = useState(originalRecipe)
 
   if (!recipe) {
     return (
@@ -55,6 +57,23 @@ export default function RecipeDetailPage() {
       </div>
     )
   }
+
+  useEffect(() => {
+    let active = true
+    async function run() {
+      if (!originalRecipe) return
+      if (language === "pt") {
+        setRecipe(originalRecipe)
+      } else {
+        const translated = await translateRecipe(originalRecipe, language)
+        if (active) setRecipe(translated)
+      }
+    }
+    run()
+    return () => {
+      active = false
+    }
+  }, [language, originalRecipe])
 
   const toggleStepComplete = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
