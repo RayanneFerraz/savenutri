@@ -14,6 +14,7 @@ export interface Article {
   title: string
   description: string
   category: string
+  originalCategory?: string
   readTime: string
   rating: number
   reviews: number
