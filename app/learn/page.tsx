@@ -153,18 +153,20 @@ export default function LearnPage() {
 
     const categoryCounts = articles.reduce(
       (acc, article) => {
-        acc[article.category] = (acc[article.category] || 0) + 1
+        const key = (article as any).originalCategory || article.category
+        acc[key] = (acc[key] || 0) + 1
         return acc
       },
       {} as { [key: string]: number },
     )
 
     return [
-      { name: "all", count: articles.length, color: "bg-gray-100 text-gray-800" },
-      ...Object.keys(categoryCounts).map((category) => ({
-        name: category,
-        count: categoryCounts[category],
-        color: categoryColors[category] || categoryColors.default,
+      { name: "all", label: t("all" as TranslationKey), count: articles.length, color: "bg-gray-100 text-gray-800" },
+      ...Object.keys(categoryCounts).map((key) => ({
+        name: key,
+        label: t(key as TranslationKey),
+        count: categoryCounts[key],
+        color: categoryColors[key] || categoryColors.default,
       })),
     ]
   }, [articles])
@@ -365,7 +367,8 @@ export default function LearnPage() {
 
   const filteredContent = useMemo(() => {
     const filtered = currentContent.filter((item) => {
-      const matchesCategory = selectedCategory === "all" || item.category === selectedCategory
+      const categoryKey = (item as any).originalCategory || item.category
+      const matchesCategory = selectedCategory === "all" || categoryKey === selectedCategory
       const matchesSearch =
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -562,7 +565,7 @@ export default function LearnPage() {
                         </div>
                         <CardContent className="p-6">
                           <div className="flex items-center gap-2 mb-3">
-                            <Badge className={categories.find((c) => c.name === article.category)?.color}>
+                            <Badge className={categories.find((c) => c.name === (article as any).originalCategory)?.color}>
                               {article.category}
                             </Badge>
                             <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -796,13 +799,9 @@ export default function LearnPage() {
                     variant={selectedCategory === (category.name || category.nameKey) ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedCategory(category.name || category.nameKey)}
-                    className={
-                      selectedCategory === (category.name || category.nameKey) ? "bg-[#F24E29] hover:bg-[#F27D16]" : ""
-                    }
+                    className={selectedCategory === (category.name || category.nameKey) ? "bg-[#F24E29] hover:bg-[#F27D16]" : ""}
                   >
-                    {category.name === "all" || category.nameKey === "all"
-                      ? t("all")
-                      : category.name || t(category.nameKey)}
+                    {category.label ? category.label : category.nameKey ? t(category.nameKey) : category.name}
                     <Badge variant="secondary" className="ml-2 text-xs">
                       {category.count}
                     </Badge>

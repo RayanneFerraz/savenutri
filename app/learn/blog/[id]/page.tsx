@@ -15,7 +15,7 @@ import {
   Lightbulb,
   CheckCircle,
 } from "lucide-react"
-import articlesData, { type Article, type ContentSection } from "lib/articles-data"
+import articlesData, { type Article, type ContentSection } from "@/lib/articles-data"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 

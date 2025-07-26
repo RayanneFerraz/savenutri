@@ -289,7 +289,11 @@ export default function ArticleDetailPage({ params }: { params: { id: string } }
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.values(articlesData)
-                  .filter((a) => a.id !== article.id && a.category === article.category)
+                  .filter(
+                    (a) =>
+                      a.id !== article.id &&
+                      a.category === (article as any).originalCategory
+                  )
                   .slice(0, 2)
                   .map((relatedArticle) => (
                     <Card

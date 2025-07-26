@@ -24,21 +24,3 @@ export default function Home({ params: { lang } }: { params: { lang: string } })
   );
 }
 
-export async function getStaticProps({ locale }: { locale: string }) {
-  return {
-    props: {
-      messages: (await import(`../../locales/${locale}/common.json`)).default,
-    },
-  };
-}
-
-export async function getStaticPaths() {
-  return {
-    paths: [
-      { params: { lang: 'en' } },
-      { params: { lang: 'pt' } },
-      { params: { lang: 'es' } },
-    ],
-    fallback: false,
-  };
-}

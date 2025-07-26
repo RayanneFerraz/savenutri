@@ -55,6 +55,7 @@ interface Recipe {
   difficulty: string;
   tags: string[];
   ingredients: { item: string; amount: string; calories: number }[];
+  originalCategory?: string;
   [key: string]: any;
 }
 
@@ -94,6 +95,7 @@ export async function translateArticle(
   const tags = await Promise.all(article.tags.map((t) => autoTranslate(t, lang)));
   return {
     ...article,
+    originalCategory: article.category,
     title: await autoTranslate(article.title, lang),
     description: await autoTranslate(article.description, lang),
     category: await autoTranslate(article.category, lang),
@@ -116,6 +118,7 @@ export async function translateRecipe(
   const tags = await Promise.all(recipe.tags.map((t) => autoTranslate(t, lang)));
   return {
     ...recipe,
+    originalCategory: recipe.category,
     title: await autoTranslate(recipe.title, lang),
     description: await autoTranslate(recipe.description, lang),
     category: await autoTranslate(recipe.category, lang),
