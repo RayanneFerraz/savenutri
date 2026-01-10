@@ -1,4 +1,4 @@
-"use client" // Ensure this is a client component if using hooks directly
+"use client"
 
 import FastingTimer from "@/components/fasting-timer"
 import ProgressOverview from "@/components/progress-overview"
@@ -23,19 +23,19 @@ export default function HomePage() {
             <FastingTimer />
           </div>
 
-          {/* Visão Geral do Progresso */}
+          {/* Visao Geral do Progresso */}
           <div>
             <ProgressOverview />
           </div>
 
-          {/* Grid para Ações Rápidas e Conteúdo Educacional */}
+          {/* Grid para Acoes Rapidas e Conteudo Educacional */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Ações Rápidas */}
+            {/* Acoes Rapidas */}
             <div>
               <QuickActions />
             </div>
 
-            {/* Conteúdo Educacional */}
+            {/* Conteudo Educacional */}
             <div>
               <EducationalContent />
             </div>
