@@ -1,11 +1,13 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Home, User, Clock, BarChart3, BookOpen, Menu, LogIn, LogOut, ChefHat } from "lucide-react"
+import { Home, User, Clock, BarChart3, BookOpen, Menu, LogIn, LogOut, ChefHat, LineChart, Settings } from "lucide-react"
 import { useLanguage } from "@/context/languageContext"
 import { useAuth } from "@/context/authContext"
 import LanguageSelector from "@/components/LanguageSelector"
@@ -20,9 +22,11 @@ export default function Navigation() {
     { href: "/", labelKey: "home" as const, icon: Home },
     { href: "/timer", labelKey: "timer" as const, icon: Clock },
     { href: "/progress", labelKey: "progress" as const, icon: BarChart3 },
+    { href: "/statistics", labelKey: "statistics" as const, icon: LineChart },
     { href: "/learn", labelKey: "learn" as const, icon: BookOpen },
     { href: "/recipes", labelKey: "recipes" as const, icon: ChefHat },
     { href: "/profile", labelKey: "profile" as const, icon: User },
+    { href: "/settings", labelKey: "settings" as const, icon: Settings },
   ]
 
   const NavLink = ({
@@ -32,8 +36,8 @@ export default function Navigation() {
     mobile = false,
   }: {
     href: string
-    labelKey: "home" | "timer" | "progress" | "learn" | "recipes" | "profile"
-    icon: any
+    labelKey: "home" | "timer" | "progress" | "statistics" | "learn" | "recipes" | "profile" | "settings"
+    icon: React.ComponentType<{ className?: string }>
     mobile?: boolean
   }) => (
     <Link

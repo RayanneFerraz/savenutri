@@ -266,6 +266,8 @@ export const translations = {
     totalChange: "Total Change",
     records: "Records",
     fastingHistory: "Fasting History",
+    useTimerToLogFasts: "Use the timer to log fasts", // Added
+    noFastingHistory: "No fasting history", // Already exists
     planType: "Plan: {type}",
     incomplete: "✗ Incomplete",
     moodHistory: "Mood History",
@@ -290,7 +292,7 @@ export const translations = {
     weightLossAchievementDesc: "Lose 5kg",
     conquered: "Conquered",
     conqueredOn: "Conquered on {date}",
-    monthlyProgress: "Monthly Progress",
+    monthlyProgress: "Monthly Progress", // Already exists
 
     // Learn Page (app/learn/page.tsx)
     learnPageTitle: "Learn About Intermittent Fasting",
@@ -353,7 +355,7 @@ export const translations = {
     // Community Stats items
     activeMembers: "Active Members",
     postsPublished: "Posts Published",
-    // successRateLabel: "Success Rate", // Renamed to avoid conflict with ProgressPage
+    successRateLabel: "Success Rate", // Renamed to avoid conflict with ProgressPage
     // Categories (used in filters and badges)
     all: "All",
     beginner: "Beginner",
@@ -498,6 +500,112 @@ export const translations = {
     variationVeganDesc: "Replace animal ingredients with plant-based alternatives",
     variationGlutenFreeName: "Gluten-Free Version",
     variationGlutenFreeDesc: "Use gluten-free ingredients for those with restrictions",
+
+    // Statistics page
+    statistics: "Statistics",
+    trackYourProgress: "Track your fasting progress",
+    selectPeriod: "Select period",
+    last7Days: "Last 7 days",
+    last14Days: "Last 14 days",
+    last30Days: "Last 30 days",
+    last90Days: "Last 90 days",
+    avgFastingHours: "Avg. Fasting",
+    avgWaterIntake: "Avg. Water",
+    consecutiveFasts: "consecutive fasts",
+    noDataForPeriod: "No data for this period",
+    water: "Water",
+
+    // Reminder Settings
+    reminders: "Reminders",
+    reminderSettings: "Reminder Settings",
+    reminderSettingsDesc: "Configure your daily reminders",
+    waterReminder: "Water Reminder",
+    fastingReminder: "Fasting Reminder",
+    dailyReminder: "Daily Reminder",
+    reminderDefaultMessage: "Don't forget!",
+    enableNotifications: "Enable Notifications",
+    enableNotificationsDesc: "Get reminders to stay on track with your goals",
+    enable: "Enable",
+    notificationsEnabled: "Notifications Enabled",
+    notificationsEnabledDesc: "You will now receive reminders",
+    notificationsDenied: "Permission Denied",
+    notificationsDeniedDesc: "Please enable notifications in your browser settings",
+    dailyReminders: "Daily Reminders",
+
+    // Settings page
+    customizeExperience: "Customize your experience",
+    account: "Account",
+    data: "Data",
+    accountSettings: "Account Settings",
+    accountSettingsDesc: "Manage your account and sync data",
+    syncData: "Sync Data",
+    syncDataDesc: "Sign in to sync your data across devices",
+    signIn: "Sign In",
+    exportData: "Export Data",
+    exportDataDesc: "Download all your data as JSON",
+    export: "Export",
+    dataManagement: "Data Management",
+    dataManagementDesc: "Manage your local and cloud data",
+    clearLocalData: "Clear Local Data",
+    clearLocalDataDesc: "Remove all data stored on this device",
+    clear: "Clear",
+    deleteAccount: "Delete Account",
+    deleteAccountDesc: "Permanently delete your account and all data",
+
+    // Tip Categories
+    categoryHydration: "Hydration",
+    categoryTiming: "Timing",
+    categoryNutrition: "Nutrition",
+    categoryHealth: "Health",
+    categoryExercises: "Exercises",
+    categoryGeneral: "General",
+
+    // Fallback Tip Content
+    noTipAvailableShort: "No tip available at the moment.",
+    noTipAvailableFull: "Check back later for a new tip of the day!",
+
+    // Tip Titles & Content
+    tipHydrationTitle: "Stay Hydrated!",
+    tipHydrationShort: "Drinking enough water is crucial during fasting...",
+    tipHydrationFull:
+      "Water aids in detoxification, curbs hunger, and supports overall bodily functions. Aim for at least 2-3 liters per day, especially during your fasting window.",
+    tipBreakFastTimeTitle: "Breaking Your Fast Mindfully",
+    tipBreakFastTimeShort: "Ease into your eating window gently...",
+    tipBreakFastTimeFull:
+      "Avoid shocking your system with a large, heavy meal immediately after fasting. Start with something light and easily digestible, like a small portion of fruits, a light soup, or yogurt.",
+    tipIdealFoodsToBreakFast: "Ideal Foods to Break Your Fast",
+    tipIdealFoodsToBreakFastShort: "Choose nutrient-dense foods...",
+    tipIdealFoodsToBreakFastFull:
+      "Focus on whole foods rich in protein, healthy fats, and fiber. Good options include lean proteins (chicken, fish, tofu), avocados, nuts, seeds, and plenty of vegetables.",
+    tipSignsJejumWorking: "Signs Your Fast is Working",
+    tipSignsJejumWorkingShort: "Look for positive changes in your body...",
+    tipSignsJejumWorkingFull:
+      "Increased mental clarity, stable energy levels, reduced cravings, and gradual weight loss (if that's a goal) are common signs. Listen to your body and adjust as needed.",
+    tipCombiningJejumExercises: "Fasting and Exercise",
+    tipCombiningJejumExercisesShort: "You can exercise while fasting, but listen to your body...",
+    tipCombiningJejumExercisesFull:
+      "Light to moderate exercise like walking, yoga, or light strength training is generally fine. For more intense workouts, consider scheduling them closer to your eating window or on non-fasting days, especially when starting out.",
+
+    // Read times
+    readTime1min: "1 min read",
+    readTime2min: "2 min read",
+    readTime3min: "3 min read",
+    readTime4min: "4 min read",
+
+    // General
+    loading: "Loading...",
+    error: "Error",
+    success: "Success!",
+    submit: "Submit",
+    comingSoon: "Coming soon!",
+    retry: "Retry",
+    confirm: "Confirm",
+    edit: "Edit",
+    delete: "Delete",
+    cancel: "Cancel",
+    add: "Add",
+    remove: "Remove",
+    update: "Update",
   },
 
   pt: {
@@ -590,12 +698,12 @@ export const translations = {
     photoRemoved: "Foto removida",
     photoAdded: "Foto adicionada!",
     photoSaved: "Foto salva com sucesso",
-    // save: "Salvar", // Already in General
+    save: "Salvar",
     saveChanges: "Salvar Alterações",
     profileUpdated: "Perfil atualizado!",
     infoSaved: "Suas informações foram salvas com sucesso",
-    // hours: "horas", // Already in General
-    // days: "dias", // Already in General
+    hours: "horas",
+    days: "dias",
     selected: "Selecionados",
     sun: "Dom",
     mon: "Seg",
@@ -686,7 +794,7 @@ export const translations = {
     defaultGoalLabel: "Meta padrão (2L)",
     basedOnYourWeight: "Baseado no seu peso ({userWeight}kg)",
     saveSettings: "Salvar Configurações",
-    // close: "Fechar", // Already in General
+    close: "Fechar",
     goalReached: "🎯 Meta atingida!",
     remainingForGoal: "Faltam {amount}ml para a meta",
     waterLogged: "Água registrada!",
@@ -727,7 +835,7 @@ export const translations = {
     fastTrackCommunity: "Comunidade Save Nutri",
     fastTrackCommunityDesc: "Conecte-se com outros praticantes",
     tipOfTheDay: "Dica do Dia",
-    // readMore: "Ler Mais", // Defined below in Learn Page
+    readMore: "Ler Mais",
     fastingStages: "Estágios do Jejum",
     stageDigestion: "0-4h: Digestão",
     stageTransition: "4-8h: Transição",
@@ -754,7 +862,6 @@ export const translations = {
     thisMonth: "Este Mês",
     completedFasts: "Jejuns Completos",
     successRate: "Taxa de Sucesso",
-    // weightChange: "Mudança de Peso", // Already defined
     weeklyProgress: "Progresso Semanal",
     hydrationGoal: "Meta de Hidratação",
     recentActivity: "Atividade Recente",
@@ -800,7 +907,6 @@ export const translations = {
     featuredArticles: "Artigos em Destaque",
     featuredPosts: "Posts em Destaque",
     mainBenefitsOfIF: "Principais Benefícios do Jejum Intermitente",
-    // fastingStagesTitle: "Estágios do Jejum", // Already defined
     communityStats: "Estatísticas da Comunidade",
     articleLibrary: "Biblioteca de Artigos",
     communityPosts: "Posts da Comunidade",
@@ -832,22 +938,17 @@ export const translations = {
     faqExerciseTitle: "Posso fazer exercícios durante o jejum?",
     faqExerciseAnswer: "Sim, exercícios leves a moderados são seguros. Evite treinos muito intensos no início.",
     benefitCardioTitle: "Saúde Cardiovascular",
-    benefitCardioDesc: "Melhora da pressão arterial e redução do colesterol", // Added from EN
+    benefitCardioDesc: "Melhora da pressão arterial e redução do colesterol",
     benefitBrainTitle: "Função Cerebral",
     benefitBrainDesc: "Aumento da concentração e clareza mental",
     benefitEnergyTitle: "Energia e Vitalidade",
     benefitEnergyDesc: "Mais energia e disposição ao longo do dia",
     benefitImmuneTitle: "Sistema Imunológico",
     benefitImmuneDesc: "Fortalecimento das defesas naturais do corpo",
-    // stageDigestionTitle: "Digestão", // Already defined
     stageDigestionDesc: "Corpo processa a última refeição",
-    // stageTransitionTitle: "Transição", // Already defined
     stageTransitionDesc: "Mudança do metabolismo de glicose",
-    // stageFatBurningTitle: "Queima de Gordura", // Already defined
     stageFatBurningDesc: "Início da lipólise para energia",
-    // stageKetosisTitle: "Cetose", // Already defined
     stageKetosisDesc: "Produção de cetonas pelo fígado",
-    stageAutophagyTitle: "Autofagia",
     stageAutophagyDesc: "Limpeza e renovação celular",
     activeMembers: "Membros Ativos",
     postsPublished: "Posts Publicados",
@@ -866,7 +967,6 @@ export const translations = {
     drinks: "Bebidas",
     salads: "Saladas",
     desserts: "Sobremesas",
-    readMore: "Ler Mais", // Moved from EducationalContent as it's more general for articles/posts
 
     // Article Detail Page (app/learn/[id]/page.tsx & app/learn/blog/[id]/page.tsx)
     articleNotFound: "Artigo não encontrado",
@@ -903,16 +1003,14 @@ export const translations = {
     fiveMistakesFirstMonth: "5 Erros que Cometi no Meu Primeiro Mês de Jejum",
     perfectSmoothieRecipe: "Receita: Smoothie Perfeito para Quebrar o Jejum",
     howToStayMotivated: "Como Manter a Motivação nos Dias Difíceis",
-    quickTipSocialEating: "Dica Rápida: Como Lidar com a Fome Social", // Corrected from "Comida Social"
+    quickTipSocialEating: "Dica Rápida: Como Lidar com a Fome Social",
     whyIAlmostGaveUp: "Por Que Quase Desisti (E Como Não Desisti)",
     fastingAtWorkStrategies: "Jejum no Trabalho: Minhas Estratégias",
     celebratingFirst10kgLost: "Celebrando Meus Primeiros 10kg Perdidos! 🎉",
 
     // Recipes Page (app/recipes/page.tsx)
     recipesPageTitle: "Receitas Deliciosas para Sua Janela de Alimentação",
-    // recipesPageSubtitle: "Encontre refeições saudáveis e satisfatórias para complementar seu estilo de vida de jejum.", // Duplicated
     healthyRecipes: "Receitas Saudáveis",
-    // recipesPageSubtitle: "Refeições nutritivas para quebrar o jejum e manter a saúde", // Duplicated
     searchRecipes: "Buscar receitas...",
     difficulty: "Dificuldade",
     easy: "Fácil",
@@ -932,7 +1030,6 @@ export const translations = {
     hydrationIsKey: "Hidratação é Fundamental",
     hydrationIsKeyDesc: "Mantenha-se bem hidratado durante e após o jejum para otimizar os benefícios.",
     hydrationIsKeyItems: ["Água pura em abundância", "Chás sem açúcar", "Água com limão"],
-    // tryAdjustingFilters: "Tente ajustar os filtros ou termo de busca", // Already defined
 
     // Recipe Detail Page (app/recipes/[id]/page.tsx)
     recipeNotFound: "Receita não encontrada",
@@ -991,223 +1088,70 @@ export const translations = {
     variationGlutenFreeName: "Versão Sem Glúten",
     variationGlutenFreeDesc: "Use ingredientes sem glúten para pessoas com restrições",
 
-    // Learn Page (Specific section from user, some keys might be duplicated/better placed)
-    // learnPageTitle: "Aprenda Sobre Jejum Intermitente", // Already defined
-    // learnPageSubtitle: "Explore artigos, guias e dicas para maximizar seus benefícios do jejum.", // Already defined
-    // searchArticles: "Buscar Artículos", // Already defined
-    searchPlaceholder: "Palavras-chave, tópicos...",
-    searchButton: "Buscar",
-    filterByCategory: "Filtrar por Categoria",
-    exploreBenefits: "Explorar Benefícios",
-    popularArticles: "Artículos Populares", // Changed from "Artículos"
-    // readMore: "Ler Mais", // Already defined
-    // fastingStagesTitle: "Estágios do Jejum", // Already defined
-    backToArticles: "Voltar aos Artigos", // Changed from "Artículos"
-    // relatedArticles: "Artículos Relacionados", // Already defined
-    shareArticle: "Compartilhar este Artigo", // Changed from "Artículos"
-    shareFacebook: "Compartilhar no Facebook",
-    shareTwitter: "Compartilhar no Twitter",
-    shareLinkedIn: "Compartilhar no LinkedIn",
-    reviews: "avaliações",
+    // Statistics page
+    statistics: "Estatísticas",
+    trackYourProgress: "Acompanhe seu progresso de jejum",
+    selectPeriod: "Selecionar período",
+    last7Days: "Últimos 7 dias",
+    last14Days: "Últimos 14 dias",
+    last30Days: "Últimos 30 dias",
+    last90Days: "Últimos 90 dias",
+    avgFastingHours: "Média Jejum",
+    avgWaterIntake: "Média Água",
+    consecutiveFasts: "jejuns consecutivos",
+    noDataForPeriod: "Sem dados para este período",
+    water: "Água",
 
-    // Learn Page Categories (Specific section from user)
-    scienceCategory: "Ciência",
-    preparationCategory: "Preparação",
-    protocolsCategory: "Protocolos",
-    alimentationCategory: "Alimentação",
-    challengesCategory: "Desafios",
-    enhancersCategory: "Potencializadores",
-    lifestyleCategory: "Estilo de Vida",
-    benefitsCategory: "Benefícios",
-    mythsCategory: "Mitos",
+    // Reminder Settings
+    reminders: "Lembretes",
+    reminderSettings: "Configurações de Lembretes",
+    reminderSettingsDesc: "Configure seus lembretes diários",
+    waterReminder: "Lembrete de Água",
+    fastingReminder: "Lembrete de Jejum",
+    dailyReminder: "Lembrete Diário",
+    reminderDefaultMessage: "Não se esqueça!",
+    enableNotifications: "Ativar Notificações",
+    enableNotificationsDesc: "Receba lembretes para manter suas metas",
+    enable: "Ativar",
+    notificationsEnabled: "Notificações Ativadas",
+    notificationsEnabledDesc: "Você receberá lembretes agora",
+    notificationsDenied: "Permissão Negada",
+    notificationsDeniedDesc: "Por favor, ative as notificações nas configurações do navegador",
+    dailyReminders: "Lembretes Diários",
 
-    // Learn Page Benefits (Specific section from user)
-    weightLossBenefit: "Perda de Peso",
-    improvedEnergyBenefit: "Energia Melhorada",
-    mentalClarityBenefit: "Clareza Mental",
-    diseasePreventionBenefit: "Prevenção de Doenças",
-    longevityBenefit: "Longevidade",
-
-    // Learn Page Fasting Stages (Specific section from user)
-    transitionStage: "Transição (0-12h)",
-    transitionStageDescription: "Corpo usa glicose armazenada. Níveis de insulina começam a cair.",
-    fatBurningStage: "Queima de Gordura (12-18h)",
-    fatBurningStageDescription:
-      "Glucogênio esgotado. Corpo começa a queimar gordura para energia. Cetonas podem aparecer.",
-    ketosisStage: "Cetose (18-24h)",
-    ketosisStageDescription: "Níveis de cetona aumentam. Cérebro usa cetonas. Autofagia pode começar.",
-    autophagyStage: "Autofagia (24h+)",
-    autophagyStageDescription: "Limpeza e regeneração celular. HGH aumenta. Benefícios ao sistema imunológico.",
-
-    // Progress Page (Specific section from user, some keys might be duplicated/better placed)
-    progressPageTitle: "Acompanhe Seu Progresso",
-    progressPageSubtitle: "Monitore seu histórico de jejum, peso e outras métricas importantes.",
-    weightChart: "Gráfico de Peso",
-    fastingChart: "Gráfico de Horas de Jejum",
-    // waterIntake: "Consumo de Água", // Already defined
-    moodTracker: "Monitor de Humor",
-    addEntry: "Adicionar Novo Registro",
-    date: "Data",
-    // weight: "Peso (kg)", // Already defined
-    fastingDuration: "Duração do Jejum (horas)",
-    mood: "Humor (1-5)",
-    notes: "Notas",
-    saveEntry: "Salvar Registro",
-    // monthlyProgress: "Progresso Mensal", // Already defined
-
-    // Timer Page (Specific section from user, some keys might be duplicated/better placed)
-    // timerPageTitle: "Cronômetro de Jejum", // Already defined
-    // timerPageSubtitle: "Gerencie seu jejum atual e planeje o próximo.", // Already defined
-    currentFastStatus: "Status do Jejum Atual",
-    // fastingFor: "Jejum por", // Already defined
-    remainingTime: "Tempo Restante",
-    // goal: "Meta", // Already defined
-    startFast: "Iniciar Jejum",
-    endFast: "Encerrar Jejum",
-    editFast: "Editar Jejum",
-    cancelFast: "Cancelar Jejum",
-    // fastingHistory: "Histórico de Jejum", // Already defined
-    // completedFasts: "Jejuns Concluídos", // Already defined
-    averageDuration: "Duração Média",
-    longestFast: "Jejum Mais Longo",
-    setGoal: "Definir Meta de Jejum (horas)",
-
-    // Settings Page (Specific section from user, some keys might be duplicated/better placed)
-    settingsPageTitle: "Configurações",
-    settingsPageSubtitle: "Personalize sua experiência no aplicativo e preferências.",
-    // language: "Idioma", // Already defined
-    // notifications: "Notificações", // Already defined
-    fastStartReminder: "Lembrete de Início de Jejum",
-    fastEndReminder: "Lembrete de Fim de Jejum",
-    waterIntakeReminder: "Lembrete de Consumo de Água",
-    theme: "Tema",
-    lightTheme: "Claro",
-    darkTheme: "Escuro",
-    systemTheme: "Sistema",
+    // Settings page
+    customizeExperience: "Personalize sua experiência",
     account: "Conta",
+    data: "Dados",
+    accountSettings: "Configurações da Conta",
+    accountSettingsDesc: "Gerencie sua conta e sincronize dados",
+    syncData: "Sincronizar Dados",
+    syncDataDesc: "Entre para sincronizar seus dados entre dispositivos",
+    signIn: "Entrar",
     exportData: "Exportar Dados",
+    exportDataDesc: "Baixe todos os seus dados como JSON",
+    export: "Exportar",
+    dataManagement: "Gerenciamento de Dados",
+    dataManagementDesc: "Gerencie seus dados locais e na nuvem",
+    clearLocalData: "Limpar Dados Locais",
+    clearLocalDataDesc: "Remover todos os dados armazenados neste dispositivo",
+    clear: "Limpar",
     deleteAccount: "Excluir Conta",
-    fastingProtocol: "Protocolo de Jejum",
-    // fastingHours: "Horas de Jejum", // Already defined
-    eatingHours: "Horas de Alimentação",
-    // saveSettings: "Salvar Configurações", // Already defined
+    deleteAccountDesc: "Excluir permanentemente sua conta e todos os dados",
 
-    // Profile Page (Specific section from user, some keys might be duplicated/better placed)
-    // profilePageTitle: "Meu Perfil", // Already defined
-    // profilePageSubtitle: "Gerencie suas informações pessoais e metas de saúde.", // Already defined
-    // personalInfo: "Informações Pessoais", // Already defined
-    name: "Nome",
-    // email: "Email", // Already defined
-    // age: "Idade", // Already defined
-    // height: "Altura (cm)", // Already defined
-    startingWeight: "Peso Inicial (kg)",
-    // currentWeight: "Peso Atual (kg)", // Already defined
-    goalWeight: "Peso Alvo (kg)",
-    healthGoals: "Metas de Saúde",
-    updateProfile: "Atualizar Perfil",
-    uploadPhoto: "Carregar Foto",
-
-    // Admin Page
-    adminDashboard: "Painel do Admin",
-    manageUsers: "Gerenciar Usuários",
-    manageArticles: "Gerenciar Artigos",
-    manageRecipes: "Gerenciar Receitas",
-    siteAnalytics: "Análises do Site",
-    totalUsers: "Total de Usuários",
-    activeUsers: "Usuários Ativos",
-    totalArticles: "Total de Artigos",
-    totalRecipes: "Total de Receitas",
-    createNew: "Criar Novo",
-    title: "Título",
-    category: "Categoria",
-    author: "Autor",
-    publishedDate: "Data de Publicação",
-    actions: "Ações",
-    // edit: "Editar", // Already in General
-    // delete: "Excluir", // Already in General
-    confirmDelete: "Tem certeza que deseja excluir este item?",
-    // cancel: "Cancelar", // Already in General
-
-    // Auth Page
-    loginTitle: "Acesse Sua Conta",
-    signupTitle: "Crie uma Conta",
-    password: "Senha",
-    confirmPassword: "Confirmar Senha",
-    forgotPassword: "Esqueceu a Senha?",
-    loginWithGoogle: "Entrar com Google",
-    signupWithGoogle: "Cadastrar com Google",
-    alreadyHaveAccount: "Já tem uma conta? Entrar",
-    dontHaveAccount: "Não tem uma conta? Cadastre-se",
-
-    // PWA Notifications
-    pwaInstallTitle: "Instalar Aplicativo",
-    pwaInstallDescription: "Adicione este aplicativo à sua tela inicial para uma melhor experiência.",
-    pwaInstallButton: "Instalar",
-    pwaNotificationTitle: "Ativar Notificações",
-    pwaNotificationDescription: "Mantenha-se atualizado com lembretes e informações importantes.",
-    pwaEnableButton: "Ativar Notificações",
-    pwaLaterButton: "Mais Tarde",
-
-    // Novas traduções de progresso, bem-estar e conquistas
-    startYourFirstFast: "Comece seu primeiro jejum",
-    trackYourProgress: "Acompanhe seu progresso",
-    noDataAvailable: "Nenhum dado disponível",
-    noRecentActivity: "Nenhuma atividade recente",
-    dailyProgress: "Progresso Diário",
-    fastingStreak: "Sequência de Jejuns",
-    longestStreak: "Maior Sequência",
-    averageFastDuration: "Duração Média do Jejum",
-    totalFastsCompleted: "Total de Jejuns Completados",
-    dailyHydrationGoal: "Meta Diária de Hidratação",
-    weeklyHydrationGoal: "Meta Semanal de Hidratação",
-    monthlyHydrationGoal: "Meta Mensal de Hidratação",
-    moodTracking: "Acompanhamento do Humor",
-    sleepTracking: "Acompanhamento do Sono",
-    energyLevel: "Nível de Energia",
-    overallWellness: "Bem-estar Geral",
-    unlockedAchievements: "Conquistas Desbloqueadas",
-    progressToNextAchievement: "Progresso para Próxima Conquista",
-
-    // General
-    loading: "Carregando...",
-    error: "Erro", // Atualizado
-    success: "Sucesso!",
-    submit: "Enviar",
-    close: "Fechar",
-    save: "Salvar",
-    hours: "horas",
-    minutes: "minutos",
-    day: "dia",
-    week: "semana",
-    month: "mês",
-    year: "ano",
-    kg: "kg",
-    cm: "cm",
-    yes: "Sim",
-    no: "Não",
-    comingSoon: "Em breve!",
-    retry: "Tentar Novamente", // Adicionado
-    confirm: "Confirmar", // Adicionado
-    edit: "Editar", // Já existia, mantido
-    delete: "Excluir", // Já existia, mantido
-    cancel: "Cancelar", // Já existia, mantido
-    add: "Adicionar", // Adicionado
-    remove: "Remover", // Adicionado
-    update: "Atualizar", // Adicionado
-
-    // Categorias das Dicas
+    // Tip Categories
     categoryHydration: "Hidratação",
     categoryTiming: "Horários",
-    // categoryNutrition: "Nutrição", // Already defined
+    categoryNutrition: "Nutrição",
     categoryHealth: "Saúde",
     categoryExercises: "Exercícios",
     categoryGeneral: "Geral",
 
-    // Conteúdo da Dica de Fallback
+    // Fallback Tip Content
     noTipAvailableShort: "Nenhuma dica disponível no momento.",
     noTipAvailableFull: "Volte mais tarde para uma nova dica do dia!",
 
-    // Títulos e Conteúdo das Dicas
+    // Tip Titles & Content
     tipHydrationTitle: "Mantenha-se Hidratado!",
     tipHydrationShort: "Beber água suficiente é crucial durante o jejum...",
     tipHydrationFull:
@@ -1229,11 +1173,26 @@ export const translations = {
     tipCombiningJejumExercisesFull:
       "Exercícios leves a moderados como caminhada, ioga ou treino de força leve geralmente são adequados. Para treinos mais intensos, considere programá-los mais perto da sua janela de alimentação ou em dias sem jejum, especialmente no início.",
 
-    // Tempos de leitura
+    // Read times
     readTime1min: "1 min de leitura",
     readTime2min: "2 min de leitura",
     readTime3min: "3 min de leitura",
-    readTime4min: "4 min de leitura", // Corrigido para 4 min
+    readTime4min: "4 min de leitura",
+
+    // General
+    loading: "Carregando...",
+    error: "Erro",
+    success: "Sucesso!",
+    submit: "Enviar",
+    comingSoon: "Em breve!",
+    retry: "Tentar Novamente",
+    confirm: "Confirmar",
+    edit: "Editar",
+    delete: "Excluir",
+    cancel: "Cancelar",
+    add: "Adicionar",
+    remove: "Remover",
+    update: "Atualizar",
   },
   es: {
     // Navigation
@@ -1455,7 +1414,7 @@ export const translations = {
 
     // EducationalContent Component
     educationalContentTitle: "Contenido Educativo",
-    benefits168: "Beneficios del Ayuno 16:8",
+    benefits168: "Beneficios del Jejum 16:8",
     benefits168Desc: "Descubre cómo este método puede mejorar tu salud",
     recipesToBreakFast: "Recetas para Romper el Ayuno",
     recipesToBreakFastDesc: "Comidas nutritivas y sabrosas",
@@ -1489,8 +1448,6 @@ export const translations = {
     thisMonth: "Este Mes",
     completedFasts: "Ayunos Completados",
     successRate: "Tasa de Éxito",
-    // weightChange: "Cambio de Peso", // Already defined
-    // currentStreak: "Racha actual", // Already defined
     weeklyProgress: "Progreso Semanal",
     hydrationGoal: "Meta de Hidratación",
     recentActivity: "Actividad Reciente",
@@ -1517,7 +1474,7 @@ export const translations = {
     firstWeekAchievement: "Primera Semana",
     firstWeekAchievementDesc: "Completa 7 ayunos",
     hydrationMasterAchievement: "Maestro de la Hidratación",
-    hydrationMasterAchievementDesc: "Bebe 2L de agua durante 7 días",
+    hydrationMasterAchievementDesc: "Bebe 2L de agua por 7 días",
     ironStreakAchievement: "Racha de Hierro",
     ironStreakAchievementDesc: "10 ayunos consecutivos",
     fullMonthAchievement: "Mes Completo",
@@ -1526,17 +1483,16 @@ export const translations = {
     weightLossAchievementDesc: "Pierde 5kg",
     conquered: "Conquistado",
     conqueredOn: "Conquistado el {date}",
-    monthlyProgress: "Progreso Mensual", // Already exists
+    monthlyProgress: "Progreso Mensal", // Already exists
 
     // Learn Page (app/learn/page.tsx)
-    learnPageTitle: "Aprende Sobre el Ayuno Intermitente", // Corrected from "Learn About Intermittent Fasting"
-    learnPageSubtitle: "Explora artículos, guías y consejos para maximizar los beneficios de tu ayuno.", // Corrected
+    learnPageTitle: "Aprende Sobre el Ayuno Intermitente",
+    learnPageSubtitle: "Explora artículos, guías y consejos para maximizar los beneficios de tu ayuno.",
     scientificArticles: "Artículos Científicos",
     communityBlog: "Blog de la Comunidad",
     featuredArticles: "Artículos Destacados",
     featuredPosts: "Publicaciones Destacadas",
     mainBenefitsOfIF: "Principales Beneficios del Ayuno Intermitente",
-    // fastingStagesTitle: "Etapas del Ayuno", // Already defined
     communityStats: "Estadísticas de la Comunidad",
     articleLibrary: "Biblioteca de Artículos",
     communityPosts: "Publicaciones de la Comunidad",
@@ -1556,7 +1512,7 @@ export const translations = {
     noArticlesFound: "No se encontraron artículos",
     noPostsFound: "No se encontraron publicaciones",
     tryAdjustingFilters: "Intenta ajustar los filtros o los términos de búsqueda",
-    faq: "Preguntas Frecuentes",
+    faq: "Preguntas Frequentes",
     faqWaterTitle: "¿Puedo beber agua durante el ayuno?",
     faqWaterAnswer: "¡Sí! Se permite y se recomienda agua, tés sin azúcar y café negro.",
     faqResultsTitle: "¿Cuánto tiempo se tarda en ver resultados?",
@@ -1569,22 +1525,17 @@ export const translations = {
     faqExerciseAnswer:
       "Sí, el ejercicio ligero a moderado es seguro. Evita los entrenamientos muy intensos inicialmente.",
     benefitCardioTitle: "Salud Cardiovascular",
-    benefitCardioDesc: "Mejora de la presión arterial y reducción del colesterol", // Added from EN
+    benefitCardioDesc: "Mejora de la presión arterial y reducción del colesterol",
     benefitBrainTitle: "Función Cerebral",
     benefitBrainDesc: "Aumento de la concentración y la claridad mental",
     benefitEnergyTitle: "Energía y Vitalidad",
-    benefitEnergyDesc: "Más energía y disposición a lo largo del día", // Corrected "la día"
+    benefitEnergyDesc: "Más energía y disposición a lo largo del día",
     benefitImmuneTitle: "Sistema Inmunológico",
     benefitImmuneDesc: "Fortalecimiento de las defensas naturales del cuerpo",
-    // stageDigestionTitle: "Digestión", // Already defined
     stageDigestionDesc: "El cuerpo procesa la última comida",
-    // stageTransitionTitle: "Transición", // Already defined
     stageTransitionDesc: "Cambio del metabolismo de la glucosa",
-    // stageFatBurningTitle: "Quema de Grasa", // Already defined
     stageFatBurningDesc: "Inicio de la lipólisis para obtener energía",
-    // stageKetosisTitle: "Cetosis", // Already defined
     stageKetosisDesc: "Producción de cetonas por el hígado",
-    // stageAutophagyTitle: "Autofagia", // Already defined
     stageAutophagyDesc: "Limpieza y renovación celular",
     activeMembers: "Miembros Activos",
     postsPublished: "Publicaciones Publicadas",
@@ -1645,10 +1596,8 @@ export const translations = {
     celebratingFirst10kgLost: "¡Celebrando Mis Primeros 10kg Perdidos! 🎉",
 
     // Recipes Page (app/recipes/page.tsx)
-    recipesPageTitle: "Recetas Deliciosas para Tu Ventana de Alimentación", // Corrected
-    // recipesPageSubtitle: "Find healthy and satisfying meals to complement your fasting lifestyle.", // Duplicated
+    recipesPageTitle: "Recetas Deliciosas para Tu Ventana de Alimentación",
     healthyRecipes: "Recetas Saludables",
-    // recipesPageSubtitle: "Comidas nutritivas para romper tu ayuno y mantenerte saludable", // Duplicated
     searchRecipes: "Buscar recetas...",
     difficulty: "Dificultad",
     easy: "Fácil",
@@ -1718,232 +1667,80 @@ export const translations = {
     presentAndServeDesc: "Finalice la presentación y sirva inmediatamente para la mejor experiencia.",
     presentAndServeTip: "Sirva a la temperatura ideal para realzar todos los sabores.",
     recipeTipPrepBefore: "Prepare todos los ingredientes antes de comenzar",
-    recipeTipTemp: "Mantenga la temperatura adecuada durante la preparación", // Corrected "preparo"
-    recipeTipSeason: "Ajuste los condimentos a su gusto personal", // Corrected
+    recipeTipTemp: "Mantenga la temperatura adecuada durante la preparación",
+    recipeTipSeason: "Ajuste los condimentos a su gusto personal",
     recipeTipServeHot: "Sirva inmediatamente para mejor sabor",
     variationLightName: "Versión Light",
     variationLightDesc: "Reduzca la cantidad de grasas y use ingredientes con menos calorías",
     variationVeganName: "Versión Vegana",
     variationVeganDesc: "Sustituya ingredientes de origen animal por alternativas vegetales",
-    variationGlutenFreeName: "Versión Sin Gluten", // Corrected "Glúten"
-    variationGlutenFreeDesc: "Use ingredientes sin gluten para personas con restricciones", // Corrected "glúten"
+    variationGlutenFreeName: "Versión Sin Gluten",
+    variationGlutenFreeDesc: "Use ingredientes sin gluten para personas con restricciones",
 
-    // Learn Page (Specific section from user, some keys might be duplicated/better placed)
-    // learnPageTitle: "Aprenda Sobre Jejum Intermitente", // Already defined
-    // learnPageSubtitle: "Explore articles, guides, and tips to maximize your fasting benefits.", // Already defined
-    // searchArticles: "Buscar Artículos", // Already defined
-    searchPlaceholder: "Palabras clave, temas...", // Corrected
-    searchButton: "Buscar",
-    filterByCategory: "Filtrar por Categoría", // Corrected
-    exploreBenefits: "Explorar Beneficios", // Corrected
-    popularArticles: "Artículos Populares",
-    // readMore: "Leer Más", // Already defined
-    // fastingStagesTitle: "Etágios do Jejum", // Already defined
-    backToArticles: "Volver a los Artículos", // Corrected
-    // relatedArticles: "Artículos Relacionados", // Already defined
-    shareArticle: "Compartir este Artículo",
-    shareFacebook: "Compartir en Facebook",
-    shareTwitter: "Compartir en Twitter",
-    shareLinkedIn: "Compartir en LinkedIn",
-    reviews: "reseñas", // Corrected "avaliações"
+    // Statistics page
+    statistics: "Estadísticas",
+    trackYourProgress: "Sigue tu progreso de ayuno",
+    selectPeriod: "Seleccionar período",
+    last7Days: "Últimos 7 días",
+    last14Days: "Últimos 14 días",
+    last30Days: "Últimos 30 días",
+    last90Days: "Últimos 90 días",
+    avgFastingHours: "Promedio Ayuno",
+    avgWaterIntake: "Promedio Agua",
+    consecutiveFasts: "ayunos consecutivos",
+    noDataForPeriod: "Sin datos para este período",
+    water: "Agua",
 
-    // Learn Page Categories (Specific section from user)
-    scienceCategory: "Ciencia", // Corrected
-    preparationCategory: "Preparación",
-    protocolsCategory: "Protocolos",
-    alimentationCategory: "Alimentación",
-    challengesCategory: "Desafíos", // Corrected
-    enhancersCategory: "Potenciadores", // Corrected
-    lifestyleCategory: "Estilo de Vida",
-    benefitsCategory: "Beneficios", // Corrected
-    mythsCategory: "Mitos",
+    // Reminder Settings
+    reminders: "Recordatorios",
+    reminderSettings: "Configuración de Recordatorios",
+    reminderSettingsDesc: "Configure sus recordatorios diarios",
+    waterReminder: "Recordatorio de Agua",
+    fastingReminder: "Recordatorio de Ayuno",
+    dailyReminder: "Recordatorio Diario",
+    reminderDefaultMessage: "¡No olvides!",
+    enableNotifications: "Activar Notificaciones",
+    enableNotificationsDesc: "Reciba recordatorios para mantener sus metas",
+    enable: "Activar",
+    notificationsEnabled: "Notificaciones Activadas",
+    notificationsEnabledDesc: "Ahora recibirá recordatorios",
+    notificationsDenied: "Permiso Denegado",
+    notificationsDeniedDesc: "Por favor, active las notificaciones en la configuración del navegador",
+    dailyReminders: "Recordatorios Diarios",
 
-    // Learn Page Benefits (Specific section from user)
-    weightLossBenefit: "Pérdida de Peso", // Corrected
-    improvedEnergyBenefit: "Energía Mejorada", // Corrected
-    mentalClarityBenefit: "Claridad Mental", // Corrected
-    diseasePreventionBenefit: "Prevención de Enfermedades", // Corrected
-    longevityBenefit: "Longevidad", // Corrected
-
-    // Learn Page Fasting Stages (Specific section from user)
-    transitionStage: "Transición (0-12h)",
-    transitionStageDescription: "El cuerpo usa la glucosa almacenada. Los niveles de insulina comienzan a bajar.", // Corrected
-    fatBurningStage: "Quema de Grasa (12-18h)",
-    fatBurningStageDescription:
-      "Glucógeno agotado. El cuerpo comienza a quemar grasa para obtener energía. Pueden aparecer cetonas.", // Corrected
-    ketosisStage: "Cetosis (18-24h)",
-    ketosisStageDescription: "Aumentan los niveles de cetonas. El cerebro usa cetonas. Puede comenzar la autofagia.", // Corrected
-    autophagyStage: "Autofagia (24h+)",
-    autophagyStageDescription:
-      "Limpieza y regeneración celular. Aumenta la HGH. Beneficios para el sistema inmunológico.", // Corrected
-
-    // Progress Page (Specific section from user, some keys might be duplicated/better placed)
-    progressPageTitle: "Sigue Tu Progreso", // Corrected
-    progressPageSubtitle: "Monitorea tu historial de ayuno, peso y otras métricas importantes.", // Corrected
-    weightChart: "Gráfico de Peso",
-    fastingChart: "Gráfico de Horas de Ayuno",
-    // waterIntake: "Consumo de Água", // Already defined
-    moodTracker: "Monitor de Humor", // Corrected "Monitor de Humor"
-    addEntry: "Añadir Nuevo Registro", // Corrected
-    date: "Fecha", // Corrected
-    // weight: "Peso (kg)", // Already defined
-    fastingDuration: "Duración del Ayuno (horas)", // Corrected
-    mood: "Humor (1-5)", // Corrected "Humor (1-5)"
-    notes: "Notas",
-    saveEntry: "Guardar Registro", // Corrected
-    // monthlyProgress: "Progreso Mensual", // Already defined
-
-    // Timer Page (Specific section from user, some keys might be duplicated/better placed)
-    // timerPageTitle: "Cronômetro de Jejum", // Already defined
-    // timerPageSubtitle: "Gerencie seu jejum atual e planeje o próximo.", // Already defined
-    currentFastStatus: "Estado del Ayuno Actual", // Corrected
-    // fastingFor: "Jejum por", // Already defined
-    remainingTime: "Tiempo Restante",
-    // goal: "Meta", // Already defined
-    startFast: "Iniciar Ayuno", // Corrected
-    endFast: "Finalizar Ayuno", // Corrected
-    editFast: "Editar Ayuno", // Corrected
-    cancelFast: "Cancelar Ayuno", // Corrected
-    // fastingHistory: "Histórico de Jejum", // Already defined
-    // completedFasts: "Jejuns Concluídos", // Already defined
-    averageDuration: "Duración Promedio", // Corrected
-    longestFast: "Ayuno Más Largo", // Corrected
-    setGoal: "Establecer Meta de Ayuno (horas)", // Corrected
-
-    // Settings Page (Specific section from user, some keys might be duplicated/better placed)
-    settingsPageTitle: "Configuración", // Corrected
-    settingsPageSubtitle: "Personaliza tu experiencia en la aplicación y tus preferencias.", // Corrected
-    // language: "Idioma", // Already defined
-    // notifications: "Notificações", // Already defined
-    fastStartReminder: "Recordatorio de Inicio de Ayuno", // Corrected
-    fastEndReminder: "Recordatorio de Fin de Ayuno", // Corrected
-    waterIntakeReminder: "Recordatorio de Consumo de Agua", // Corrected
-    theme: "Tema",
-    lightTheme: "Claro",
-    darkTheme: "Oscuro",
-    systemTheme: "Sistema",
-    account: "Cuenta", // Corrected
+    // Settings page
+    customizeExperience: "Personaliza tu experiencia",
+    account: "Cuenta",
+    data: "Datos",
+    accountSettings: "Configuración de Cuenta",
+    accountSettingsDesc: "Administra tu cuenta y sincroniza datos",
+    syncData: "Sincronizar Datos",
+    syncDataDesc: "Inicia sesión para sincronizar tus datos entre dispositivos",
+    signIn: "Iniciar Sesión",
     exportData: "Exportar Datos",
-    deleteAccount: "Eliminar Cuenta", // Corrected
-    fastingProtocol: "Protocolo de Ayuno", // Corrected
-    // fastingHours: "Horas de Jejum", // Already defined
-    eatingHours: "Horas de Alimentación", // Corrected
-    // saveSettings: "Salvar Configurações", // Already defined
-
-    // Profile Page (Specific section from user, some keys might be duplicated/better placed)
-    // profilePageTitle: "Meu Perfil", // Already defined
-    // profilePageSubtitle: "Gerencie suas informações pessoais e metas de saúde.", // Already defined
-    // personalInfo: "Informações Pessoais", // Already defined
-    name: "Nombre", // Corrected
-    // email: "Email", // Already defined
-    // age: "Idade", // Already defined
-    // height: "Altura (cm)", // Already defined
-    startingWeight: "Peso Inicial (kg)",
-    // currentWeight: "Peso Atual (kg)", // Already defined
-    goalWeight: "Peso Objetivo (kg)", // Corrected
-    healthGoals: "Metas de Salud", // Corrected
-    updateProfile: "Actualizar Perfil", // Corrected
-    uploadPhoto: "Subir Foto", // Corrected
-
-    // Admin Page
-    adminDashboard: "Panel de Admin", // Corrected
-    manageUsers: "Gestionar Usuarios", // Corrected
-    manageArticles: "Gestionar Artículos", // Corrected
-    manageRecipes: "Gestionar Recetas", // Corrected
-    siteAnalytics: "Análisis del Sitio", // Corrected
-    totalUsers: "Total de Usuarios",
-    activeUsers: "Usuarios Activos",
-    totalArticles: "Total de Artículos",
-    totalRecipes: "Total de Recetas",
-    createNew: "Crear Nuevo",
-    title: "Título",
-    category: "Categoría", // Corrected
-    author: "Autor",
-    publishedDate: "Fecha de Publicación", // Corrected
-    actions: "Acciones",
-    // edit: "Editar", // Already in General
-    // delete: "Excluir", // Already in General
-    confirmDelete: "¿Estás seguro de que quieres eliminar este elemento?", // Corrected
-    // cancel: "Cancelar", // Already in General
-
-    // Auth Page
-    loginTitle: "Accede a Tu Cuenta", // Corrected
-    signupTitle: "Crear una Cuenta", // Corrected
-    password: "Contraseña", // Corrected
-    confirmPassword: "Confirmar Contraseña", // Corrected
-    forgotPassword: "¿Olvidaste la Contraseña?", // Corrected
-    loginWithGoogle: "Acceder con Google", // Corrected
-    signupWithGoogle: "Registrarse con Google", // Corrected
-    alreadyHaveAccount: "¿Ya tienes una cuenta? Acceder", // Corrected
-    dontHaveAccount: "¿No tienes una cuenta? Regístrate", // Corrected
-
-    // PWA Notifications
-    pwaInstallTitle: "Instalar Aplicación",
-    pwaInstallDescription: "Añade esta aplicación a tu pantalla de inicio para una mejor experiencia.",
-    pwaInstallButton: "Instalar",
-    pwaNotificationTitle: "Activar Notificaciones",
-    pwaNotificationDescription: "Mantente actualizado con recordatorios e información importante.",
-    pwaEnableButton: "Activar Notificaciones",
-    pwaLaterButton: "Más Tarde",
-
-    // Novas traduções de progresso, bien-estar e conquistas (ES)
-    startYourFirstFast: "Comienza tu primer ayuno",
-    trackYourProgress: "Sigue tu progreso",
-    noDataAvailable: "No hay datos disponibles",
-    noRecentActivity: "Ninguna actividad reciente",
-    dailyProgress: "Progreso Diario",
-    fastingStreak: "Racha de Ayunos",
-    longestStreak: "Racha Más Larga",
-    averageFastDuration: "Duración Promedio del Ayuno",
-    totalFastsCompleted: "Total de Ayunos Completados",
-    dailyHydrationGoal: "Meta Diaria de Hidratación",
-    weeklyHydrationGoal: "Meta Semanal de Hidratación",
-    monthlyHydrationGoal: "Meta Mensal de Hidratación",
-    moodTracking: "Seguimiento del Humor",
-    sleepTracking: "Seguimiento del Sueño",
-    energyLevel: "Nivel de Energía",
-    overallWellness: "Bienestar General",
-    unlockedAchievements: "Logros Desbloqueados",
-    progressToNextAchievement: "Progreso para el Próximo Logro",
-
-    // General
-    loading: "Cargando...",
-    error: "Error", // Atualizado
-    success: "¡Éxito!", // Corrected
-    submit: "Enviar",
-    // close: "Fechar", // Already defined
-    // save: "Salvar", // Already defined
-    // hours: "horas", // Already defined
-    minutes: "minutos",
-    day: "día", // Corrected
-    week: "semana",
-    month: "mes", // Corrected
-    year: "año", // Corrected
-    kg: "kg",
-    cm: "cm",
-    yes: "Sí", // Corrected
-    no: "No",
-    comingSoon: "¡Próximamente!",
-    retry: "Intentar de Nuevo", // Adicionado
-    confirm: "Confirmar", // Adicionado
-    edit: "Editar", // Já existia, mantido
-    delete: "Eliminar", // Corrected "Excluir"
-    cancel: "Cancelar", // Já existia, mantido
-    add: "Añadir", // Adicionado
-    remove: "Eliminar", // Adicionado
-    update: "Actualizar", // Adicionado
+    exportDataDesc: "Descarga todos tus datos como JSON",
+    export: "Exportar",
+    dataManagement: "Gestión de Datos",
+    dataManagementDesc: "Administra tus datos locales y en la nube",
+    clearLocalData: "Borrar Datos Locales",
+    clearLocalDataDesc: "Eliminar todos los datos almacenados en este dispositivo",
+    clear: "Borrar",
+    deleteAccount: "Eliminar Cuenta",
+    deleteAccountDesc: "Eliminar permanentemente tu cuenta y todos los datos",
 
     // Tip Categories
     categoryHydration: "Hidratación",
     categoryTiming: "Horarios",
-    // categoryNutrition: "Nutrición", // Already defined
+    categoryNutrition: "Nutrición",
     categoryHealth: "Salud",
     categoryExercises: "Ejercicios",
     categoryGeneral: "General",
+
     // Fallback Tip Content
     noTipAvailableShort: "No hay consejos disponibles en este momento.",
     noTipAvailableFull: "¡Vuelve más tarde para un nuevo consejo del día!",
-    // Tip Titles & Content (ensure these exist if not already present)
+
+    // Tip Titles & Content
     tipHydrationTitle: "¡Mantente Hidratado!",
     tipHydrationShort: "Beber suficiente agua es crucial durante el ayuno...",
     tipHydrationFull:
@@ -1964,11 +1761,27 @@ export const translations = {
     tipCombiningJejumExercisesShort: "Puedes hacer ejercicio mientras ayunas, pero escucha a tu cuerpo...",
     tipCombiningJejumExercisesFull:
       "El ejercicio ligero a moderado como caminar, yoga o entrenamiento de fuerza ligero generalmente está bien. Para entrenamientos más intensos, considera programarlos más cerca de tu ventana de alimentación o en días sin ayuno, especialmente al comenzar.",
-    // Read times (ensure these exist)
+
+    // Read times
     readTime1min: "1 min de lectura",
     readTime2min: "2 min de lectura",
     readTime3min: "3 min de lectura",
     readTime4min: "4 min de lectura",
+
+    // General
+    loading: "Cargando...",
+    error: "Error",
+    success: "¡Éxito!",
+    submit: "Enviar",
+    comingSoon: "¡Próximamente!",
+    retry: "Intentar de Nuevo",
+    confirm: "Confirmar",
+    edit: "Editar",
+    delete: "Eliminar",
+    cancel: "Cancelar",
+    add: "Añadir",
+    remove: "Eliminar",
+    update: "Actualizar",
   },
 }
 
