@@ -11,27 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Progress } from "@/components/ui/progress"
 import { useLanguage } from "@/context/languageContext"
-
-interface HydrationSettings {
-  customGoal?: number
-  useWeightBased: boolean
-  activityLevel: "sedentary" | "light" | "moderate" | "active" | "very_active"
-  climate: "normal" | "hot" | "cold"
-}
-
-interface WeightEntry {
-  date: string
-  weight: number
-  timestamp: number
-}
-
-interface DailyData {
-  date: string
-  water: number
-  mood: string
-  sleep: string
-  weight?: number
-}
+import type { HydrationSettings, WeightEntry, DailyData } from "@/types"
 
 export default function QuickActions() {
   const { t } = useLanguage()

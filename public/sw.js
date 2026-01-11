@@ -1,11 +1,21 @@
-const CACHE_NAME = "fasttrack-v1.0.0"
-const STATIC_CACHE = "fasttrack-static-v1.0.0"
-const DYNAMIC_CACHE = "fasttrack-dynamic-v1.0.0"
+const CACHE_NAME = "fasttrack-v1.1.0"
+const STATIC_CACHE = "fasttrack-static-v1.1.0"
+const DYNAMIC_CACHE = "fasttrack-dynamic-v1.1.0"
 
-// Arquivos essenciais para cache
-const STATIC_FILES = ["/", "/timer", "/recipes", "/progress", "/profile", "/learn", "/manifest.json", "/offline.html"]
+// Essential files to cache
+const STATIC_FILES = [
+  "/",
+  "/timer",
+  "/recipes",
+  "/progress",
+  "/profile",
+  "/learn",
+  "/settings",
+  "/manifest.json",
+  "/offline.html",
+]
 
-// Instalar Service Worker
+// Install Service Worker
 self.addEventListener("install", (event) => {
   console.log("Service Worker: Installing...")
   event.waitUntil(
@@ -25,7 +35,7 @@ self.addEventListener("install", (event) => {
   )
 })
 
-// Ativar Service Worker
+// Activate Service Worker
 self.addEventListener("activate", (event) => {
   console.log("Service Worker: Activating...")
   event.waitUntil(
@@ -48,66 +58,64 @@ self.addEventListener("activate", (event) => {
   )
 })
 
-// Interceptar requisições
+// Intercept requests - Network first, fallback to cache
 self.addEventListener("fetch", (event) => {
-  // Ignorar requisições não-GET e requisições para admin
+  // Ignore non-GET requests and admin routes
   if (event.request.method !== "GET" || event.request.url.includes("/admin")) {
     return
   }
 
+  // Ignore API routes
+  if (event.request.url.includes("/api/")) {
+    return
+  }
+
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // Se encontrou no cache, retorna
-      if (cachedResponse) {
-        return cachedResponse
-      }
-
-      // Se não encontrou, busca na rede
-      return fetch(event.request)
-        .then((response) => {
-          // Se a resposta não é válida, retorna ela
-          if (!response || response.status !== 200 || response.type !== "basic") {
-            return response
-          }
-
-          // Clona a resposta para cache
+    fetch(event.request)
+      .then((response) => {
+        // Clone response for caching
+        if (response && response.status === 200) {
           const responseToCache = response.clone()
-
           caches.open(DYNAMIC_CACHE).then((cache) => {
             cache.put(event.request, responseToCache)
           })
-
-          return response
-        })
-        .catch(() => {
-          // Se falhou, tenta retornar página offline
+        }
+        return response
+      })
+      .catch(() => {
+        // Network failed, try cache
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse
+          }
+          // If no cache and it's a document request, show offline page
           if (event.request.destination === "document") {
             return caches.match("/offline.html")
           }
+          return new Response("Offline", { status: 503 })
         })
-    }),
+      }),
   )
 })
 
-// Notificações Push - MELHORADO
+// Push Notifications
 self.addEventListener("push", (event) => {
   console.log("Service Worker: Push received", event)
 
   let notificationData = {
     title: "FastTrack",
-    body: "Nova notificação do FastTrack!",
-    icon: "/placeholder.svg?height=192&width=192&text=FT",
-    badge: "/placeholder.svg?height=72&width=72&text=FT",
-    data: {},
+    body: "Nova notificacao do FastTrack!",
+    icon: "/icons/icon-192x192.png",
+    badge: "/icons/icon-72x72.png",
+    data: { url: "/" },
   }
 
-  // Se há dados na notificação
   if (event.data) {
     try {
       const data = event.data.json()
       notificationData = { ...notificationData, ...data }
     } catch (error) {
-      console.error("Erro ao parsear dados da notificação:", error)
+      console.error("Error parsing push data:", error)
       notificationData.body = event.data.text()
     }
   }
@@ -119,91 +127,73 @@ self.addEventListener("push", (event) => {
     vibrate: [200, 100, 200],
     data: notificationData.data,
     actions: [
-      {
-        action: "open",
-        title: "Abrir App",
-        icon: "/placeholder.svg?height=128&width=128&text=📱",
-      },
-      {
-        action: "close",
-        title: "Fechar",
-        icon: "/placeholder.svg?height=128&width=128&text=❌",
-      },
+      { action: "open", title: "Abrir" },
+      { action: "close", title: "Fechar" },
     ],
-    requireInteraction: true, // Mantém a notificação até o usuário interagir
-    tag: "fasttrack-notification", // Substitui notificações anteriores
+    requireInteraction: false,
+    tag: notificationData.tag || "fasttrack-notification",
   }
 
   event.waitUntil(self.registration.showNotification(notificationData.title, options))
 })
 
-// Clique em notificação - MELHORADO
+// Notification click handler
 self.addEventListener("notificationclick", (event) => {
   console.log("Service Worker: Notification clicked", event)
   event.notification.close()
 
-  if (event.action === "open" || !event.action) {
-    // Abrir ou focar na janela do app
-    event.waitUntil(
-      clients.matchAll({ type: "window" }).then((clientList) => {
-        // Se já tem uma janela aberta, focar nela
-        for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && "focus" in client) {
-            return client.focus()
-          }
-        }
-        // Se não tem janela aberta, abrir uma nova
-        if (clients.openWindow) {
-          return clients.openWindow("/")
-        }
-      }),
-    )
+  if (event.action === "close") {
+    return
   }
-  // Se action === "close", apenas fecha (já fechou acima)
+
+  const urlToOpen = event.notification.data?.url || "/"
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      // Focus existing window if available
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          client.navigate(urlToOpen)
+          return client.focus()
+        }
+      }
+      // Open new window
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen)
+      }
+    }),
+  )
 })
 
-// Background Sync para quando voltar online - MELHORADO
+// Background Sync
 self.addEventListener("sync", (event) => {
   console.log("Service Worker: Background sync", event.tag)
 
-  if (event.tag === "background-sync") {
+  if (event.tag === "sync-data") {
     event.waitUntil(syncOfflineData())
   }
 })
 
-// Função para sincronizar dados offline
+// Sync offline data function
 async function syncOfflineData() {
   try {
-    console.log("Sincronizando dados offline...")
+    console.log("Syncing offline data...")
 
-    // Aqui você pode sincronizar dados que foram salvos offline
-    // Por exemplo, progresso do jejum, configurações, etc.
+    // Get all clients and notify them to sync
+    const clients = await self.clients.matchAll()
+    clients.forEach((client) => {
+      client.postMessage({ type: "SYNC_REQUESTED" })
+    })
 
-    // Exemplo: enviar dados pendentes para o servidor
-    const pendingData = await getOfflineData()
-    if (pendingData.length > 0) {
-      await sendDataToServer(pendingData)
-      await clearOfflineData()
-    }
-
-    console.log("Sincronização concluída")
+    console.log("Sync complete")
   } catch (error) {
-    console.error("Erro na sincronização:", error)
+    console.error("Sync error:", error)
   }
 }
 
-// Funções auxiliares para dados offline
-async function getOfflineData() {
-  // Implementar lógica para buscar dados offline
-  return []
-}
-
-async function sendDataToServer(data) {
-  // Implementar envio para servidor
-  console.log("Enviando dados para servidor:", data)
-}
-
-async function clearOfflineData() {
-  // Limpar dados offline após sincronização
-  console.log("Dados offline limpos")
-}
+// Message handler for communication with main app
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting()
+  }
+})

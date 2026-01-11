@@ -1,11 +1,11 @@
 {
   "name": "FastTrack - Jejum Intermitente",
   "short_name": "FastTrack",
-  "description": "Seu companheiro para uma jornada saudável com jejum intermitente",
+  "description": "Seu companheiro para uma jornada saudavel com jejum intermitente",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#10b981",
+  "background_color": "#F2EAE4",
+  "theme_color": "#F24E29",
   "orientation": "portrait-primary",
   "categories": ["health", "fitness", "lifestyle"],
   "lang": "pt-BR",
@@ -64,7 +64,7 @@
     {
       "name": "Iniciar Jejum",
       "short_name": "Timer",
-      "description": "Iniciar um novo período de jejum",
+      "description": "Iniciar um novo periodo de jejum",
       "url": "/timer",
       "icons": [
         {
@@ -77,7 +77,7 @@
     {
       "name": "Receitas",
       "short_name": "Receitas",
-      "description": "Ver receitas saudáveis",
+      "description": "Ver receitas saudaveis",
       "url": "/recipes",
       "icons": [
         {

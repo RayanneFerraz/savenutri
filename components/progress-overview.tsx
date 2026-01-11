@@ -7,19 +7,7 @@ import { TrendingUp, TrendingDown, BarChart3, Scale, ChevronRight } from "lucide
 import Link from "next/link"
 import { useLanguage } from "@/context/languageContext"
 import { useEffect, useState } from "react"
-
-interface WeightEntry {
-  date: string
-  weight: number
-  timestamp: number
-}
-
-interface HydrationSettings {
-  customGoal?: number
-  useWeightBased: boolean
-  activityLevel: "sedentary" | "light" | "moderate" | "active" | "very_active"
-  climate: "normal" | "hot" | "cold"
-}
+import type { WeightEntry, HydrationSettings } from "@/types"
 
 export default function ProgressOverview() {
   const { t } = useLanguage()

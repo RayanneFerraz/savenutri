@@ -8,52 +8,52 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, TrendingDown, Calendar, Target, Award, Scale, Clock, BarChart3, Smile, Moon } from "lucide-react"
 import { useLanguage } from "@/context/languageContext"
-import type { Translations } from "@/lib/translations" // Assuming your translations type is exported
+import type { WeightEntry, WellnessEntry, FastingEntry, HydrationSettings, Stats, Achievement } from "@/types"
 
 // Interfaces for our data structures
-interface WeightEntry {
-  date: string
-  weight: number
-  timestamp: number
-}
+// interface WeightEntry {
+//   date: string
+//   weight: number
+//   timestamp: number
+// }
 
-interface WellnessEntry {
-  date: string
-  value: string
-}
+// interface WellnessEntry {
+//   date: string
+//   value: string
+// }
 
-interface FastingEntry {
-  date: string // Formatted date string
-  duration: number // in hours
-  completed: boolean
-  type: string
-  timestamp: number // Original timestamp for sorting/filtering
-}
+// interface FastingEntry {
+//   date: string // Formatted date string
+//   duration: number // in hours
+//   completed: boolean
+//   type: string
+//   timestamp: number // Original timestamp for sorting/filtering
+// }
 
-interface HydrationSettings {
-  customGoal?: number
-  useWeightBased: boolean
-  activityLevel: "sedentary" | "light" | "moderate" | "active" | "very_active"
-  climate: "normal" | "hot" | "cold"
-}
+// interface HydrationSettings {
+//   customGoal?: number
+//   useWeightBased: boolean
+//   activityLevel: "sedentary" | "light" | "moderate" | "active" | "very_active"
+//   climate: "normal" | "hot" | "cold"
+// }
 
-interface Stats {
-  completedFasts: number
-  totalFasts: number
-  averageDuration: number
-  waterIntake: number // in Liters
-  currentStreak: number
-}
+// interface Stats {
+//   completedFasts: number
+//   totalFasts: number
+//   averageDuration: number
+//   waterIntake: number // in Liters
+//   currentStreak: number
+// }
 
-// ADD: Interface for Achievement
-interface Achievement {
-  key: string
-  titleKey: keyof Translations["pt"] // Or a more specific type for translation keys
-  descKey: keyof Translations["pt"]
-  completed: boolean
-  date: string | null // Date of completion
-  progress: number // 0-100
-}
+// Interface for Achievement
+// interface Achievement {
+//   key: string
+//   titleKey: keyof Translations["pt"] // Or a more specific type for translation keys
+//   descKey: keyof Translations["pt"]
+//   completed: boolean
+//   date: string | null // Date of completion
+//   progress: number // 0-100
+// }
 
 const initialStats: Stats = {
   completedFasts: 0,
@@ -79,7 +79,7 @@ const getLastDayOfCurrentMonth = () => {
   return new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
 }
 
-// ADD: Initial state for achievements
+// Initial state for achievements
 const initialAchievementsData: Achievement[] = [
   {
     key: "firstWeek",
@@ -137,10 +137,10 @@ export default function ProgressPage() {
   const [weeklyHydrationGoalL, setWeeklyHydrationGoalL] = useState(14)
   const [monthlyHydrationGoalL, setMonthlyHydrationGoalL] = useState((2000 / 1000) * getDaysInCurrentMonth())
 
-  // UPDATE: Use the new Achievement interface and initial data
+  // Use the new Achievement interface and initial data
   const [achievementsData, setAchievementsData] = useState<Achievement[]>(initialAchievementsData)
 
-  // ADD: Function to calculate achievements
+  // Function to calculate achievements
   const calculateAchievements = (
     fasts: FastingEntry[],
     weights: WeightEntry[],
@@ -280,7 +280,7 @@ export default function ProgressPage() {
     return updatedAchievements
   }
 
-  // ADD: Function to calculate current streak
+  // Function to calculate current streak
   const calculateCurrentFastingStreak = (fasts: FastingEntry[]): number => {
     const sortedFasts = [...fasts].sort((a, b) => b.timestamp - a.timestamp) // Most recent first
     let streak = 0
@@ -404,7 +404,7 @@ export default function ProgressPage() {
         })
         .reduce((sum, [, dataItem]) => sum + (dataItem.water || 0), 0)
 
-      // UPDATE: Calculate current streak
+      // Calculate current streak
       const currentFastingStreak = calculateCurrentFastingStreak(sortedFastingData)
 
       setWeeklyStats({
@@ -425,7 +425,7 @@ export default function ProgressPage() {
         currentStreak: currentFastingStreak, // Use calculated streak
       })
 
-      // ADD: Calculate and set achievements
+      // Calculate and set achievements
       const dailyDataForAchievements: Record<string, { water?: number }> = {}
       Object.entries(dailyDataStore).forEach(([dateKey, data]) => {
         dailyDataForAchievements[dateKey] = { water: data.water }

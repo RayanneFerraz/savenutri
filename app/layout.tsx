@@ -15,11 +15,11 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "FastTrack - Aplicativo de Jejum Intermitente",
   description:
-    "Transforme sua saúde com jejum intermitente. Interface intuitiva, rastreamento completo e conteúdo científico.",
-  keywords: "jejum intermitente, saúde, perda de peso, bem-estar, nutrição",
+    "Transforme sua saude com jejum intermitente. Interface intuitiva, rastreamento completo e conteudo cientifico.",
+  keywords: "jejum intermitente, saude, perda de peso, bem-estar, nutricao",
   authors: [{ name: "FastTrack Team" }],
   manifest: "/manifest.json",
-  themeColor: "#10b981",
+  themeColor: "#F24E29",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "FastTrack - Jejum Intermitente",
-    description: "Seu companheiro para uma vida mais saudável através do jejum intermitente",
+    description: "Seu companheiro para uma vida mais saudavel atraves do jejum intermitente",
     type: "website",
   },
   icons: {
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/placeholder.svg?height=180&width=180&text=FT", sizes: "180x180" }],
   },
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -46,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         {/* PWA Meta Tags */}
         <meta name="application-name" content="FastTrack" />
@@ -56,7 +56,7 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
-        <meta name="msapplication-TileColor" content="#10b981" />
+        <meta name="msapplication-TileColor" content="#F24E29" />
         <meta name="msapplication-tap-highlight" content="no" />
 
         {/* Apple Touch Icons */}

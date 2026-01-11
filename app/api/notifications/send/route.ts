@@ -1,43 +1,47 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-// Em produção, essas chaves devem estar em variáveis de ambiente
-const VAPID_PUBLIC_KEY = "BEl62iUYgUivxIkv69yViEuiBIa40HcCWLrUjHLjdMorGDlLVW6SCDhHxiHSNOHIS03v7VdHoTxKryaHXr6tmlA"
-const VAPID_PRIVATE_KEY = "your-vapid-private-key-here"
+// Web Push requires these VAPID keys from environment variables
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, body, data } = await request.json()
+    const { title, body, data, userId } = await request.json()
 
-    // Em produção, você buscaria os tokens do banco de dados
-    // Por enquanto, vamos simular o envio
+    // Validate VAPID keys
+    if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+      console.warn("VAPID keys not configured. Push notifications will use local fallback.")
+      return NextResponse.json({
+        success: true,
+        message: "Notification queued (local fallback)",
+        fallback: true,
+      })
+    }
+
+    // In production, you would:
+    // 1. Fetch push tokens from database for the user
+    // 2. Use web-push library to send notifications
+    // 3. Handle subscription cleanup for expired tokens
+
     const notification = {
       title,
       body,
-      icon: "/placeholder.svg?height=192&width=192&text=FT",
-      badge: "/placeholder.svg?height=72&width=72&text=FT",
+      icon: "/icons/icon-192x192.png",
+      badge: "/icons/icon-72x72.png",
       data,
-      actions: [
-        {
-          action: "open",
-          title: "Abrir App",
-        },
-        {
-          action: "close",
-          title: "Fechar",
-        },
-      ],
+      timestamp: Date.now(),
     }
 
-    // Aqui você enviaria para todos os tokens registrados
-    // usando uma biblioteca como web-push
-    console.log("Enviando notificação:", notification)
+    console.log("Push notification prepared:", notification)
 
+    // For now, return success
+    // In production, implement actual web-push sending
     return NextResponse.json({
       success: true,
-      message: "Notificação enviada com sucesso",
+      message: "Notification sent successfully",
     })
   } catch (error) {
-    console.error("Erro ao enviar notificação:", error)
-    return NextResponse.json({ success: false, error: "Falha ao enviar notificação" }, { status: 500 })
+    console.error("Error sending notification:", error)
+    return NextResponse.json({ success: false, error: "Failed to send notification" }, { status: 500 })
   }
 }

@@ -1,3 +1,5 @@
+"use client"
+
 interface NotificationToken {
   endpoint: string
   keys: {
@@ -13,13 +15,13 @@ interface ScheduledNotification {
   title: string
   body: string
   scheduledFor: number
-  type: "timer" | "reminder" | "achievement" | "tip"
-  data?: any
+  type: "timer" | "reminder" | "achievement" | "tip" | "water"
+  data?: Record<string, unknown>
 }
 
 class NotificationManager {
   private static instance: NotificationManager
-  private vapidPublicKey = "BEl62iUYgUivxIkv69yViEuiBIa40HcCWLrUjHLjdMorGDlLVW6SCDhHxiHSNOHIS03v7VdHoTxKryaHXr6tmlA" // Exemplo - em produção usar chaves reais
+  private scheduledTimeouts: Map<string, NodeJS.Timeout> = new Map()
 
   static getInstance(): NotificationManager {
     if (!NotificationManager.instance) {
@@ -28,9 +30,18 @@ class NotificationManager {
     return NotificationManager.instance
   }
 
+  async isSupported(): Promise<boolean> {
+    return "Notification" in window && "serviceWorker" in navigator
+  }
+
+  async getPermission(): Promise<NotificationPermission> {
+    if (!("Notification" in window)) return "denied"
+    return Notification.permission
+  }
+
   async requestPermission(): Promise<boolean> {
-    if (!("Notification" in window) || !("serviceWorker" in navigator)) {
-      console.log("Notificações não suportadas")
+    if (!(await this.isSupported())) {
+      console.log("Notificacoes nao suportadas neste navegador")
       return false
     }
 
@@ -41,29 +52,52 @@ class NotificationManager {
   async subscribeToPush(): Promise<PushSubscription | null> {
     try {
       const registration = await navigator.serviceWorker.ready
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+
+      if (!vapidPublicKey) {
+        console.warn("VAPID public key not configured")
+        return null
+      }
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey),
+        applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey),
       })
 
-      // Salvar token no localStorage (em produção, enviar para servidor)
-      const token: NotificationToken = {
-        endpoint: subscription.endpoint,
-        keys: {
-          p256dh: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey("p256dh")!))),
-          auth: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey("auth")!))),
-        },
-        createdAt: Date.now(),
-      }
+      // Save token to server
+      const p256dh = subscription.getKey("p256dh")
+      const auth = subscription.getKey("auth")
 
-      localStorage.setItem("pushToken", JSON.stringify(token))
-      console.log("Push subscription criada:", token)
+      if (p256dh && auth) {
+        const token: NotificationToken = {
+          endpoint: subscription.endpoint,
+          keys: {
+            p256dh: btoa(String.fromCharCode(...new Uint8Array(p256dh))),
+            auth: btoa(String.fromCharCode(...new Uint8Array(auth))),
+          },
+          createdAt: Date.now(),
+        }
+
+        await this.registerToken(token)
+        localStorage.setItem("pushToken", JSON.stringify(token))
+      }
 
       return subscription
     } catch (error) {
       console.error("Erro ao criar push subscription:", error)
       return null
+    }
+  }
+
+  private async registerToken(token: NotificationToken): Promise<void> {
+    try {
+      await fetch("/api/notifications/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(token),
+      })
+    } catch (error) {
+      console.error("Failed to register push token:", error)
     }
   }
 
@@ -78,121 +112,184 @@ class NotificationManager {
     return outputArray
   }
 
-  // Notificação local imediata
+  // Show local notification immediately
   showLocalNotification(title: string, body: string, options?: NotificationOptions) {
     if (Notification.permission === "granted") {
-      new Notification(title, {
+      const notification = new Notification(title, {
         body,
-        icon: "/placeholder.svg?height=192&width=192&text=FT",
-        badge: "/placeholder.svg?height=72&width=72&text=FT",
+        icon: "/icons/icon-192x192.png",
+        badge: "/icons/icon-72x72.png",
         tag: "fasttrack-notification",
+        requireInteraction: false,
         ...options,
       })
+
+      notification.onclick = () => {
+        window.focus()
+        notification.close()
+      }
+
+      return notification
     }
+    return null
   }
 
-  // Agendar notificação local
-  scheduleLocalNotification(notification: Omit<ScheduledNotification, "id">) {
-    const id = Date.now().toString()
+  // Schedule a local notification
+  scheduleLocalNotification(notification: Omit<ScheduledNotification, "id">): string {
+    const id = `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     const scheduledNotification: ScheduledNotification = { ...notification, id }
 
     const scheduled = this.getScheduledNotifications()
     scheduled.push(scheduledNotification)
     localStorage.setItem("scheduledNotifications", JSON.stringify(scheduled))
 
-    // Configurar timeout
+    // Set timeout
     const delay = notification.scheduledFor - Date.now()
     if (delay > 0) {
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         this.showLocalNotification(notification.title, notification.body, {
           data: notification.data,
           tag: notification.type,
         })
         this.removeScheduledNotification(id)
       }, delay)
+
+      this.scheduledTimeouts.set(id, timeout)
     }
 
     return id
   }
 
   getScheduledNotifications(): ScheduledNotification[] {
+    if (typeof window === "undefined") return []
     const stored = localStorage.getItem("scheduledNotifications")
     return stored ? JSON.parse(stored) : []
   }
 
   removeScheduledNotification(id: string) {
+    // Clear timeout if exists
+    const timeout = this.scheduledTimeouts.get(id)
+    if (timeout) {
+      clearTimeout(timeout)
+      this.scheduledTimeouts.delete(id)
+    }
+
+    // Remove from storage
     const scheduled = this.getScheduledNotifications()
     const filtered = scheduled.filter((n) => n.id !== id)
     localStorage.setItem("scheduledNotifications", JSON.stringify(filtered))
   }
 
-  // Notificações específicas do jejum
-  scheduleTimerNotification(duration: number, type: "start" | "end") {
-    const now = Date.now()
-    const scheduledFor = now + duration
+  clearAllScheduledNotifications() {
+    // Clear all timeouts
+    this.scheduledTimeouts.forEach((timeout) => clearTimeout(timeout))
+    this.scheduledTimeouts.clear()
 
-    if (type === "start") {
-      this.scheduleLocalNotification({
-        title: "Jejum Iniciado! 🚀",
-        body: "Seu período de jejum começou. Boa sorte!",
-        scheduledFor: now + 1000, // 1 segundo depois
-        type: "timer",
-        data: { timerType: "start" },
-      })
-    } else {
-      this.scheduleLocalNotification({
-        title: "Jejum Concluído! 🎉",
-        body: "Parabéns! Você completou seu jejum com sucesso.",
-        scheduledFor,
-        type: "timer",
-        data: { timerType: "end" },
-      })
-    }
+    // Clear storage
+    localStorage.removeItem("scheduledNotifications")
   }
 
-  scheduleDailyReminder(hour: number, minute: number) {
+  // Fasting timer notifications
+  scheduleTimerStartNotification() {
+    return this.scheduleLocalNotification({
+      title: "Jejum Iniciado!",
+      body: "Seu periodo de jejum comecou. Boa sorte!",
+      scheduledFor: Date.now() + 1000,
+      type: "timer",
+      data: { action: "timer_start" },
+    })
+  }
+
+  scheduleTimerEndNotification(durationMs: number) {
+    return this.scheduleLocalNotification({
+      title: "Jejum Concluido!",
+      body: "Parabens! Voce completou seu jejum com sucesso.",
+      scheduledFor: Date.now() + durationMs,
+      type: "timer",
+      data: { action: "timer_end" },
+    })
+  }
+
+  scheduleTimerHalfwayNotification(durationMs: number) {
+    return this.scheduleLocalNotification({
+      title: "Metade do Jejum!",
+      body: "Voce ja completou metade do seu jejum. Continue assim!",
+      scheduledFor: Date.now() + durationMs / 2,
+      type: "timer",
+      data: { action: "timer_halfway" },
+    })
+  }
+
+  // Water reminder notifications
+  scheduleWaterReminder(intervalMinutes = 60) {
+    return this.scheduleLocalNotification({
+      title: "Hora de Hidratar!",
+      body: "Lembre-se de beber agua para manter a hidratacao.",
+      scheduledFor: Date.now() + intervalMinutes * 60 * 1000,
+      type: "water",
+      data: { action: "water_reminder" },
+    })
+  }
+
+  // Daily reminder
+  scheduleDailyReminder(hour: number, minute: number, message?: string) {
     const now = new Date()
     const scheduledTime = new Date()
     scheduledTime.setHours(hour, minute, 0, 0)
 
-    // Se já passou da hora hoje, agendar para amanhã
+    // If time has passed today, schedule for tomorrow
     if (scheduledTime.getTime() <= now.getTime()) {
       scheduledTime.setDate(scheduledTime.getDate() + 1)
     }
 
-    this.scheduleLocalNotification({
-      title: "Hora do Jejum! ⏰",
-      body: "Que tal começar seu jejum agora?",
+    return this.scheduleLocalNotification({
+      title: "Lembrete FastTrack",
+      body: message || "Hora de comecar seu jejum!",
       scheduledFor: scheduledTime.getTime(),
       type: "reminder",
+      data: { action: "daily_reminder" },
     })
   }
 
-  // Enviar push notification via API
-  async sendPushNotification(title: string, body: string, data?: any) {
-    try {
-      const response = await fetch("/api/notifications/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          body,
-          data,
-        }),
-      })
+  // Achievement notification
+  showAchievementNotification(achievementName: string) {
+    this.showLocalNotification("Conquista Desbloqueada!", `Parabens! Voce conquistou: ${achievementName}`, {
+      tag: "achievement",
+      data: { action: "achievement", achievementName },
+    })
+  }
 
-      if (!response.ok) {
-        throw new Error("Falha ao enviar notificação")
+  // Tip notification
+  showTipNotification(tip: string) {
+    this.showLocalNotification("Dica do Dia", tip, {
+      tag: "tip",
+      data: { action: "tip" },
+    })
+  }
+
+  // Restore scheduled notifications on page load
+  restoreScheduledNotifications() {
+    const scheduled = this.getScheduledNotifications()
+    const now = Date.now()
+
+    scheduled.forEach((notification) => {
+      const delay = notification.scheduledFor - now
+
+      if (delay > 0) {
+        const timeout = setTimeout(() => {
+          this.showLocalNotification(notification.title, notification.body, {
+            data: notification.data,
+            tag: notification.type,
+          })
+          this.removeScheduledNotification(notification.id)
+        }, delay)
+
+        this.scheduledTimeouts.set(notification.id, timeout)
+      } else {
+        // Remove expired notifications
+        this.removeScheduledNotification(notification.id)
       }
-
-      return await response.json()
-    } catch (error) {
-      console.error("Erro ao enviar push notification:", error)
-      // Fallback para notificação local
-      this.showLocalNotification(title, body, { data })
-    }
+    })
   }
 }
 

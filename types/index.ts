@@ -39,6 +39,23 @@ export interface HydrationSettings {
   climate: "normal" | "hot" | "cold"
 }
 
+export interface Stats {
+  completedFasts: number
+  totalFasts: number
+  averageDuration: number
+  waterIntake: number
+  currentStreak: number
+}
+
+export interface Achievement {
+  key: string
+  titleKey: string
+  descKey: string
+  completed: boolean
+  date: string | null
+  progress: number
+}
+
 // User profile
 export interface UserProfile {
   name: string
@@ -125,7 +142,24 @@ export interface Article {
 
 // Analytics types
 export interface AnalyticsEvent {
+  id: string
   event: string
-  timestamp: number
+  timestamp: string
+  sessionId: string
+  path: string
+  referrer: string
+  userAgent: string
+  screenSize: string
+  language: string
   data?: Record<string, unknown>
 }
+
+export interface AnalyticsSession {
+  id: string
+  startTime: string
+  lastActivity: string
+  pageViews: number
+  events: number
+}
+
+export type { Language } from "@/lib/translations"
