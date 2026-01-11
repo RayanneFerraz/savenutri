@@ -146,7 +146,7 @@ export default function AuthPage() {
       <div className="min-h-screen bg-gradient-to-br from-[#F2EAE4] to-white flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-[#F24E29] mb-2">FastTrack</h1>
+            <h1 className="text-4xl font-bold text-[#F24E29] mb-2">SaveNutri</h1>
             <p className="text-gray-600">{t("resetYourPassword")}</p>
           </div>
 
@@ -163,7 +163,7 @@ export default function AuthPage() {
                     <Input
                       id="reset-email"
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder="your@email.com"
                       className="pl-10"
                       value={formData.email}
                       onChange={(e) => handleInputChange("email", e.target.value)}
@@ -202,7 +202,7 @@ export default function AuthPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#F2EAE4] to-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-[#F24E29] mb-2">FastTrack</h1>
+          <h1 className="text-4xl font-bold text-[#F24E29] mb-2">SaveNutri</h1>
           <p className="text-gray-600">{t("transformYourHealth")}</p>
         </div>
 
@@ -226,7 +226,7 @@ export default function AuthPage() {
                       <Input
                         id="email"
                         type="email"
-                        placeholder="seu@email.com"
+                        placeholder="your@email.com"
                         className="pl-10"
                         value={formData.email}
                         onChange={(e) => handleInputChange("email", e.target.value)}
@@ -317,7 +317,7 @@ export default function AuthPage() {
                       <Input
                         id="signup-email"
                         type="email"
-                        placeholder="seu@email.com"
+                        placeholder="your@email.com"
                         className="pl-10"
                         value={formData.email}
                         onChange={(e) => handleInputChange("email", e.target.value)}

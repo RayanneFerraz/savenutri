@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "SaveNutri - Intermittent Fasting App",
   description:
     "Transform your health with intermittent fasting. Intuitive interface, complete tracking, and scientific content.",
-  keywords: "intermittent fasting, health, weight loss, wellness, nutrition, fasting timer",
+  keywords: "intermittent fasting, health, weight loss, wellness, nutrition, fasting timer, meal planning",
   authors: [{ name: "SaveNutri Team" }],
   manifest: "/manifest.json",
   appleWebApp: {
@@ -30,13 +30,19 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     alternateLocale: ["pt_BR", "es_ES"],
+    siteName: "SaveNutri",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SaveNutri - Intermittent Fasting",
+    description: "Your companion for a healthier life through intermittent fasting",
   },
   icons: {
     icon: [
-      { url: "/placeholder.svg?height=32&width=32&text=SN", sizes: "32x32" },
-      { url: "/placeholder.svg?height=192&width=192&text=SN", sizes: "192x192" },
+      { url: "/icons/icon-32x32.jpg", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
     ],
-    apple: [{ url: "/placeholder.svg?height=180&width=180&text=SN", sizes: "180x180" }],
+    apple: [{ url: "/icons/icon-180x180.png", sizes: "180x180", type: "image/png" }],
   },
   generator: "v0.dev",
 }
@@ -45,8 +51,19 @@ export const viewport: Viewport = {
   themeColor: "#F24E29",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
+}
+
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#F2EAE4] to-white">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-[#F24E29] border-t-transparent rounded-full animate-spin" />
+        <p className="text-gray-600 font-medium">Loading SaveNutri...</p>
+      </div>
+    </div>
+  )
 }
 
 export default function RootLayout({
@@ -69,10 +86,10 @@ export default function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
 
         {/* Apple Touch Icons */}
-        <link rel="apple-touch-icon" href="/placeholder.svg?height=180&width=180&text=SN" />
-        <link rel="apple-touch-icon" sizes="152x152" href="/placeholder.svg?height=152&width=152&text=SN" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/placeholder.svg?height=180&width=180&text=SN" />
-        <link rel="apple-touch-icon" sizes="167x167" href="/placeholder.svg?height=167&width=167&text=SN" />
+        <link rel="apple-touch-icon" href="/icons/icon-180x180.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
+        <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
 
         {/* Splash Screens */}
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -99,10 +116,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <LanguageProvider>
           <AuthProvider>
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+            <Suspense fallback={<LoadingFallback />}>
               <AnalyticsProvider>
                 <Navigation />
-                <main>{children}</main>
+                <main className="pb-20 md:pb-0">{children}</main>
                 <PWAInstall />
                 <Toaster />
               </AnalyticsProvider>
