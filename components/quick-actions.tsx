@@ -5,20 +5,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Droplets, Scale, Moon, Smile, TrendingDown, TrendingUp } from "lucide-react"
+import { Droplets, Scale, Smile, TrendingDown, TrendingUp } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Progress } from "@/components/ui/progress"
 import { useLanguage } from "@/context/languageContext"
-import type { HydrationSettings, WeightEntry, DailyData } from "@/types"
+import { useDatabase } from "@/hooks/use-database"
+import type { HydrationSettings } from "@/types"
 
 export default function QuickActions() {
   const { t } = useLanguage()
+  const {
+    weightHistory,
+    addWeight,
+    dailyData,
+    updateDailyData,
+    hydrationSettings: dbHydrationSettings,
+    updateHydrationSettings: updateDbHydrationSettings,
+    isLoading,
+  } = useDatabase()
+
   const [waterIntake, setWaterIntake] = useState(0)
   const [weight, setWeight] = useState("")
   const [mood, setMood] = useState("")
-  const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([])
   const [lastWeight, setLastWeight] = useState<number | null>(null)
   const [hydrationSettings, setHydrationSettings] = useState<HydrationSettings>({
     useWeightBased: true,
@@ -29,47 +39,27 @@ export default function QuickActions() {
   const [userWeight, setUserWeight] = useState<number | null>(null)
 
   useEffect(() => {
-    const savedData = localStorage.getItem("dailyData")
-    const savedWeightHistory = localStorage.getItem("weightHistory")
-
-    if (savedData) {
-      try {
-        const data = JSON.parse(savedData)
-        const today = new Date().toDateString()
-        const todayData = data[today]
-        if (todayData) {
-          setWaterIntake(todayData.water || 0)
-          setMood(todayData.mood || "")
-        }
-      } catch (error) {
-        console.log("Erro ao carregar dados diários:", error)
-      }
+    if (dailyData) {
+      setWaterIntake(dailyData.water || 0)
+      setMood(dailyData.mood || "")
     }
+  }, [dailyData])
 
-    if (savedWeightHistory) {
-      try {
-        const history = JSON.parse(savedWeightHistory)
-        setWeightHistory(history)
-        if (history.length > 0) {
-          setLastWeight(history[history.length - 1].weight)
-        }
-      } catch (error) {
-        console.log("Erro ao carregar histórico de peso:", error)
-      }
+  useEffect(() => {
+    if (weightHistory.length > 0) {
+      setLastWeight(weightHistory[weightHistory.length - 1].weight)
     }
+  }, [weightHistory])
 
-    const savedHydrationSettings = localStorage.getItem("hydrationSettings")
+  useEffect(() => {
+    if (dbHydrationSettings) {
+      setHydrationSettings((prev) => ({ ...prev, ...dbHydrationSettings }))
+    }
+  }, [dbHydrationSettings])
+
+  // Load user weight from profile (still uses localStorage for profile)
+  useEffect(() => {
     const savedProfile = localStorage.getItem("fastingProfile")
-
-    if (savedHydrationSettings) {
-      try {
-        const settings = JSON.parse(savedHydrationSettings)
-        setHydrationSettings(settings)
-      } catch (error) {
-        console.log("Erro ao carregar configurações de hidratação:", error)
-      }
-    }
-
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile)
@@ -77,55 +67,29 @@ export default function QuickActions() {
           setUserWeight(Number.parseFloat(profile.weight))
         }
       } catch (error) {
-        console.log("Erro ao carregar peso do perfil:", error)
+        console.log("Error loading profile weight:", error)
       }
     }
   }, [])
 
-  const saveDailyData = (updates: Partial<DailyData>) => {
-    const today = new Date().toDateString()
-    const savedData = localStorage.getItem("dailyData")
-    let allData: Record<string, DailyData> = {}
-
-    if (savedData) {
-      try {
-        allData = JSON.parse(savedData)
-      } catch (error) {
-        console.log("Erro ao carregar dados:", error)
-      }
-    }
-
-    const todayData = { ...(allData[today] || {}), ...updates, date: today } as DailyData
-    allData[today] = todayData
-
-    localStorage.setItem("dailyData", JSON.stringify(allData))
-    window.dispatchEvent(new CustomEvent("localStorageChange", { detail: { key: "dailyData" } }))
-  }
-
-  const addWater = (amount: number) => {
+  const addWater = async (amount: number) => {
     const newWaterIntake = waterIntake + amount
     setWaterIntake(newWaterIntake)
-    saveDailyData({ water: newWaterIntake })
+    await updateDailyData({ water: newWaterIntake })
     toast({
       title: t("waterLogged"),
       description: t("waterAdded", { amount: amount.toString(), total: newWaterIntake.toString() }),
     })
   }
 
-  const logWeight = () => {
+  const logWeight = async () => {
     if (weight) {
       const weightValue = Number.parseFloat(weight)
-      const newEntry: WeightEntry = {
-        date: new Date().toLocaleDateString(),
-        weight: weightValue,
-        timestamp: Date.now(),
-      }
-      const updatedHistory = [...weightHistory, newEntry]
-      setWeightHistory(updatedHistory)
-      localStorage.setItem("weightHistory", JSON.stringify(updatedHistory))
-      saveDailyData({ weight: weightValue })
 
-      // Update profile weight
+      await addWeight(weightValue)
+      await updateDailyData({ weight: weightValue })
+
+      // Update profile weight (still localStorage)
       const savedProfile = localStorage.getItem("fastingProfile")
       let profile = savedProfile ? JSON.parse(savedProfile) : {}
       profile = { ...profile, weight: weightValue.toString() }
@@ -150,357 +114,253 @@ export default function QuickActions() {
     }
   }
 
-  const logMood = (selectedMood: string) => {
+  const logMood = async (selectedMood: string) => {
     setMood(selectedMood)
-    saveDailyData({ mood: selectedMood })
+    await updateDailyData({ mood: selectedMood })
     toast({
       title: t("moodLogged"),
-      description: t("moodIs", { mood: selectedMood }),
+      description: t("moodSelectedMessage", { mood: t(selectedMood) }),
     })
   }
 
-  const logSleep = (sleepQuality: string) => {
-    saveDailyData({ sleep: sleepQuality })
+  const saveHydrationSettings = async () => {
+    await updateDbHydrationSettings(hydrationSettings)
+    localStorage.setItem("hydrationSettings", JSON.stringify(hydrationSettings))
+    setShowHydrationSettings(false)
     toast({
-      title: t("sleepLogged"),
-      description: t("qualityIs", { quality: sleepQuality }),
+      title: t("settingsSaved"),
+      description: t("hydrationSettingsUpdated"),
     })
   }
+
+  const calculateDailyWaterGoal = () => {
+    if (hydrationSettings.customGoal) {
+      return hydrationSettings.customGoal
+    }
+
+    if (hydrationSettings.useWeightBased && userWeight) {
+      let baseGoal = Math.round(userWeight * 35)
+
+      if (hydrationSettings.activityLevel === "active") {
+        baseGoal *= 1.2
+      } else if (hydrationSettings.activityLevel === "very_active") {
+        baseGoal *= 1.4
+      }
+
+      if (hydrationSettings.climate === "hot") {
+        baseGoal *= 1.2
+      }
+
+      return Math.round(baseGoal / 250)
+    }
+
+    return 8
+  }
+
+  const dailyWaterGoal = calculateDailyWaterGoal()
+  const waterProgress = Math.min((waterIntake / dailyWaterGoal) * 100, 100)
 
   const getWeightTrend = () => {
     if (weightHistory.length < 2) return null
-    const recent = weightHistory.slice(-2)
-    const difference = recent[1].weight - recent[0].weight
-    return {
-      difference: difference.toFixed(1),
-      isPositive: difference > 0,
-      isNegative: difference < 0,
-    }
+    const recent = weightHistory.slice(-7)
+    if (recent.length < 2) return null
+    const first = recent[0].weight
+    const last = recent[recent.length - 1].weight
+    return last - first
   }
 
   const weightTrend = getWeightTrend()
 
-  const calculateWaterGoal = (): number => {
-    if (hydrationSettings.customGoal) return hydrationSettings.customGoal
-    if (!hydrationSettings.useWeightBased || !userWeight) return 2000
-    let baseGoal = userWeight * 35
-    const activityMultipliers = { sedentary: 1.0, light: 1.1, moderate: 1.2, active: 1.3, very_active: 1.4 }
-    baseGoal *= activityMultipliers[hydrationSettings.activityLevel]
-    const climateMultipliers = { cold: 0.9, normal: 1.0, hot: 1.2 }
-    baseGoal *= climateMultipliers[hydrationSettings.climate]
-    return Math.round(baseGoal)
+  if (isLoading) {
+    return (
+      <Card className="animate-pulse">
+        <CardHeader>
+          <CardTitle>{t("quickActions")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="h-24 bg-muted rounded"></div>
+          <div className="h-24 bg-muted rounded"></div>
+        </CardContent>
+      </Card>
+    )
   }
-
-  const saveHydrationSettings = (newSettings: HydrationSettings) => {
-    setHydrationSettings(newSettings)
-    localStorage.setItem("hydrationSettings", JSON.stringify(newSettings))
-    window.dispatchEvent(new CustomEvent("localStorageChange", { detail: { key: "hydrationSettings" } }))
-    toast({
-      title: t("saveSettings"),
-      description: `${t("currentGoal")} ${calculateWaterGoal()}ml`,
-    })
-  }
-
-  const moodOptions = [
-    { value: "😊 Ótimo", labelKey: "moodGreat" as const },
-    { value: "😐 Normal", labelKey: "moodNormal" as const },
-    { value: "😔 Cansado", labelKey: "moodTired" as const },
-    { value: "🤗 Energizado", labelKey: "moodEnergized" as const },
-  ]
-
-  const sleepOptions = [
-    { value: "Ruim", labelKey: "sleepBad" as const },
-    { value: "Bom", labelKey: "sleepGood" as const },
-    { value: "Ótimo", labelKey: "sleepGreat" as const },
-  ]
 
   return (
-    <Card className="bg-white shadow-lg">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-[#F24E29] flex items-center gap-2">
-          <Droplets className="w-5 h-5" />
-          {t("quickActionsTitle")}
-        </CardTitle>
+        <CardTitle className="flex items-center gap-2">{t("quickActions")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Water Tracking */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">{t("waterIntake")}</Label>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowHydrationSettings(!showHydrationSettings)}
-              className="text-xs text-[#F24E29] hover:bg-[#F2AEE7]/20"
-            >
-              ⚙️ {t("configure")}
+            <Label className="flex items-center gap-2">
+              <Droplets className="h-4 w-4 text-blue-500" />
+              {t("waterIntake")}
+            </Label>
+            <Button variant="ghost" size="sm" onClick={() => setShowHydrationSettings(!showHydrationSettings)}>
+              {t("settings")}
             </Button>
           </div>
 
           {showHydrationSettings && (
-            <Card className="border-2 border-[#F2AEE7] bg-[#F2EAE4]/50">
-              <CardContent className="p-4 space-y-4">
-                <h4 className="font-semibold text-[#F24E29] text-sm">{t("hydrationSettings")}</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t("weightBasedGoal")}</Label>
-                    <Switch
-                      checked={hydrationSettings.useWeightBased}
-                      onCheckedChange={(checked) =>
-                        setHydrationSettings((prev) => ({ ...prev, useWeightBased: checked }))
-                      }
-                    />
-                  </div>
-                  {hydrationSettings.useWeightBased && (
-                    <div className="bg-blue-50 p-3 rounded-lg text-xs">
-                      <p className="text-blue-800 mb-2">
-                        <strong>{t("autoCalculation")}</strong> 35ml × {t("weight").toLowerCase()}
-                      </p>
-                      {userWeight ? (
-                        <p className="text-blue-700">
-                          {t("yourWeight")} {userWeight}kg = {Math.round(userWeight * 35)}ml {t("baseGoal")}
-                        </p>
-                      ) : (
-                        <p className="text-blue-700">{t("configureWeightInProfile")}</p>
-                      )}
-                    </div>
-                  )}
-                  <div className="space-y-2">
-                    <Label className="text-xs">{t("activityLevel")}</Label>
+            <div className="p-3 border rounded-lg space-y-3 bg-muted/50">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="weight-based">{t("weightBasedGoal")}</Label>
+                <Switch
+                  id="weight-based"
+                  checked={hydrationSettings.useWeightBased}
+                  onCheckedChange={(checked) => setHydrationSettings({ ...hydrationSettings, useWeightBased: checked })}
+                />
+              </div>
+
+              {!hydrationSettings.useWeightBased && (
+                <div className="space-y-1">
+                  <Label htmlFor="custom-goal">{t("customDailyGoal")}</Label>
+                  <Input
+                    id="custom-goal"
+                    type="number"
+                    placeholder="8"
+                    value={hydrationSettings.customGoal || ""}
+                    onChange={(e) =>
+                      setHydrationSettings({
+                        ...hydrationSettings,
+                        customGoal: Number.parseInt(e.target.value) || undefined,
+                      })
+                    }
+                  />
+                </div>
+              )}
+
+              {hydrationSettings.useWeightBased && (
+                <>
+                  <div className="space-y-1">
+                    <Label>{t("activityLevel")}</Label>
                     <Select
                       value={hydrationSettings.activityLevel}
-                      onValueChange={(value: any) =>
-                        setHydrationSettings((prev) => ({ ...prev, activityLevel: value }))
+                      onValueChange={(value) =>
+                        setHydrationSettings({
+                          ...hydrationSettings,
+                          activityLevel: value as HydrationSettings["activityLevel"],
+                        })
                       }
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="sedentary">{t("sedentary")} (+0%)</SelectItem>
-                        <SelectItem value="light">{t("light")} (+10%)</SelectItem>
-                        <SelectItem value="moderate">{t("moderate")} (+20%)</SelectItem>
-                        <SelectItem value="active">{t("active")} (+30%)</SelectItem>
-                        <SelectItem value="very_active">{t("veryActive")} (+40%)</SelectItem>
+                        <SelectItem value="sedentary">{t("sedentary")}</SelectItem>
+                        <SelectItem value="light">{t("light")}</SelectItem>
+                        <SelectItem value="moderate">{t("moderate")}</SelectItem>
+                        <SelectItem value="active">{t("active")}</SelectItem>
+                        <SelectItem value="very_active">{t("veryActive")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs">{t("climate")}</Label>
+
+                  <div className="space-y-1">
+                    <Label>{t("climate")}</Label>
                     <Select
                       value={hydrationSettings.climate}
-                      onValueChange={(value: any) => setHydrationSettings((prev) => ({ ...prev, climate: value }))}
+                      onValueChange={(value) =>
+                        setHydrationSettings({ ...hydrationSettings, climate: value as HydrationSettings["climate"] })
+                      }
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="cold">{t("cold")} (-10%)</SelectItem>
                         <SelectItem value="normal">{t("normal")}</SelectItem>
-                        <SelectItem value="hot">{t("hot")} (+20%)</SelectItem>
+                        <SelectItem value="hot">{t("hot")}</SelectItem>
+                        <SelectItem value="cold">{t("cold")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs">{t("customGoalMl")}</Label>
-                    <Input
-                      type="number"
-                      placeholder="Ex: 2500"
-                      value={hydrationSettings.customGoal || ""}
-                      onChange={(e) =>
-                        setHydrationSettings((prev) => ({
-                          ...prev,
-                          customGoal: e.target.value ? Number.parseInt(e.target.value) : undefined,
-                        }))
-                      }
-                      className="h-8 text-xs"
-                      min="500"
-                      max="5000"
-                    />
-                    <p className="text-xs text-gray-500">{t("leaveEmptyForAuto")}</p>
-                  </div>
-                  <div className="bg-gradient-to-r from-[#F2AEE7] to-[#F2C12E] p-3 rounded-lg text-white">
-                    <div className="text-xs">
-                      <strong>
-                        {t("currentGoal")} {calculateWaterGoal()}ml
-                      </strong>
-                    </div>
-                    <div className="text-xs opacity-90 mt-1">
-                      {hydrationSettings.customGoal
-                        ? t("customGoalLabel")
-                        : hydrationSettings.useWeightBased && userWeight
-                          ? t("basedOnYourWeight", { userWeight: userWeight.toString() })
-                          : t("defaultGoalLabel")}
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => saveHydrationSettings(hydrationSettings)}
-                      className="flex-1 bg-[#F24E29] hover:bg-[#F24E29]/90 text-white text-xs"
-                    >
-                      {t("save")}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setShowHydrationSettings(false)}
-                      className="text-xs"
-                    >
-                      {t("close")}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          <div className="flex items-center gap-2 mb-2">
-            <Droplets className="w-4 h-4 text-blue-500" />
-            <span className="text-lg font-semibold">{waterIntake}ml</span>
-            <div className="text-xs text-gray-500">
-              {waterIntake >= calculateWaterGoal()
-                ? t("goalReached")
-                : t("remainingForGoal", { amount: (calculateWaterGoal() - waterIntake).toString() })}
+                </>
+              )}
+
+              <Button onClick={saveHydrationSettings} className="w-full" size="sm">
+                {t("saveSettings")}
+              </Button>
             </div>
-          </div>
-          <div className="space-y-1">
-            <Progress
-              value={(waterIntake / calculateWaterGoal()) * 100}
-              className="h-2 bg-blue-100 [&>*]:bg-blue-600"
-            />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>{waterIntake}ml</span>
+          )}
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
               <span>
-                {t("goal")}: {calculateWaterGoal()}ml
+                {waterIntake} / {dailyWaterGoal} {t("glasses")}
               </span>
+              <span>{Math.round(waterProgress)}%</span>
             </div>
+            <Progress value={waterProgress} className="h-2" />
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            <Button
-              onClick={() => addWater(250)}
-              variant="outline"
-              className="text-xs border-[#F2C12E] text-[#F27D16] hover:bg-[#F2C12E]/10"
-            >
-              +250ml
+
+          <div className="flex gap-2">
+            <Button onClick={() => addWater(1)} variant="outline" size="sm" className="flex-1">
+              +1 {t("glass")}
+            </Button>
+            <Button onClick={() => addWater(2)} variant="outline" size="sm" className="flex-1">
+              +2 {t("glasses")}
             </Button>
             <Button
-              onClick={() => addWater(500)}
+              onClick={() => setWaterIntake(Math.max(0, waterIntake - 1))}
               variant="outline"
-              className="text-xs border-[#F2C12E] text-[#F27D16] hover:bg-[#F2C12E]/10"
+              size="sm"
+              className="flex-1"
             >
-              +500ml
-            </Button>
-            <Button
-              onClick={() => addWater(1000)}
-              variant="outline"
-              className="text-xs border-[#F2C12E] text-[#F27D16] hover:bg-[#F2C12E]/10"
-            >
-              +1L
+              -1
             </Button>
           </div>
-          {waterIntake < calculateWaterGoal() * 0.3 && (
-            <div className="bg-red-50 border border-red-200 p-2 rounded-lg">
-              <p className="text-xs text-red-700">{t("hydrationTipLow")}</p>
-            </div>
-          )}
-          {waterIntake >= calculateWaterGoal() * 0.7 && waterIntake < calculateWaterGoal() && (
-            <div className="bg-yellow-50 border border-yellow-200 p-2 rounded-lg">
-              <p className="text-xs text-yellow-700">
-                {t("hydrationTipMedium", { amount: (calculateWaterGoal() - waterIntake).toString() })}
-              </p>
-            </div>
-          )}
-          {waterIntake >= calculateWaterGoal() && (
-            <div className="bg-green-50 border border-green-200 p-2 rounded-lg">
-              <p className="text-xs text-green-700">{t("hydrationTipHigh")}</p>
-            </div>
-          )}
         </div>
 
+        {/* Weight Tracking */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium flex items-center gap-2">
-            <Scale className="w-4 h-4" /> {t("registerWeight")}
+          <Label className="flex items-center gap-2">
+            <Scale className="h-4 w-4 text-green-500" />
+            {t("logWeight")}
+            {weightTrend !== null && (
+              <span className={`text-xs flex items-center ${weightTrend < 0 ? "text-green-500" : "text-red-500"}`}>
+                {weightTrend < 0 ? <TrendingDown className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />}
+                {Math.abs(weightTrend).toFixed(1)} kg
+              </span>
+            )}
           </Label>
-          {lastWeight && (
-            <div className="bg-[#F2EAE4] p-3 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm text-gray-600">{t("lastWeightRegistered")}</div>
-                  <div className="font-semibold text-[#F24E29]">{lastWeight}kg</div>
-                </div>
-                {weightTrend && (
-                  <div className="flex items-center gap-1">
-                    {weightTrend.isPositive && <TrendingUp className="w-4 h-4 text-red-500" />}
-                    {weightTrend.isNegative && <TrendingDown className="w-4 h-4 text-green-500" />}
-                    <span
-                      className={`text-sm font-medium ${weightTrend.isPositive ? "text-red-500" : weightTrend.isNegative ? "text-green-500" : "text-gray-500"}`}
-                    >
-                      {weightTrend.isPositive ? "+" : ""}
-                      {weightTrend.difference}kg
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
           <div className="flex gap-2">
             <Input
               type="number"
-              placeholder="Ex: 70.5"
+              placeholder={t("weightPlaceholder")}
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              className="flex-1"
               step="0.1"
-              min="30"
-              max="300"
             />
-            <Button onClick={logWeight} className="bg-[#F27D16] hover:bg-[#F27D16]/90 text-white" disabled={!weight}>
-              {t("save")}
-            </Button>
+            <Button onClick={logWeight}>{t("log")}</Button>
           </div>
-          {weightHistory.length > 0 && (
-            <div className="text-xs text-gray-500">{t("recordsSaved", { count: weightHistory.length.toString() })}</div>
+          {lastWeight && (
+            <p className="text-xs text-muted-foreground">
+              {t("lastWeight")}: {lastWeight} kg
+            </p>
           )}
         </div>
 
+        {/* Mood Tracking */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium flex items-center gap-2">
-            <Smile className="w-4 h-4" /> {t("moodHowAreYouFeeling")}
+          <Label className="flex items-center gap-2">
+            <Smile className="h-4 w-4 text-yellow-500" />
+            {t("howAreYouFeeling")}
           </Label>
-          <div className="grid grid-cols-2 gap-2">
-            {moodOptions.map((moodOption) => (
+          <div className="flex gap-2 flex-wrap">
+            {["great", "good", "okay", "bad", "terrible"].map((m) => (
               <Button
-                key={moodOption.value}
-                onClick={() => logMood(t(moodOption.labelKey))}
-                variant={mood === t(moodOption.labelKey) ? "default" : "outline"}
-                className={`text-xs ${mood === t(moodOption.labelKey) ? "bg-[#F2AEE7] text-[#F24E29]" : "border-[#F2AEE7] text-[#F24E29] hover:bg-[#F2AEE7]/10"}`}
+                key={m}
+                onClick={() => logMood(m)}
+                variant={mood === m ? "default" : "outline"}
+                size="sm"
+                className="flex-1 min-w-[60px]"
               >
-                {t(moodOption.labelKey)}
+                {t(m)}
               </Button>
             ))}
           </div>
-        </div>
-
-        <div className="space-y-3">
-          <Label className="text-sm font-medium flex items-center gap-2">
-            <Moon className="w-4 h-4" /> {t("sleepQuality")}
-          </Label>
-          <div className="grid grid-cols-3 gap-2">
-            {sleepOptions.map((sleepOpt) => (
-              <Button
-                key={sleepOpt.value}
-                onClick={() => logSleep(t(sleepOpt.labelKey))}
-                variant="outline"
-                className="text-xs border-[#F2AEE7] text-[#F24E29] hover:bg-[#F2AEE7]/10"
-              >
-                {t(sleepOpt.labelKey)}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
-          <h4 className="font-semibold text-blue-800 text-sm mb-1">{t("aboutYourEntries")}</h4>
-          <p className="text-xs text-blue-700">{t("aboutYourEntriesDesc")}</p>
         </div>
       </CardContent>
     </Card>

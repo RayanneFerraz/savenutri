@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client"
-import type { WeightEntry, FastingEntry, DailyData, HydrationSettings, Achievement, ProgressPhoto } from "@/types"
+import type { WeightEntry, FastingEntry, DailyData, HydrationSettings, Achievement } from "@/types"
 
 // Database service for Supabase operations
 export class DatabaseService {
@@ -8,7 +8,7 @@ export class DatabaseService {
     const supabase = createClient()
     const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single()
 
-    if (error) throw error
+    if (error && error.code !== "PGRST116") throw error
     return data
   }
 
@@ -43,7 +43,7 @@ export class DatabaseService {
     }))
   }
 
-  static async addWeightEntry(userId: string, weight: number, date?: string) {
+  static async addWeightEntry(userId: string, weight: number, date?: string, notes?: string) {
     const supabase = createClient()
     const { data, error } = await supabase
       .from("weight_entries")
@@ -51,6 +51,7 @@ export class DatabaseService {
         user_id: userId,
         weight,
         date: date || new Date().toISOString().split("T")[0],
+        notes,
       })
       .select()
       .single()
@@ -72,22 +73,38 @@ export class DatabaseService {
     if (error) throw error
     return (data || []).map((entry) => ({
       date: new Date(entry.start_time).toLocaleDateString(),
-      duration: Number(entry.actual_duration) || 0,
-      completed: entry.completed,
+      duration: Number(entry.actual_hours) || 0,
+      completed: entry.status === "completed",
       type: entry.fasting_type,
       timestamp: new Date(entry.start_time).getTime(),
     }))
   }
 
-  static async startFasting(userId: string, targetDuration: number, fastingType: string) {
+  static async getActiveFasting(userId: string) {
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from("fasting_entries")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("status", "in_progress")
+      .order("start_time", { ascending: false })
+      .limit(1)
+      .single()
+
+    if (error && error.code !== "PGRST116") throw error
+    return data
+  }
+
+  static async startFasting(userId: string, targetHours: number, fastingType: string) {
     const supabase = createClient()
     const { data, error } = await supabase
       .from("fasting_entries")
       .insert({
         user_id: userId,
         start_time: new Date().toISOString(),
-        target_duration: targetDuration,
+        target_hours: targetHours,
         fasting_type: fastingType,
+        status: "in_progress",
       })
       .select()
       .single()
@@ -96,7 +113,7 @@ export class DatabaseService {
     return data
   }
 
-  static async endFasting(entryId: string, completed: boolean) {
+  static async endFasting(entryId: string, status: "completed" | "cancelled" = "completed") {
     const supabase = createClient()
     const { data: entry } = await supabase.from("fasting_entries").select("start_time").eq("id", entryId).single()
 
@@ -104,14 +121,14 @@ export class DatabaseService {
 
     const endTime = new Date()
     const startTime = new Date(entry.start_time)
-    const actualDuration = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60) // hours
+    const actualHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
 
     const { data, error } = await supabase
       .from("fasting_entries")
       .update({
         end_time: endTime.toISOString(),
-        actual_duration: actualDuration,
-        completed,
+        actual_hours: actualHours,
+        status,
       })
       .eq("id", entryId)
       .select()
@@ -133,15 +150,15 @@ export class DatabaseService {
       .eq("date", targetDate)
       .single()
 
-    if (error && error.code !== "PGRST116") throw error // PGRST116 = no rows found
+    if (error && error.code !== "PGRST116") throw error
 
     return data
       ? {
           date: data.date,
-          water: data.water_intake || 0,
+          water: data.water_glasses || 0,
           mood: data.mood || "",
-          sleep: data.sleep_quality || "",
-          weight: data.weight,
+          sleep: data.sleep_hours ? String(data.sleep_hours) : "",
+          weight: data.water_goal,
         }
       : null
   }
@@ -150,18 +167,17 @@ export class DatabaseService {
     const supabase = createClient()
     const targetDate = date || new Date().toISOString().split("T")[0]
 
-    const { data, error } = await supabase
-      .from("daily_data")
-      .upsert({
-        user_id: userId,
-        date: targetDate,
-        water_intake: updates.water,
-        mood: updates.mood,
-        sleep_quality: updates.sleep,
-        updated_at: new Date().toISOString(),
-      })
-      .select()
-      .single()
+    const upsertData: Record<string, unknown> = {
+      user_id: userId,
+      date: targetDate,
+      updated_at: new Date().toISOString(),
+    }
+
+    if (updates.water !== undefined) upsertData.water_glasses = updates.water
+    if (updates.mood !== undefined) upsertData.mood = updates.mood
+    if (updates.sleep !== undefined) upsertData.sleep_hours = Number.parseFloat(updates.sleep) || null
+
+    const { data, error } = await supabase.from("daily_data").upsert(upsertData).select().single()
 
     if (error) throw error
     return data
@@ -176,28 +192,28 @@ export class DatabaseService {
 
     return data
       ? {
-          customGoal: data.custom_goal,
-          useWeightBased: data.use_weight_based,
-          activityLevel: data.activity_level,
-          climate: data.climate,
+          customGoal: data.daily_goal,
+          glassSize: data.glass_size,
+          reminderEnabled: data.reminder_enabled,
+          reminderInterval: data.reminder_interval,
         }
       : null
   }
 
-  static async updateHydrationSettings(userId: string, settings: HydrationSettings) {
+  static async updateHydrationSettings(userId: string, settings: Partial<HydrationSettings>) {
     const supabase = createClient()
-    const { data, error } = await supabase
-      .from("hydration_settings")
-      .upsert({
-        user_id: userId,
-        custom_goal: settings.customGoal,
-        use_weight_based: settings.useWeightBased,
-        activity_level: settings.activityLevel,
-        climate: settings.climate,
-        updated_at: new Date().toISOString(),
-      })
-      .select()
-      .single()
+
+    const upsertData: Record<string, unknown> = {
+      user_id: userId,
+      updated_at: new Date().toISOString(),
+    }
+
+    if (settings.customGoal !== undefined) upsertData.daily_goal = settings.customGoal
+    if (settings.glassSize !== undefined) upsertData.glass_size = settings.glassSize
+    if (settings.reminderEnabled !== undefined) upsertData.reminder_enabled = settings.reminderEnabled
+    if (settings.reminderInterval !== undefined) upsertData.reminder_interval = settings.reminderInterval
+
+    const { data, error } = await supabase.from("hydration_settings").upsert(upsertData).select().single()
 
     if (error) throw error
     return data
@@ -206,41 +222,49 @@ export class DatabaseService {
   // Achievements operations
   static async getAchievements(userId: string): Promise<Achievement[]> {
     const supabase = createClient()
-    const { data, error } = await supabase.from("user_achievements").select("*").eq("user_id", userId)
+    const { data, error } = await supabase.from("achievements").select("*").eq("user_id", userId)
 
     if (error) throw error
     return (data || []).map((ach) => ({
-      key: ach.achievement_key,
-      titleKey: `${ach.achievement_key}Achievement`,
-      descKey: `${ach.achievement_key}AchievementDesc`,
-      completed: ach.completed,
-      date: ach.completed_at ? new Date(ach.completed_at).toLocaleDateString() : null,
+      id: ach.id,
+      type: ach.achievement_type,
+      name: ach.achievement_name,
+      description: ach.description,
+      icon: ach.icon,
+      unlockedAt: ach.unlocked_at,
       progress: ach.progress,
+      target: ach.target,
     }))
   }
 
-  static async updateAchievement(userId: string, achievementKey: string, progress: number, completed?: boolean) {
+  static async unlockAchievement(
+    userId: string,
+    achievementType: string,
+    achievementName: string,
+    description: string,
+    icon?: string,
+  ) {
     const supabase = createClient()
-    const updateData: Record<string, unknown> = {
-      user_id: userId,
-      achievement_key: achievementKey,
-      progress,
-      updated_at: new Date().toISOString(),
-    }
-
-    if (completed) {
-      updateData.completed = true
-      updateData.completed_at = new Date().toISOString()
-    }
-
-    const { data, error } = await supabase.from("user_achievements").upsert(updateData).select().single()
+    const { data, error } = await supabase
+      .from("achievements")
+      .insert({
+        user_id: userId,
+        achievement_type: achievementType,
+        achievement_name: achievementName,
+        description,
+        icon,
+        progress: 1,
+        target: 1,
+      })
+      .select()
+      .single()
 
     if (error) throw error
     return data
   }
 
   // Progress photos operations
-  static async getProgressPhotos(userId: string, limit = 50): Promise<ProgressPhoto[]> {
+  static async getProgressPhotos(userId: string, limit = 50) {
     const supabase = createClient()
     const { data, error } = await supabase
       .from("progress_photos")
@@ -250,24 +274,23 @@ export class DatabaseService {
       .limit(limit)
 
     if (error) throw error
-    return (data || []).map((photo) => ({
-      id: photo.id,
-      date: photo.date,
-      photoUrl: photo.photo_url,
-      weight: photo.weight,
-      notes: photo.notes,
-    }))
+    return data || []
   }
 
-  static async addProgressPhoto(userId: string, photoUrl: string, weight?: number, notes?: string) {
+  static async addProgressPhoto(
+    userId: string,
+    photoUrl: string,
+    options?: { weight?: number; notes?: string; category?: string },
+  ) {
     const supabase = createClient()
     const { data, error } = await supabase
       .from("progress_photos")
       .insert({
         user_id: userId,
         photo_url: photoUrl,
-        weight,
-        notes,
+        weight: options?.weight,
+        notes: options?.notes,
+        category: options?.category || "progress",
         date: new Date().toISOString().split("T")[0],
       })
       .select()
@@ -284,66 +307,99 @@ export class DatabaseService {
     if (error) throw error
   }
 
-  // Sync localStorage to database
-  static async syncLocalStorageToDatabase(userId: string) {
+  // Sync localStorage to database (for migration)
+  static async syncFromLocalStorage(userId: string): Promise<{ success: boolean; synced: string[] }> {
+    const synced: string[] = []
+
     try {
       // Sync weight history
       const localWeightHistory = localStorage.getItem("weightHistory")
       if (localWeightHistory) {
-        const entries = JSON.parse(localWeightHistory)
+        const entries = JSON.parse(localWeightHistory) as WeightEntry[]
         for (const entry of entries) {
-          await this.addWeightEntry(userId, entry.weight, entry.date).catch(() => {})
+          try {
+            await this.addWeightEntry(userId, entry.weight, entry.date)
+          } catch {
+            // Ignore duplicates
+          }
         }
+        synced.push("weightHistory")
       }
 
       // Sync fasting history
       const localFastingHistory = localStorage.getItem("fastingHistory")
       if (localFastingHistory) {
-        const entries = JSON.parse(localFastingHistory)
+        const entries = JSON.parse(localFastingHistory) as FastingEntry[]
+        const supabase = createClient()
         for (const entry of entries) {
-          const supabase = createClient()
-          await supabase
-            .from("fasting_entries")
-            .insert({
+          try {
+            await supabase.from("fasting_entries").insert({
               user_id: userId,
               start_time: new Date(entry.timestamp).toISOString(),
               end_time: new Date(entry.timestamp + entry.duration * 60 * 60 * 1000).toISOString(),
-              target_duration: Math.round(entry.duration),
-              actual_duration: entry.duration,
-              fasting_type: entry.type,
-              completed: entry.completed,
+              target_hours: Math.round(entry.duration),
+              actual_hours: entry.duration,
+              fasting_type: entry.type || "16:8",
+              status: entry.completed ? "completed" : "cancelled",
             })
-            .catch(() => {})
+          } catch {
+            // Ignore duplicates
+          }
         }
+        synced.push("fastingHistory")
       }
 
       // Sync daily data
       const localDailyData = localStorage.getItem("dailyData")
       if (localDailyData) {
-        const data = JSON.parse(localDailyData)
+        const data = JSON.parse(localDailyData) as Record<string, DailyData>
         for (const [dateKey, dayData] of Object.entries(data)) {
-          const d = dayData as DailyData
-          await this.updateDailyData(
-            userId,
-            {
-              water: d.water,
-              mood: d.mood,
-              sleep: d.sleep,
-            },
-            new Date(dateKey).toISOString().split("T")[0],
-          ).catch(() => {})
+          try {
+            const dateStr = new Date(dateKey).toISOString().split("T")[0]
+            await this.updateDailyData(userId, dayData, dateStr)
+          } catch {
+            // Ignore errors
+          }
+        }
+        synced.push("dailyData")
+      }
+
+      // Sync hydration settings
+      const localHydrationSettings = localStorage.getItem("hydrationSettings")
+      if (localHydrationSettings) {
+        const settings = JSON.parse(localHydrationSettings) as HydrationSettings
+        try {
+          await this.updateHydrationSettings(userId, settings)
+          synced.push("hydrationSettings")
+        } catch {
+          // Ignore errors
         }
       }
 
-      // Clear localStorage after successful sync
-      // localStorage.removeItem("weightHistory")
-      // localStorage.removeItem("fastingHistory")
-      // localStorage.removeItem("dailyData")
+      // Sync profile
+      const localProfile = localStorage.getItem("fastingProfile")
+      if (localProfile) {
+        const profile = JSON.parse(localProfile)
+        try {
+          await this.updateProfile(userId, {
+            name: profile.name,
+            age: profile.age ? Number.parseInt(profile.age) : null,
+            weight: profile.weight ? Number.parseFloat(profile.weight) : null,
+            height: profile.height ? Number.parseFloat(profile.height) : null,
+            goal: profile.goal,
+            fasting_plan: profile.fastingPlan,
+            custom_fast_hours: profile.customFastHours ? Number.parseInt(profile.customFastHours) : null,
+          })
+          synced.push("fastingProfile")
+        } catch {
+          // Ignore errors
+        }
+      }
 
-      return true
+      return { success: true, synced }
     } catch (error) {
-      console.error("Error syncing localStorage to database:", error)
-      return false
+      console.error("Error syncing from localStorage:", error)
+      return { success: false, synced }
     }
   }
 }

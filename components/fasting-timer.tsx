@@ -1,81 +1,97 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Play, Pause, Square, Clock } from "lucide-react"
 import { useLanguage } from "@/context/languageContext"
+import { useDatabase } from "@/hooks/use-database"
 
 export default function FastingTimer() {
   const { t } = useLanguage()
+  const { activeFasting, startFast, endFast, isAuthenticated } = useDatabase()
+
   const [isActive, setIsActive] = useState(false)
   const [timeLeft, setTimeLeft] = useState(16 * 60 * 60)
   const [totalTime, setTotalTime] = useState(16 * 60 * 60)
   const [fastingStageKey, setFastingStageKey] = useState<string>("fastingInitiated")
   const [startTime, setStartTime] = useState<Date | null>(null)
-
-  const fastingStages = {
-    digestionStarted: "digestionStarted",
-    insulinStabilizing: "insulinStabilizing",
-    fatBurningStarted: "fatBurningStarted",
-    ketosisInitial: "ketosisInitial",
-    fastCompleted: "fastCompleted",
-    fastingInitiated: "fastingInitiated",
-  }
+  const [fastingType, setFastingType] = useState("16:8")
 
   useEffect(() => {
-    const savedTimerState = localStorage.getItem("fastingTimerState")
     const savedProfile = localStorage.getItem("fastingProfile")
-
-    if (savedTimerState) {
-      try {
-        const timerState = JSON.parse(savedTimerState)
-        setIsActive(timerState.isActive)
-        setStartTime(timerState.startTime ? new Date(timerState.startTime) : null)
-
-        if (timerState.isActive && timerState.startTime) {
-          const now = new Date().getTime()
-          const startTimeMs = new Date(timerState.startTime).getTime()
-          const elapsedSeconds = Math.floor((now - startTimeMs) / 1000)
-          const newTimeLeft = Math.max(0, timerState.totalTime - elapsedSeconds)
-          setTimeLeft(newTimeLeft)
-          setTotalTime(timerState.totalTime)
-        } else {
-          setTimeLeft(timerState.timeLeft || 16 * 60 * 60)
-          setTotalTime(timerState.totalTime || 16 * 60 * 60)
-        }
-      } catch (error) {
-        console.log("Error loading timer state:", error)
-      }
-    }
 
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile)
         let fastHours = 16
+        let type = "16:8"
 
         if (profile.fastingPlan === "custom" && profile.customFastHours) {
           fastHours = Number.parseInt(profile.customFastHours)
+          type = "custom"
         } else if (profile.fastingPlan === "18:6") {
           fastHours = 18
+          type = "18:6"
         } else if (profile.fastingPlan === "20:4") {
           fastHours = 20
+          type = "20:4"
         } else if (profile.fastingPlan === "omad") {
           fastHours = 23
+          type = "omad"
         }
 
+        setFastingType(type)
         const newTotalTime = fastHours * 60 * 60
-        if (!savedTimerState || !JSON.parse(savedTimerState).isActive) {
-          setTotalTime(newTotalTime)
+        setTotalTime(newTotalTime)
+
+        // Only set timeLeft if not active
+        if (!activeFasting) {
           setTimeLeft(newTotalTime)
         }
       } catch (error) {
         console.log("Error loading profile:", error)
       }
     }
-  }, [])
+  }, [activeFasting])
 
+  useEffect(() => {
+    if (activeFasting) {
+      setIsActive(true)
+      setStartTime(activeFasting.startTime)
+      setTotalTime(activeFasting.targetHours * 3600)
+
+      const now = new Date().getTime()
+      const startTimeMs = activeFasting.startTime.getTime()
+      const elapsedSeconds = Math.floor((now - startTimeMs) / 1000)
+      const newTimeLeft = Math.max(0, activeFasting.targetHours * 3600 - elapsedSeconds)
+      setTimeLeft(newTimeLeft)
+    } else {
+      // Check localStorage for non-authenticated users
+      const savedTimerState = localStorage.getItem("fastingTimerState")
+      if (savedTimerState) {
+        try {
+          const timerState = JSON.parse(savedTimerState)
+          setIsActive(timerState.isActive || false)
+          setStartTime(timerState.startTime ? new Date(timerState.startTime) : null)
+
+          if (timerState.isActive && timerState.startTime) {
+            const now = new Date().getTime()
+            const startTimeMs = new Date(timerState.startTime).getTime()
+            const elapsedSeconds = Math.floor((now - startTimeMs) / 1000)
+            const newTimeLeft = Math.max(0, timerState.totalTime - elapsedSeconds)
+            setTimeLeft(newTimeLeft)
+            setTotalTime(timerState.totalTime)
+          }
+        } catch (error) {
+          console.log("Error loading timer state:", error)
+        }
+      }
+    }
+  }, [activeFasting])
+
+  // Save to localStorage for cross-tab sync
   useEffect(() => {
     const timerState = {
       isActive,
@@ -86,6 +102,7 @@ export default function FastingTimer() {
     localStorage.setItem("fastingTimerState", JSON.stringify(timerState))
   }, [isActive, timeLeft, totalTime, startTime])
 
+  // Cross-tab sync via storage event
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "fastingTimerState" && e.newValue) {
@@ -114,6 +131,7 @@ export default function FastingTimer() {
     return () => window.removeEventListener("storage", handleStorageChange)
   }, [])
 
+  // Timer countdown
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
 
@@ -125,8 +143,9 @@ export default function FastingTimer() {
           return newTime
         })
       }, 1000)
-    } else if (timeLeft === 0) {
-      setIsActive(false)
+    } else if (timeLeft === 0 && isActive) {
+      // Auto-complete fast when timer reaches 0
+      handleCompleteFast()
     }
 
     return () => {
@@ -158,14 +177,51 @@ export default function FastingTimer() {
 
   const progress = ((totalTime - timeLeft) / totalTime) * 100
 
-  const toggleTimer = () => {
-    if (!isActive) {
-      setStartTime(new Date())
+  const handleStartFast = useCallback(async () => {
+    const newStartTime = new Date()
+    setStartTime(newStartTime)
+    setIsActive(true)
+
+    if (isAuthenticated) {
+      await startFast(totalTime / 3600, fastingType)
     }
-    setIsActive(!isActive)
+  }, [isAuthenticated, startFast, totalTime, fastingType])
+
+  const handleCompleteFast = useCallback(async () => {
+    setIsActive(false)
+
+    if (isAuthenticated && activeFasting) {
+      await endFast(true)
+    }
+
+    // Save to history in localStorage
+    const fastingHistory = JSON.parse(localStorage.getItem("fastingHistory") || "[]")
+    if (startTime) {
+      const duration = (Date.now() - startTime.getTime()) / (1000 * 60 * 60)
+      fastingHistory.unshift({
+        date: startTime.toLocaleDateString(),
+        duration,
+        completed: true,
+        type: fastingType,
+        timestamp: startTime.getTime(),
+      })
+      localStorage.setItem("fastingHistory", JSON.stringify(fastingHistory))
+    }
+  }, [isAuthenticated, activeFasting, endFast, startTime, fastingType])
+
+  const toggleTimer = async () => {
+    if (!isActive) {
+      await handleStartFast()
+    } else {
+      setIsActive(false)
+    }
   }
 
-  const resetTimer = () => {
+  const resetTimer = async () => {
+    if (isAuthenticated && activeFasting) {
+      await endFast(false) // cancelled
+    }
+
     setIsActive(false)
     setTimeLeft(totalTime)
     setFastingStageKey("fastingInitiated")

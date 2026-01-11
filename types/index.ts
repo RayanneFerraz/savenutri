@@ -34,9 +34,12 @@ export interface DailyData {
 // Hydration settings
 export interface HydrationSettings {
   customGoal?: number
-  useWeightBased: boolean
-  activityLevel: "sedentary" | "light" | "moderate" | "active" | "very_active"
-  climate: "normal" | "hot" | "cold"
+  glassSize?: number
+  reminderEnabled?: boolean
+  reminderInterval?: number
+  useWeightBased?: boolean
+  activityLevel?: "sedentary" | "light" | "moderate" | "active" | "very_active"
+  climate?: "normal" | "hot" | "cold"
 }
 
 export interface Stats {
@@ -48,12 +51,19 @@ export interface Stats {
 }
 
 export interface Achievement {
-  key: string
-  titleKey: string
-  descKey: string
-  completed: boolean
-  date: string | null
-  progress: number
+  id?: string
+  key?: string
+  type?: string
+  name?: string
+  titleKey?: string
+  descKey?: string
+  description?: string
+  icon?: string
+  completed?: boolean
+  unlockedAt?: string
+  date?: string | null
+  progress?: number
+  target?: number
 }
 
 // User profile
