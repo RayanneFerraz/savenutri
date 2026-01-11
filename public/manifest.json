@@ -1,60 +1,60 @@
 {
-  "name": "FastTrack - Jejum Intermitente",
-  "short_name": "FastTrack",
-  "description": "Seu companheiro para uma jornada saudavel com jejum intermitente",
+  "name": "SaveNutri - Intermittent Fasting",
+  "short_name": "SaveNutri",
+  "description": "Your companion for a healthy intermittent fasting journey",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F2EAE4",
   "theme_color": "#F24E29",
   "orientation": "portrait-primary",
   "categories": ["health", "fitness", "lifestyle"],
-  "lang": "pt-BR",
+  "lang": "en-US",
   "scope": "/",
   "icons": [
     {
-      "src": "/placeholder.svg?height=72&width=72&text=FT",
+      "src": "/placeholder.svg?height=72&width=72&text=SN",
       "sizes": "72x72",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/placeholder.svg?height=96&width=96&text=FT",
+      "src": "/placeholder.svg?height=96&width=96&text=SN",
       "sizes": "96x96",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/placeholder.svg?height=128&width=128&text=FT",
+      "src": "/placeholder.svg?height=128&width=128&text=SN",
       "sizes": "128x128",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/placeholder.svg?height=144&width=144&text=FT",
+      "src": "/placeholder.svg?height=144&width=144&text=SN",
       "sizes": "144x144",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/placeholder.svg?height=152&width=152&text=FT",
+      "src": "/placeholder.svg?height=152&width=152&text=SN",
       "sizes": "152x152",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/placeholder.svg?height=192&width=192&text=FT",
+      "src": "/placeholder.svg?height=192&width=192&text=SN",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/placeholder.svg?height=384&width=384&text=FT",
+      "src": "/placeholder.svg?height=384&width=384&text=SN",
       "sizes": "384x384",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/placeholder.svg?height=512&width=512&text=FT",
+      "src": "/placeholder.svg?height=512&width=512&text=SN",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -62,9 +62,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Iniciar Jejum",
+      "name": "Start Fasting",
       "short_name": "Timer",
-      "description": "Iniciar um novo periodo de jejum",
+      "description": "Start a new fasting period",
       "url": "/timer",
       "icons": [
         {
@@ -75,9 +75,9 @@
       ]
     },
     {
-      "name": "Receitas",
-      "short_name": "Receitas",
-      "description": "Ver receitas saudaveis",
+      "name": "Recipes",
+      "short_name": "Recipes",
+      "description": "View healthy recipes",
       "url": "/recipes",
       "icons": [
         {
@@ -88,9 +88,9 @@
       ]
     },
     {
-      "name": "Progresso",
-      "short_name": "Progresso",
-      "description": "Acompanhar seu progresso",
+      "name": "Progress",
+      "short_name": "Progress",
+      "description": "Track your progress",
       "url": "/progress",
       "icons": [
         {

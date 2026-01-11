@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
@@ -13,31 +13,40 @@ import { LanguageProvider } from "@/context/languageContext"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "FastTrack - Aplicativo de Jejum Intermitente",
+  title: "SaveNutri - Intermittent Fasting App",
   description:
-    "Transforme sua saude com jejum intermitente. Interface intuitiva, rastreamento completo e conteudo cientifico.",
-  keywords: "jejum intermitente, saude, perda de peso, bem-estar, nutricao",
-  authors: [{ name: "FastTrack Team" }],
+    "Transform your health with intermittent fasting. Intuitive interface, complete tracking, and scientific content.",
+  keywords: "intermittent fasting, health, weight loss, wellness, nutrition, fasting timer",
+  authors: [{ name: "SaveNutri Team" }],
   manifest: "/manifest.json",
-  themeColor: "#F24E29",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "FastTrack",
+    title: "SaveNutri",
   },
   openGraph: {
-    title: "FastTrack - Jejum Intermitente",
-    description: "Seu companheiro para uma vida mais saudavel atraves do jejum intermitente",
+    title: "SaveNutri - Intermittent Fasting",
+    description: "Your companion for a healthier life through intermittent fasting",
     type: "website",
+    locale: "en_US",
+    alternateLocale: ["pt_BR", "es_ES"],
   },
   icons: {
     icon: [
-      { url: "/placeholder.svg?height=32&width=32&text=FT", sizes: "32x32" },
-      { url: "/placeholder.svg?height=192&width=192&text=FT", sizes: "192x192" },
+      { url: "/placeholder.svg?height=32&width=32&text=SN", sizes: "32x32" },
+      { url: "/placeholder.svg?height=192&width=192&text=SN", sizes: "192x192" },
     ],
-    apple: [{ url: "/placeholder.svg?height=180&width=180&text=FT", sizes: "180x180" }],
+    apple: [{ url: "/placeholder.svg?height=180&width=180&text=SN", sizes: "180x180" }],
   },
   generator: "v0.dev",
+}
+
+export const viewport: Viewport = {
+  themeColor: "#F24E29",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({
@@ -46,13 +55,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR">
+    <html lang="en">
       <head>
         {/* PWA Meta Tags */}
-        <meta name="application-name" content="FastTrack" />
+        <meta name="application-name" content="SaveNutri" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="FastTrack" />
+        <meta name="apple-mobile-web-app-title" content="SaveNutri" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
@@ -60,10 +69,10 @@ export default function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
 
         {/* Apple Touch Icons */}
-        <link rel="apple-touch-icon" href="/placeholder.svg?height=180&width=180&text=FT" />
-        <link rel="apple-touch-icon" sizes="152x152" href="/placeholder.svg?height=152&width=152&text=FT" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/placeholder.svg?height=180&width=180&text=FT" />
-        <link rel="apple-touch-icon" sizes="167x167" href="/placeholder.svg?height=167&width=167&text=FT" />
+        <link rel="apple-touch-icon" href="/placeholder.svg?height=180&width=180&text=SN" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/placeholder.svg?height=152&width=152&text=SN" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/placeholder.svg?height=180&width=180&text=SN" />
+        <link rel="apple-touch-icon" sizes="167x167" href="/placeholder.svg?height=167&width=167&text=SN" />
 
         {/* Splash Screens */}
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -90,7 +99,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <LanguageProvider>
           <AuthProvider>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
               <AnalyticsProvider>
                 <Navigation />
                 <main>{children}</main>

@@ -5,13 +5,16 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Home, User, Clock, BarChart3, BookOpen, Menu, LogIn, ChefHat } from "lucide-react"
-import { useLanguage } from "@/context/languageContext" // Import useLanguage
+import { Home, User, Clock, BarChart3, BookOpen, Menu, LogIn, LogOut, ChefHat } from "lucide-react"
+import { useLanguage } from "@/context/languageContext"
+import { useAuth } from "@/context/authContext"
+import LanguageSelector from "@/components/LanguageSelector"
 
 export default function Navigation() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
-  const { t } = useLanguage() // Use the t function
+  const { t } = useLanguage()
+  const { user, signOut } = useAuth()
 
   const navItems = [
     { href: "/", labelKey: "home" as const, icon: Home },
@@ -67,15 +70,23 @@ export default function Navigation() {
             ))}
           </div>
 
-          {/* Auth Button */}
-          <div className="hidden md:block">
-            <Link href="/auth">
-              {/* Assuming "Entrar" is a general "Login" or "Sign In" */}
-              <Button className="bg-gradient-to-r from-[#F27D16] to-[#F24E29] hover:from-[#F27D16]/90 hover:to-[#F24E29]/90 text-white">
-                <LogIn className="w-4 h-4 mr-2" />
-                {t("login")} {/* Placeholder, ideally a "login" key */}
+          {/* Language Selector + Auth Button (Desktop) */}
+          <div className="hidden md:flex items-center gap-3">
+            <LanguageSelector variant="dropdown" />
+
+            {user ? (
+              <Button onClick={() => signOut()} variant="outline" className="text-gray-600 hover:text-[#F24E29]">
+                <LogOut className="w-4 h-4 mr-2" />
+                {t("logout")}
               </Button>
-            </Link>
+            ) : (
+              <Link href="/auth">
+                <Button className="bg-gradient-to-r from-[#F27D16] to-[#F24E29] hover:from-[#F27D16]/90 hover:to-[#F24E29]/90 text-white">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  {t("login")}
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu */}
@@ -90,13 +101,35 @@ export default function Navigation() {
                 {navItems.map((item) => (
                   <NavLink key={item.href} href={item.href} labelKey={item.labelKey} icon={item.icon} mobile />
                 ))}
+
+                {/* Language Selector (Mobile) */}
                 <div className="pt-4 border-t">
-                  <Link href="/auth" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full bg-gradient-to-r from-[#F27D16] to-[#F24E29] hover:from-[#F27D16]/90 hover:to-[#F24E29]/90 text-white">
-                      <LogIn className="w-4 h-4 mr-2" />
-                      {t("login")} {/* Placeholder */}
+                  <p className="text-sm text-gray-500 mb-2">{t("language")}</p>
+                  <LanguageSelector variant="select" className="w-full" />
+                </div>
+
+                {/* Auth Button (Mobile) */}
+                <div className="pt-4 border-t">
+                  {user ? (
+                    <Button
+                      onClick={() => {
+                        signOut()
+                        setIsOpen(false)
+                      }}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      {t("logout")}
                     </Button>
-                  </Link>
+                  ) : (
+                    <Link href="/auth" onClick={() => setIsOpen(false)}>
+                      <Button className="w-full bg-gradient-to-r from-[#F27D16] to-[#F24E29] hover:from-[#F27D16]/90 hover:to-[#F24E29]/90 text-white">
+                        <LogIn className="w-4 h-4 mr-2" />
+                        {t("login")}
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             </SheetContent>
