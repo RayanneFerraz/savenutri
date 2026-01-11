@@ -9,8 +9,9 @@ export const translations = {
     profile: "Profile",
     settings: "Settings",
     admin: "Admin",
-    login: "Login", // Added for login button
+    login: "Login",
     logout: "Logout",
+    statistics: "Statistics", // Added statistics key for navigation
 
     // Home Page
     welcomeMessage: "Welcome to Your Intermittent Fasting Journey!",
@@ -1206,6 +1207,7 @@ export const translations = {
     admin: "Admin",
     login: "Acceso",
     logout: "Cerrar sesión",
+    statistics: "Estadísticas", // Added statistics key for navigation
 
     // Home Page
     welcomeMessage: "¡Bienvenido a tu viaje de ayuno intermitente!",
@@ -1474,7 +1476,7 @@ export const translations = {
     firstWeekAchievement: "Primera Semana",
     firstWeekAchievementDesc: "Completa 7 ayunos",
     hydrationMasterAchievement: "Maestro de la Hidratación",
-    hydrationMasterAchievementDesc: "Bebe 2L de agua por 7 días",
+    hydrationMasterAchievementDesc: "Beba 2L de agua por 7 días",
     ironStreakAchievement: "Racha de Hierro",
     ironStreakAchievementDesc: "10 ayunos consecutivos",
     fullMonthAchievement: "Mes Completo",
