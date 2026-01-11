@@ -621,6 +621,7 @@ export const translations = {
     admin: "Admin",
     login: "Entrar",
     logout: "Sair",
+    statistics: "Estatísticas",
 
     // Home Page
     welcomeMessage: "Bem-vindo à Sua Jornada de Jejum Intermitente!",
@@ -1424,7 +1425,7 @@ export const translations = {
     fastTrackCommunityDesc: "Conéctate con otros practicantes",
     tipOfTheDay: "Consejo del Día",
     readMore: "Leer Más",
-    fastingStages: "Etapas del Ayuno",
+    fastingStages: "Etapas del Jejum",
     stageDigestion: "0-4h: Digestión",
     stageTransition: "4-8h: Transición",
     stageFatBurning: "8-12h: Quema de Grasa",
@@ -1433,7 +1434,7 @@ export const translations = {
     // ProgressOverview Component
     progressOverviewTitle: "Resumen del Progreso",
     viewDetails: "Ver Detalles",
-    fastingThisWeek: "Ayuno esta semana",
+    fastingThisWeek: "Jejum esta semana",
     completed: "Completados",
     hydration: "Hidratación",
     currentWeightLabel: "Peso Actual",
@@ -1580,7 +1581,7 @@ export const translations = {
     first30Minutes: "Primeros 30 Minutos",
     bestFoodsToBreakFast: "Mejores Alimentos para Romper el Ayuno",
     foodsToAvoid: "Alimentos a Evitar",
-    conventionalDietsFail: "Por qué las dietas convencionales fallan: La verdad sobre el efecto yo-yo",
+    conventionalDietsFail: "Por que las dietas convencionales fallan: La verdad sobre el efecto yo-yo",
     metabolicResponseToCalorieDeficit: "Respuesta Metabólica al Déficit Calórico",
     theYoYoCycle: "El Ciclo del Efecto Yo-Yo",
     emotionalAndBehavioralAspects: "Aspectos Emocionales y Conductuales",
@@ -1698,7 +1699,7 @@ export const translations = {
     reminderSettings: "Configuración de Recordatorios",
     reminderSettingsDesc: "Configure sus recordatorios diarios",
     waterReminder: "Recordatorio de Agua",
-    fastingReminder: "Recordatorio de Ayuno",
+    fastingReminder: "Recordatorio de Jejum",
     dailyReminder: "Recordatorio Diario",
     reminderDefaultMessage: "¡No olvides!",
     enableNotifications: "Activar Notificaciones",
